@@ -28,30 +28,24 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GENSIMCELL_HPP
-#define GENSIMCELL_HPP
+#ifndef GENSIMCELL_IMPL_HPP
+#define GENSIMCELL_IMPL_HPP
 
 
-#include "gensimcell_impl.hpp"
+#include "cstdlib"
 
 
-/*!
-Namespace where everything related to gensimcell is defined.
-*/
 namespace gensimcell {
 
 
-/*!
-\todo Write documentation.
-*/
 template<
+	size_t number_of_variables,
 	class... Variables
-> class Cell :
-	Cell_impl<sizeof...(Variables), Variables...>
-{};
+> class Cell_impl {};
 
 
 } // namespace
 
 
-#endif // ifndef GENSIMCELL_HPP
+#endif // ifndef GENSIMCELL_IMPL_HPP
+
