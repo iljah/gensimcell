@@ -1,0 +1,4 @@
+CXX = g++-mp-4.8
+CPPFLAGS +=
+CXXFLAGS +=
+
