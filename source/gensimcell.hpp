@@ -44,10 +44,10 @@ namespace gensimcell {
 /*!
 \todo Write documentation.
 */
-template<
+template <
 	class... Variables
 > class Cell :
-	Cell_impl<sizeof...(Variables), Variables...>
+	public detail::Cell_impl<sizeof...(Variables), Variables...>
 {};
 
 

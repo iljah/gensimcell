@@ -37,15 +37,107 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace gensimcell {
 
+/*!
+Everything in this namespace should be considered as an
+implementation detail that is subject to change without notice.
+*/
+namespace detail {
 
-template<
+
+
+/*!
+Generic version of the implementation that doesn't do anything.
+
+See the version that stops the iteration
+over Variables for documentation.
+*/
+template <
 	size_t number_of_variables,
 	class... Variables
 > class Cell_impl {};
 
 
-} // namespace
+
+/*!
+Starts or continues the iteration over variables.
+
+See the version that stops the iteration for documentation.
+*/
+template <
+	size_t number_of_variables,
+	class Current_Variable,
+	class... Rest_Of_Variables
+> class Cell_impl<
+	number_of_variables,
+	Current_Variable,
+	Rest_Of_Variables...
+> :
+	public Cell_impl<number_of_variables, Rest_Of_Variables...>
+{
+
+private:
+
+
+	typename Current_Variable::data_type data;
+
+
+
+public:
+
+
+	Current_Variable& operator()(const Current_Variable&)
+	{
+		return this->data;
+	};
+
+	const Current_Variable& operator()(const Current_Variable&) const
+	{
+		return this->data;
+	};
+
+};
+
+
+
+/*!
+Stops the iteration over variables given by the user.
+
+Operator () provides access to the user's data.
+*/
+template <
+	size_t number_of_variables,
+	class Variable
+> class Cell_impl<
+	number_of_variables,
+	Variable
+> {
+
+
+private:
+
+
+	typename Variable::data_type data;
+
+
+
+public:
+
+
+	Variable& operator()(const Variable&)
+	{
+		return this->data;
+	}
+
+	const Variable& operator()(const Variable&) const
+	{
+		return this->data;
+	}
+};
+
+
+
+} // namespace detail
+} // namespace gensimcell
 
 
 #endif // ifndef GENSIMCELL_IMPL_HPP
-
