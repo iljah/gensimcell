@@ -85,6 +85,13 @@ private:
 public:
 
 
+	/*
+	Make all public functions of the inherited implementation(s)
+	available also through the current iteration over user's variables.
+	*/
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator();
+
+
 	typename Current_Variable::data_type& operator()(const Current_Variable&)
 	{
 		return this->data;
