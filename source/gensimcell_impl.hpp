@@ -85,12 +85,12 @@ private:
 public:
 
 
-	Current_Variable& operator()(const Current_Variable&)
+	typename Current_Variable::data_type& operator()(const Current_Variable&)
 	{
 		return this->data;
 	};
 
-	const Current_Variable& operator()(const Current_Variable&) const
+	const typename Current_Variable::data_type& operator()(const Current_Variable&) const
 	{
 		return this->data;
 	};
@@ -123,12 +123,12 @@ private:
 public:
 
 
-	Variable& operator()(const Variable&)
+	typename Variable::data_type& operator()(const Variable&)
 	{
 		return this->data;
 	}
 
-	const Variable& operator()(const Variable&) const
+	const typename Variable::data_type& operator()(const Variable&) const
 	{
 		return this->data;
 	}
