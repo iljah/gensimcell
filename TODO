@@ -1,0 +1,3 @@
+Add support for returning references to more than one variable
+through operator (). Something like:
+template <class First, class... Rest> std::tuple<?> operator()(?){?};
