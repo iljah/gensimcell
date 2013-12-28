@@ -48,7 +48,11 @@ template <
 	class... Variables
 > class Cell :
 	public detail::Cell_impl<sizeof...(Variables), Variables...>
-{};
+{
+public:
+	// allow the cell to be used as a variable
+	typedef detail::Cell_impl<sizeof...(Variables), Variables...> data_type;
+};
 
 
 } // namespace

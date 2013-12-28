@@ -15,6 +15,8 @@ EXECUTABLES = \
   tests/compile/one_variable.exe \
   tests/compile/two_variables.exe \
   tests/compile/many_variables.exe \
+  tests/compile/one_variable_recursive.exe \
+  tests/compile/many_variables_recursive.exe \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe
 
