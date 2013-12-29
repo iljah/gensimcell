@@ -8,7 +8,10 @@ HEADERS = \
   source/gensimcell_impl.hpp
 
 %.exe: %.cpp $(HEADERS) Makefile
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	@echo "CXX "$< && $(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+%.tst: %.exe
+	@echo "RUN "$< && ./$< && echo PASS && touch $@
 
 EXECUTABLES = \
   tests/compile/cell_included.exe \
@@ -18,14 +21,22 @@ EXECUTABLES = \
   tests/compile/one_variable_recursive.exe \
   tests/compile/many_variables_recursive.exe \
   tests/serial/one_variable.exe \
-  tests/serial/many_variables.exe
+  tests/serial/many_variables.exe \
+  tests/serial/one_variable_recursive.exe \
+  tests/serial/many_variables_recursive.exe
 
-all: $(EXECUTABLES)
+TESTS = \
+  tests/serial/one_variable.tst \
+  tests/serial/many_variables.tst \
+  tests/serial/one_variable_recursive.tst \
+  tests/serial/many_variables_recursive.tst
+
+all: $(EXECUTABLES) $(TESTS)
 
 t: test
-test: $(EXECUTABLES)
-	@for exe in $(EXECUTABLES); do echo "RUN "$$exe"...\t\t" && ./$$exe && echo "PASS"; done
+test: $(TESTS)
+	@echo "All tests passed."
 
 c: clean
 clean:
-	rm -f $(EXECUTABLES)
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS)
