@@ -1,3 +1,8 @@
 Add support for returning references to more than one variable
 through operator (). Something like:
 template <class First, class... Rest> std::tuple<?> operator()(?){?};
+
+Allow creating cells from instances of variables, for example:
+struct test_variable1 { typedef int data_type; };
+const test_variable1 v1;
+auto cell = gensimcell::make_cell(v1);
