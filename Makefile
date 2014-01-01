@@ -34,7 +34,8 @@ EXECUTABLES = \
   tests/serial/one_variable_recursive.exe \
   tests/serial/many_variables_recursive.exe \
   tests/serial/transfer_one_cell_one_variable.exe \
-  tests/serial/transfer_one_cell_many_variables.exe
+  tests/serial/transfer_one_cell_many_variables.exe \
+  tests/serial/transfer_many_cells_one_variable.exe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tstmpi \
@@ -43,7 +44,8 @@ TESTS = \
   tests/serial/one_variable_recursive.tst \
   tests/serial/many_variables_recursive.tst \
   tests/serial/transfer_one_cell_one_variable.tst \
-  tests/serial/transfer_one_cell_many_variables.tst
+  tests/serial/transfer_one_cell_many_variables.tst \
+  tests/serial/transfer_many_cells_one_variable.tst
 
 all: test
 
