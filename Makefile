@@ -41,10 +41,10 @@ TESTS = \
   tests/serial/one_variable_recursive.tst \
   tests/serial/many_variables_recursive.tst
 
-all: $(EXECUTABLES) $(TESTS)
+all: test
 
 t: test
-test: $(TESTS)
+test: $(EXECUTABLES) $(TESTS)
 	@echo "All tests passed."
 
 c: clean
