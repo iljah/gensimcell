@@ -4,6 +4,7 @@
 #include "tuple"
 #include "vector"
 
+#include "check_true.hpp"
 #include "gensimcell.hpp"
 
 
@@ -59,22 +60,10 @@ int main(int argc, char* argv[])
 	cell4(v4)(v1) = 3;
 	cell4(v4)(v2) = 1.5;
 	cell4(v4)(v3) = {'a', 'b'};
-	if (cell4(v4)(v1) != 3) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell4(v4)(v2) != 1.5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell4(v4)(v3)[0] != 'a') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell4(v4)(v3)[1] != 'b') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
+	CHECK_TRUE(cell4(v4)(v1) == 3)
+	CHECK_TRUE(cell4(v4)(v2) == 1.5)
+	CHECK_TRUE(cell4(v4)(v3)[0] == 'a')
+	CHECK_TRUE(cell4(v4)(v3)[1] == 'b')
 
 
 	gensimcell::Cell<test_variable5> cell5;
@@ -82,26 +71,11 @@ int main(int argc, char* argv[])
 	cell5(v5)(v4)(v1) = 5;
 	cell5(v5)(v4)(v2) = 2.5;
 	cell5(v5)(v4)(v3) = {'c', 'd'};
-	if (cell5(v5)(v1) != 4) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell5(v5)(v4)(v1) != 5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell5(v5)(v4)(v2) != 2.5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell5(v5)(v4)(v3)[0] != 'c') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell5(v5)(v4)(v3)[1] != 'd') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
+	CHECK_TRUE(cell5(v5)(v1) == 4)
+	CHECK_TRUE(cell5(v5)(v4)(v1) == 5)
+	CHECK_TRUE(cell5(v5)(v4)(v2) == 2.5)
+	CHECK_TRUE(cell5(v5)(v4)(v3)[0] == 'c')
+	CHECK_TRUE(cell5(v5)(v4)(v3)[1] == 'd')
 
 
 	gensimcell::Cell<test_variable6> cell6;
@@ -112,42 +86,15 @@ int main(int argc, char* argv[])
 	cell6(v6)(v5)(v4)(v1) = 8;
 	cell6(v6)(v5)(v4)(v2) = 8.5;
 	cell6(v6)(v5)(v4)(v3) = {'g', 'h'};
-	if (cell6(v6)(v4)(v1) != 6) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v4)(v2) != 4.5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v4)(v3)[0] != 'e') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v4)(v3)[1] != 'f') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v5)(v1) != 7) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v5)(v4)(v1) != 8) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v5)(v4)(v2) != 8.5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v5)(v4)(v3)[0] != 'g') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-	if (cell6(v6)(v5)(v4)(v3)[1] != 'h') {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
+	CHECK_TRUE(cell6(v6)(v4)(v1) == 6)
+	CHECK_TRUE(cell6(v6)(v4)(v2) == 4.5)
+	CHECK_TRUE(cell6(v6)(v4)(v3)[0] == 'e')
+	CHECK_TRUE(cell6(v6)(v4)(v3)[1] == 'f')
+	CHECK_TRUE(cell6(v6)(v5)(v1) == 7)
+	CHECK_TRUE(cell6(v6)(v5)(v4)(v1) == 8)
+	CHECK_TRUE(cell6(v6)(v5)(v4)(v2) == 8.5)
+	CHECK_TRUE(cell6(v6)(v5)(v4)(v3)[0] == 'g')
+	CHECK_TRUE(cell6(v6)(v5)(v4)(v3)[1] == 'h')
 
 
 	return EXIT_SUCCESS;

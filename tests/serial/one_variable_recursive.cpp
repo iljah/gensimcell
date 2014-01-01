@@ -1,6 +1,7 @@
 #include "cstdlib"
 #include "iostream"
 
+#include "check_true.hpp"
 #include "gensimcell.hpp"
 
 using namespace std;
@@ -22,26 +23,15 @@ int main(int argc, char* argv[])
 {
 	gensimcell::Cell<test_variable1> cell1;
 	cell1(test_variable1()) = 3;
-	if (cell1(test_variable1()) != 3) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-
+	CHECK_TRUE(cell1(test_variable1()) == 3)
 
 	gensimcell::Cell<test_variable2> cell2;
 	cell2(test_variable2())(test_variable1()) = 4;
-	if (cell2(test_variable2())(test_variable1()) != 4) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
-
+	CHECK_TRUE(cell2(test_variable2())(test_variable1()) == 4)
 
 	gensimcell::Cell<test_variable3> cell3;
 	cell3(test_variable3())(test_variable2())(test_variable1()) = 5;
-	if (cell3(test_variable3())(test_variable2())(test_variable1()) != 5) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
+	CHECK_TRUE(cell3(test_variable3())(test_variable2())(test_variable1()) == 5)
 
 
 	return EXIT_SUCCESS;
