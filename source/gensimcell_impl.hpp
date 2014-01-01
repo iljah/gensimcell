@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cstdlib"
 
+#include "boost/logic/tribool.hpp"
+
 
 namespace gensimcell {
 
@@ -81,6 +83,18 @@ private:
 	typename Current_Variable::data_type data;
 
 
+	/*!
+	Whether each instance tranfers
+	this variable or not using MPI
+	*/
+	static boost::logic::tribool transfer_all;
+	/*!
+	Whether this instance sends this variable
+	if transfer_all is indeterminite
+	*/
+	bool transfer = true;
+
+
 
 public:
 
@@ -90,6 +104,11 @@ public:
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator();
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
 
 	typename Current_Variable::data_type& operator()(const Current_Variable&)
@@ -102,7 +121,59 @@ public:
 		return this->data;
 	};
 
+
+	static void set_transfer_all(
+		const Current_Variable&,
+		const boost::logic::tribool given
+	) {
+		transfer_all = given;
+	}
+
+	static boost::logic::tribool get_transfer_all(const Current_Variable&)
+	{
+		return transfer_all;
+	}
+
+
+	void set_transfer(
+		const Current_Variable&,
+		const bool given
+	) {
+		this->transfer = given;
+	}
+
+	bool get_transfer(const Current_Variable&) const
+	{
+		return this->transfer;
+	}
+
+
+	bool is_transferred(const Current_Variable&) const
+	{
+		if (transfer_all) {
+			return true;
+		} else if (not transfer_all) {
+			return false;
+		} else {
+			if (this->transfer) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
 };
+
+template <
+	size_t number_of_variables,
+	class Current_Variable,
+	class... Rest_Of_Variables
+> boost::logic::tribool Cell_impl<
+	number_of_variables,
+	Current_Variable,
+	Rest_Of_Variables...
+>::transfer_all = true;
 
 
 
@@ -126,6 +197,18 @@ private:
 	typename Variable::data_type data;
 
 
+	/*!
+	Whether each instance tranfers
+	this variable or not using MPI
+	*/
+	static boost::logic::tribool transfer_all;
+	/*!
+	Whether this instance sends this variable
+	if transfer_all is indeterminite
+	*/
+	bool transfer = true;
+
+
 
 public:
 
@@ -139,7 +222,56 @@ public:
 	{
 		return this->data;
 	}
+
+
+	static void set_transfer_all(
+		const Variable&,
+		const boost::logic::tribool given
+	) {
+		transfer_all = given;
+	}
+
+	static boost::logic::tribool get_transfer_all(const Variable&)
+	{
+		return transfer_all;
+	}
+
+
+	void set_transfer(const Variable&, const bool given)
+	{
+		this->transfer = given;
+	}
+
+	bool get_transfer(const Variable&) const
+	{
+		return this->transfer;
+	}
+
+
+	bool is_transferred(const Variable&) const
+	{
+		if (transfer_all) {
+			return true;
+		} else if (not transfer_all) {
+			return false;
+		} else {
+			if (this->transfer) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
 };
+
+template <
+	size_t number_of_variables,
+	class Variable
+> boost::logic::tribool Cell_impl<
+	number_of_variables,
+	Variable
+>::transfer_all = true;
 
 
 

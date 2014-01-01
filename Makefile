@@ -1,4 +1,4 @@
-CPPFLAGS = -I source
+CPPFLAGS = -I source -I tests
 CXXFLAGS = -std=c++0x
 
 include makefiles/macosx_macports
@@ -32,20 +32,22 @@ EXECUTABLES = \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe \
   tests/serial/one_variable_recursive.exe \
-  tests/serial/many_variables_recursive.exe
+  tests/serial/many_variables_recursive.exe \
+  tests/serial/transfer_one_cell_one_variable.exe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tstmpi \
   tests/serial/one_variable.tst \
   tests/serial/many_variables.tst \
   tests/serial/one_variable_recursive.tst \
-  tests/serial/many_variables_recursive.tst
+  tests/serial/many_variables_recursive.tst \
+  tests/serial/transfer_one_cell_one_variable.tst
 
 all: test
 
 t: test
 test: $(EXECUTABLES) $(TESTS)
-	@echo "All tests passed."
+	@echo && echo "All tests passed."
 
 c: clean
 clean:
