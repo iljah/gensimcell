@@ -1,3 +1,4 @@
+#include "array"
 #include "complex"
 #include "cstdlib"
 #include "iostream"
@@ -52,6 +53,26 @@ int main(int argc, char* argv[]) {
 		address == &d
 		and count == 1
 		and datatype == MPI_CXX_LONG_DOUBLE_COMPLEX
+	)
+
+
+	std::array<char, 5> e;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_datatype(e);
+	CHECK_TRUE(
+		address == e.data()
+		and count == 5
+		and datatype == MPI_CHAR
+	)
+
+
+	std::array<std::complex<double>, 3> f;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_datatype(f);
+	CHECK_TRUE(
+		address == f.data()
+		and count == 3
+		and datatype == MPI_CXX_DOUBLE_COMPLEX
 	)
 
 

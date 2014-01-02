@@ -28,12 +28,13 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "boost/mpl/vector.hpp"
+#include "boost/tti/has_member_function.hpp"
 #include "complex"
+#include "cstddef"
 #include "cstdint"
 #include "mpi.h"
 #include "tuple"
-
-#include "boost/tti/has_member_function.hpp"
 
 
 #ifndef GET_VAR_DATATYPE_HPP
@@ -52,7 +53,8 @@ Returns the mpi transfer info of given
 variable with a get_mpi_datatype function.
 */
 template <
-	class Variable_T
+	class Variable_T,
+	std::size_t Number_Of_Items = 0
 > std::tuple<
 	void*,
 	int,
@@ -81,7 +83,7 @@ template <> std::tuple<                                               \
 	void*,                                                            \
 	int,                                                              \
 	MPI_Datatype                                                      \
-> get_var_datatype<GIVEN_CPP_TYPE>(const GIVEN_CPP_TYPE& variable)    \
+> get_var_datatype(const GIVEN_CPP_TYPE& variable)    \
 {                                                                     \
 	return std::make_tuple((void*) &variable, 1, GIVEN_MPI_TYPE);     \
 };
@@ -105,6 +107,51 @@ GENSIMCELL_GET_VAR_DATATYPE(unsigned long int, MPI_UNSIGNED_LONG)
 GENSIMCELL_GET_VAR_DATATYPE(unsigned long long int, MPI_UNSIGNED_LONG_LONG)
 GENSIMCELL_GET_VAR_DATATYPE(unsigned short int, MPI_UNSIGNED_SHORT)
 GENSIMCELL_GET_VAR_DATATYPE(wchar_t, MPI_WCHAR)
+
+
+/*!
+Specializations of get_var_datatype for standard
+C++ types with an MPI equivalent inside an array.
+*/
+#define GENSIMCELL_GET_ARRAY_VAR_DATATYPE(GIVEN_CPP_TYPE, GIVEN_MPI_TYPE) \
+template < \
+	std::size_t Number_Of_Items \
+> std::tuple< \
+	void*, \
+	int, \
+	MPI_Datatype \
+> get_var_datatype( \
+	const std::array< \
+		GIVEN_CPP_TYPE, \
+		Number_Of_Items \
+	>& variable \
+) { \
+	return std::make_tuple( \
+		(void*) variable.data(), \
+		Number_Of_Items, \
+		GIVEN_MPI_TYPE \
+	); \
+};
+
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(bool, MPI_CXX_BOOL)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(char, MPI_CHAR)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(double, MPI_DOUBLE)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(float, MPI_FLOAT)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(long double, MPI_LONG_DOUBLE)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(signed char, MPI_SIGNED_CHAR)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(signed int, MPI_INT)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(signed long int, MPI_LONG)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(signed long long int, MPI_LONG_LONG_INT)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(signed short int, MPI_SHORT)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(std::complex<float>, MPI_CXX_FLOAT_COMPLEX)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(std::complex<double>, MPI_CXX_DOUBLE_COMPLEX)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DOUBLE_COMPLEX)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(unsigned char, MPI_UNSIGNED_CHAR)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(unsigned int, MPI_UNSIGNED)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(unsigned long int, MPI_UNSIGNED_LONG)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(unsigned long long int, MPI_UNSIGNED_LONG_LONG)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(unsigned short int, MPI_UNSIGNED_SHORT)
+GENSIMCELL_GET_ARRAY_VAR_DATATYPE(wchar_t, MPI_WCHAR)
 
 
 } // namespace detail
