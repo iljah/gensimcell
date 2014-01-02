@@ -293,9 +293,9 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 void transfer_cN_v1(MPI_Comm comm, const int rank)
 {
 	const test_variable1 v1;
-	//const test_variable2 v2;
+	const test_variable2 v2;
 	vector<gensimcell::Cell<test_variable1>> c1s(3);
-	//vector<gensimcell::Cell<test_variable2>> c2s(3);
+	vector<gensimcell::Cell<test_variable2>> c2s(3);
 
 	void* address = NULL;
 	int count = -1;
@@ -418,7 +418,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 
 		// TODO: send array cells from 1 to 0
-		/*for (size_t i = 0; i < c2s.size(); i++) {
+		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				c2s[i](v2)[j] = i * 10 + j;
 			}
@@ -457,8 +457,30 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				CHECK_TRUE(c2s[i](v2)[j] == i * 10 + j)
 			}
-		}*/
+		}
 
+
+		c2s[0].set_transfer_all(v2, false);
+		for (auto& cell: c2s) {
+			std::tie(address, count, datatype) = cell.get_mpi_datatype();
+			if (count < 0) {
+				PRINT_ERROR(rank, "Couldn't get datatype.")
+				abort();
+			}
+			if (
+				MPI_Send(
+					address,
+					count,
+					datatype,
+					1,
+					0,
+					comm
+				) != MPI_SUCCESS
+			) {
+				PRINT_ERROR(rank, "Couldn't send.")
+				abort();
+			}
+		}
 
 
 	} else if (rank == 1) {
@@ -585,7 +607,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		/*for (size_t i = 0; i < c2s.size(); i++) {
+		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				c2s[i](v2)[j] = -1;
 			}
@@ -621,12 +643,42 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			}
 		}
 
+
 		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				CHECK_TRUE(c2s[i](v2)[j] == i * 10 + j)
+				c2s[i](v2)[j] = -1;
 			}
-		}*/
+		}
 
+		c2s[0].set_transfer_all(v2, false);
+		for (auto& cell: c2s) {
+			std::tie(address, count, datatype) = cell.get_mpi_datatype();
+			if (count < 0) {
+				PRINT_ERROR(rank, "Couldn't get datatype.")
+				abort();
+			}
+			if (
+				MPI_Recv(
+					address,
+					count,
+					datatype,
+					0,
+					0,
+					comm,
+					MPI_STATUS_IGNORE
+				) != MPI_SUCCESS
+			) {
+				PRINT_ERROR(rank, "Couldn't receive.")
+				abort();
+			}
+		}
+
+		for (size_t i = 0; i < c2s.size(); i++) {
+			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
+				CHECK_TRUE(c2s[i](v2)[j] == -1)
+			}
+		}
 	}
 }
 
