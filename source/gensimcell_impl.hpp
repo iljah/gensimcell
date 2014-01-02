@@ -32,10 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENSIMCELL_IMPL_HPP
 
 
-#include "cstdlib"
-
 #include "boost/logic/tribool.hpp"
+#include "cstdlib"
+#include "limits"
+#include "mpi.h"
+#include "vector"
 
+#include "get_var_datatype.hpp"
+#include "iostream"
 
 namespace gensimcell {
 
@@ -93,6 +97,44 @@ private:
 	if transfer_all is indeterminite
 	*/
 	bool transfer = true;
+
+
+
+protected:
+
+
+	using Cell_impl<
+		number_of_variables,
+		Rest_Of_Variables...
+	>::get_one_mpi_datatype;
+
+
+	std::tuple<
+		std::vector<void*>,
+		std::vector<int>,
+		std::vector<MPI_Datatype>
+	> get_one_mpi_datatype(
+		const Current_Variable&,
+		std::tuple<
+			std::vector<void*>,
+			std::vector<int>,
+			std::vector<MPI_Datatype>
+		> transfer_info
+	) const {
+		void* address = NULL;
+		int count = -1;
+		MPI_Datatype datatype = MPI_DATATYPE_NULL;
+		std::tie(
+			address,
+			count,
+			datatype
+		) = get_var_datatype(this->data);
+
+		std::get<0>(transfer_info).push_back(address);
+		std::get<1>(transfer_info).push_back(count);
+		std::get<2>(transfer_info).push_back(datatype);
+		return transfer_info;
+	}
 
 
 
@@ -210,6 +252,39 @@ private:
 
 
 
+protected:
+
+
+	std::tuple<
+		std::vector<void*>,
+		std::vector<int>,
+		std::vector<MPI_Datatype>
+	> get_one_mpi_datatype(
+		const Variable&,
+		std::tuple<
+			std::vector<void*>,
+			std::vector<int>,
+			std::vector<MPI_Datatype>
+		> transfer_info
+	) const {
+		void* address = NULL;
+		int count = -1;
+		MPI_Datatype datatype = MPI_DATATYPE_NULL;
+		std::tie(
+			address,
+			count,
+			datatype
+		) = get_var_datatype(this->data);
+
+		std::get<0>(transfer_info).push_back(address);
+		std::get<1>(transfer_info).push_back(count);
+		std::get<2>(transfer_info).push_back(datatype);
+
+		return transfer_info;
+	}
+
+
+
 public:
 
 
@@ -261,6 +336,66 @@ public:
 				return false;
 			}
 		}
+	}
+
+
+	std::tuple<
+		void*,
+		int,
+		MPI_Datatype
+	> get_mpi_datatype() const
+	{
+		std::vector<void*> addresses;
+		std::vector<int> counts;
+		std::vector<MPI_Datatype> datatypes;
+
+		if (this->is_transferred(Variable())) {
+			std::tie(
+				addresses,
+				counts,
+				datatypes
+			) = this->get_one_mpi_datatype(
+				Variable(),
+				std::tuple<
+					std::vector<void*>,
+					std::vector<int>,
+					std::vector<MPI_Datatype>
+				>()
+			);
+		}
+
+		const size_t nr_vars_to_transfer = addresses.size();
+		if (nr_vars_to_transfer > std::numeric_limits<int>::max()) {
+			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+		}
+
+		if (nr_vars_to_transfer == 0) {
+			// assume NULL won't be dereferenced if count = 0
+			return std::make_tuple((void*) NULL, 0, MPI_BYTE);
+		}
+
+		// get displacements of variables to transfer
+		std::vector<MPI_Aint> displacements(nr_vars_to_transfer, 0);
+		for (size_t i = 1; i < nr_vars_to_transfer; i++) {
+			displacements[i]
+				= static_cast<char*>(addresses[i])
+				- static_cast<char*>(addresses[0]);
+		}
+
+		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
+		if (
+			MPI_Type_create_struct(
+				int(nr_vars_to_transfer),
+				counts.data(),
+				displacements.data(),
+				datatypes.data(),
+				&final_datatype
+			) != MPI_SUCCESS
+		) {
+			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+		}
+
+		return std::make_tuple((void*) addresses[0], 1, final_datatype);
 	}
 
 };

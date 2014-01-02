@@ -1,5 +1,4 @@
-CXX = g++-mp-4.8
 MPICXX = openmpic++
-MPIRUN = openmpirun
+MPIRUN = openmpirun -n 2
 CPPFLAGS +=
 CXXFLAGS +=
