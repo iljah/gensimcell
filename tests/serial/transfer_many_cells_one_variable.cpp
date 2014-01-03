@@ -12,7 +12,7 @@ struct test_variable1 {
 typedef gensimcell::Cell<test_variable1> cell1_t;
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	const test_variable1 v1;
 	cell1_t c1_1, c1_2, c1_3;

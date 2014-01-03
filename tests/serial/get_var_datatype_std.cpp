@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
 
 	void* address = NULL;
 	int count = -1;
@@ -77,4 +77,4 @@ int main(int argc, char* argv[]) {
 
 
 	return EXIT_SUCCESS;
-};
+}

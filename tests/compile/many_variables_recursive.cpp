@@ -30,7 +30,7 @@ struct test_variable6 {
 };
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	gensimcell::Cell<test_variable5> cell1;
 	gensimcell::Cell<test_variable6> cell2;

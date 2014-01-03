@@ -5,7 +5,7 @@ struct test_variable {
 };
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	gensimcell::Cell<
 		gensimcell::Cell<

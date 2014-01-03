@@ -34,7 +34,7 @@ struct test_variable7 {
 };
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	gensimcell::Cell<
 		test_variable1,

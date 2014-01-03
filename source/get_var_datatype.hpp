@@ -71,7 +71,7 @@ template <
 		"transferred by MPI."
 	);
 	return variable.get_mpi_datatype();
-};
+}
 
 
 /*!
@@ -86,7 +86,7 @@ template <> std::tuple< \
 > get_var_datatype(const GIVEN_CPP_TYPE& variable) \
 { \
 	return std::make_tuple((void*) &variable, 1, GIVEN_MPI_TYPE); \
-};
+}
 
 GENSIMCELL_GET_VAR_DATATYPE(bool, MPI_CXX_BOOL)
 GENSIMCELL_GET_VAR_DATATYPE(char, MPI_CHAR)
@@ -131,7 +131,7 @@ template < \
 		Number_Of_Items, \
 		GIVEN_MPI_TYPE \
 	); \
-};
+}
 
 GENSIMCELL_GET_ARRAY_VAR_DATATYPE(bool, MPI_CXX_BOOL)
 GENSIMCELL_GET_ARRAY_VAR_DATATYPE(char, MPI_CHAR)

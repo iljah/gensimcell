@@ -1,5 +1,5 @@
 CPPFLAGS = -I source -I tests
-CXXFLAGS = -std=c++0x
+CXXFLAGS = -std=c++0x -W -Wall -Wextra -pedantic
 
 include makefiles/macosx_macports
 

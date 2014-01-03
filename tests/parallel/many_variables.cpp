@@ -383,7 +383,7 @@ void transfer_cN(MPI_Comm comm, const int rank)
 			c1s[i](v1) = -1;
 			c1s[i](v2) = {-1, -1, -1};
 			c1s[i](v3) = -1;
-			c1s[i](v4) = -1;
+			c1s[i](v4) = 0;
 		}
 
 		for (auto& cell: c1s) {
@@ -426,7 +426,7 @@ void transfer_cN(MPI_Comm comm, const int rank)
 			c1s[i](v1) = -1;
 			c1s[i](v2) = {-1, -1, -1};
 			c1s[i](v3) = -1;
-			c1s[i](v4) = -1;
+			c1s[i](v4) = 0;
 		}
 
 
@@ -492,7 +492,7 @@ void transfer_cN(MPI_Comm comm, const int rank)
 				CHECK_TRUE(c1s[i](v2)[1] == -1)
 				CHECK_TRUE(c1s[i](v2)[2] == -1)
 				CHECK_TRUE(c1s[i](v3) == i + 5.5)
-				CHECK_TRUE(c1s[i](v4) == -1)
+				CHECK_TRUE(c1s[i](v4) == 0)
 			}
 		}
 	}

@@ -22,7 +22,7 @@ struct test_variable3 {
 };
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	gensimcell::Cell<test_variable1> cell;
 	cell(test_variable1()) = 3;

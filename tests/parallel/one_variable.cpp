@@ -274,7 +274,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == i)
+			CHECK_TRUE(c1s[i](v1) == int(i))
 		}
 
 
@@ -332,7 +332,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == i)
+			CHECK_TRUE(c1s[i](v1) == int(i))
 		}
 
 
@@ -428,7 +428,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == i)
+			CHECK_TRUE(c1s[i](v1) == int(i))
 			c1s[i](v1) = -1;
 		}
 
@@ -493,7 +493,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				CHECK_TRUE(c1s[i](v1) == i)
+				CHECK_TRUE(c1s[i](v1) == int(i))
 			} else {
 				CHECK_TRUE(c1s[i](v1) == -1)
 			}

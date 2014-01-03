@@ -34,7 +34,7 @@ typedef gensimcell::Cell<
 > cell4_t;
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
 	const test_variable1 v1;
 	const test_variable2 v2;
