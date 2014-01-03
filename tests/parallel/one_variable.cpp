@@ -43,10 +43,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
 			abort();
 		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
-			abort();
-		}
 		if (
 			MPI_Send(
 				address,
@@ -58,10 +54,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			) != MPI_SUCCESS
 		) {
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
-			abort();
-		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
 			abort();
 		}
 		CHECK_TRUE(c1_1(v1) == 1)
@@ -74,10 +66,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
 			abort();
 		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
-			abort();
-		}
 		if (
 			MPI_Send(
 				address,
@@ -91,7 +79,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		// no need for MPI_Type_free because nothing was sent
 		CHECK_TRUE(c1_1(v1) == 1)
 
 
@@ -103,10 +90,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
 			abort();
 		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
-			abort();
-		}
 		if (
 			MPI_Send(
 				address,
@@ -120,10 +103,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
-			abort();
-		}
 		CHECK_TRUE(c1_1(v1) == 1)
 
 
@@ -132,10 +111,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
-			abort();
-		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
 			abort();
 		}
 		if (
@@ -150,10 +125,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			) != MPI_SUCCESS
 		) {
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
-			abort();
-		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
 			abort();
 		}
 		CHECK_TRUE(c1_1(v1) == 2)
@@ -170,10 +141,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
 			abort();
 		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
-			abort();
-		}
 		if (
 			MPI_Recv(
 				address,
@@ -188,10 +155,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
-			abort();
-		}
 		CHECK_TRUE(c1_1(v1) == 1)
 		c1_1(v1) = -1;
 
@@ -200,10 +163,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
-			abort();
-		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
 			abort();
 		}
 		if (
@@ -230,10 +189,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
 			abort();
 		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
-			abort();
-		}
 		if (
 			MPI_Recv(
 				address,
@@ -248,10 +203,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
-			abort();
-		}
 		CHECK_TRUE(c1_1(v1) == 1)
 		c1_1(v1) = -1;
 
@@ -260,10 +211,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
-			abort();
-		}
-		if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't commit datatype of c1_1.")
 			abort();
 		}
 		if (
@@ -277,10 +224,6 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			) != MPI_SUCCESS
 		) {
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
-			abort();
-		}
-		if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
 			abort();
 		}
 		CHECK_TRUE(c1_1(v1) == 2)
@@ -315,10 +258,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't get datatype.")
 				abort();
 			}
-			if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't commit datatype.")
-				abort();
-			}
 			if (
 				MPI_Send(
 					address,
@@ -330,10 +269,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				) != MPI_SUCCESS
 			) {
 				PRINT_ERROR(rank, "Couldn't send.")
-				abort();
-			}
-			if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't free datatype.")
 				abort();
 			}
 		}
@@ -348,10 +283,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			std::tie(address, count, datatype) = cell.get_mpi_datatype();
 			if (count < 0) {
 				PRINT_ERROR(rank, "Couldn't get datatype.")
-				abort();
-			}
-			if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't commit datatype.")
 				abort();
 			}
 			if (
@@ -385,12 +316,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't get datatype.")
 				abort();
 			}
-			if (i % 2 == 0) {
-				if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-					PRINT_ERROR(rank, "Couldn't commit datatype.")
-					abort();
-				}
-			}
 			if (
 				MPI_Send(
 					address,
@@ -404,12 +329,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't send.")
 				abort();
 			}
-			if (i % 2 == 0) {
-				if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-					PRINT_ERROR(rank, "Couldn't free datatype.")
-					abort();
-				}
-			}
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
@@ -417,7 +336,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		// TODO: send array cells from 1 to 0
 		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				c2s[i](v2)[j] = i * 10 + j;
@@ -445,10 +363,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				) != MPI_SUCCESS
 			) {
 				PRINT_ERROR(rank, "Couldn't send.")
-				abort();
-			}
-			if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't free datatype.")
 				abort();
 			}
 		}
@@ -497,10 +411,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't get datatype.")
 				abort();
 			}
-			if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't commit datatype.")
-				abort();
-			}
 			if (
 				MPI_Recv(
 					address,
@@ -513,10 +423,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				) != MPI_SUCCESS
 			) {
 				PRINT_ERROR(rank, "Couldn't receive.")
-				abort();
-			}
-			if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't free datatype.")
 				abort();
 			}
 		}
@@ -569,12 +475,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't get datatype.")
 				abort();
 			}
-			if (i % 2 == 0) {
-				if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-					PRINT_ERROR(rank, "Couldn't commit datatype.")
-					abort();
-				}
-			}
 			if (
 				MPI_Recv(
 					address,
@@ -588,12 +488,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			) {
 				PRINT_ERROR(rank, "Couldn't receive.")
 				abort();
-			}
-			if (i % 2 == 0) {
-				if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-					PRINT_ERROR(rank, "Couldn't free datatype.")
-					abort();
-				}
 			}
 		}
 
@@ -619,10 +513,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				PRINT_ERROR(rank, "Couldn't get datatype.")
 				abort();
 			}
-			if (MPI_Type_commit(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't commit datatype.")
-				abort();
-			}
 			if (
 				MPI_Recv(
 					address,
@@ -635,10 +525,6 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 				) != MPI_SUCCESS
 			) {
 				PRINT_ERROR(rank, "Couldn't receive.")
-				abort();
-			}
-			if (MPI_Type_free(&datatype) != MPI_SUCCESS) {
-				PRINT_ERROR(rank, "Couldn't free datatype.")
 				abort();
 			}
 		}

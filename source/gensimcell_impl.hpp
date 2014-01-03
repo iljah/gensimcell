@@ -103,36 +103,43 @@ private:
 protected:
 
 
-	using Cell_impl<
-		number_of_variables,
-		Rest_Of_Variables...
-	>::get_one_mpi_datatype;
-
-
 	std::tuple<
 		std::vector<void*>,
 		std::vector<int>,
 		std::vector<MPI_Datatype>
-	> get_one_mpi_datatype(
-		const Current_Variable&,
+	> get_mpi_datatype_impl(
 		std::tuple<
 			std::vector<void*>,
 			std::vector<int>,
 			std::vector<MPI_Datatype>
 		> transfer_info
 	) const {
-		void* address = NULL;
-		int count = -1;
-		MPI_Datatype datatype = MPI_DATATYPE_NULL;
-		std::tie(
-			address,
-			count,
-			datatype
-		) = get_var_datatype(this->data);
 
-		std::get<0>(transfer_info).push_back(address);
-		std::get<1>(transfer_info).push_back(count);
-		std::get<2>(transfer_info).push_back(datatype);
+		/*!
+		Put transfer info of variables closer
+		to start of memory in front
+		*/
+		transfer_info = Cell_impl<
+			number_of_variables,
+			Rest_Of_Variables...
+		>::get_mpi_datatype_impl(transfer_info);
+
+		if (this->is_transferred(Current_Variable())) {
+			void* address = NULL;
+			int count = -1;
+			MPI_Datatype datatype = MPI_DATATYPE_NULL;
+
+			std::tie(
+				address,
+				count,
+				datatype
+			) = get_var_datatype(this->data);
+
+			std::get<0>(transfer_info).push_back(address);
+			std::get<1>(transfer_info).push_back(count);
+			std::get<2>(transfer_info).push_back(datatype);
+		}
+
 		return transfer_info;
 	}
 
@@ -205,6 +212,85 @@ public:
 		}
 	}
 
+
+	std::tuple<
+		void*,
+		int,
+		MPI_Datatype
+	> get_mpi_datatype() const
+	{
+		std::vector<void*> addresses;
+		std::vector<int> counts;
+		std::vector<MPI_Datatype> datatypes;
+
+		std::tie(
+			addresses,
+			counts,
+			datatypes
+		) = this->get_mpi_datatype_impl(
+			std::tuple<
+				std::vector<void*>,
+				std::vector<int>,
+				std::vector<MPI_Datatype>
+			>()
+		);
+
+		const size_t nr_vars_to_transfer = addresses.size();
+
+		if (nr_vars_to_transfer == 0) {
+
+			// assume NULL won't be dereferenced if count = 0
+			return std::make_tuple((void*) NULL, 0, MPI_BYTE);
+
+		} else if (nr_vars_to_transfer == 1) {
+
+			if (counts.size() != 1 or datatypes.size() != 1) {
+				// this shouldn't happen
+				abort();
+			}
+
+			return std::make_tuple(
+				(void*) addresses[0],
+				counts[0],
+				datatypes[0]
+			);
+
+		} else if (nr_vars_to_transfer <= std::numeric_limits<int>::max()) {
+
+			// get displacements of variables to transfer
+			std::vector<MPI_Aint> displacements(nr_vars_to_transfer, 0);
+			for (size_t i = 1; i < nr_vars_to_transfer; i++) {
+				displacements[i]
+					= static_cast<char*>(addresses[i])
+					- static_cast<char*>(addresses[0]);
+			}
+
+			MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
+			if (
+				MPI_Type_create_struct(
+					int(nr_vars_to_transfer),
+					counts.data(),
+					displacements.data(),
+					datatypes.data(),
+					&final_datatype
+				) != MPI_SUCCESS
+			) {
+				return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+			}
+
+			return std::make_tuple((void*) addresses[0], 1, final_datatype);
+
+		} else {
+
+			return std::make_tuple(
+				(void*) NULL,
+				std::numeric_limits<int>::lowest(),
+				MPI_DATATYPE_NULL
+			);
+
+		}
+	}
+
 };
 
 template <
@@ -259,26 +345,29 @@ protected:
 		std::vector<void*>,
 		std::vector<int>,
 		std::vector<MPI_Datatype>
-	> get_one_mpi_datatype(
-		const Variable&,
+	> get_mpi_datatype_impl(
 		std::tuple<
 			std::vector<void*>,
 			std::vector<int>,
 			std::vector<MPI_Datatype>
 		> transfer_info
 	) const {
-		void* address = NULL;
-		int count = -1;
-		MPI_Datatype datatype = MPI_DATATYPE_NULL;
-		std::tie(
-			address,
-			count,
-			datatype
-		) = get_var_datatype(this->data);
 
-		std::get<0>(transfer_info).push_back(address);
-		std::get<1>(transfer_info).push_back(count);
-		std::get<2>(transfer_info).push_back(datatype);
+		if (this->is_transferred(Variable())) {
+			void* address = NULL;
+			int count = -1;
+			MPI_Datatype datatype = MPI_DATATYPE_NULL;
+
+			std::tie(
+				address,
+				count,
+				datatype
+			) = get_var_datatype(this->data);
+
+			std::get<0>(transfer_info).push_back(address);
+			std::get<1>(transfer_info).push_back(count);
+			std::get<2>(transfer_info).push_back(datatype);
+		}
 
 		return transfer_info;
 	}
@@ -345,57 +434,42 @@ public:
 		MPI_Datatype
 	> get_mpi_datatype() const
 	{
-		std::vector<void*> addresses;
-		std::vector<int> counts;
-		std::vector<MPI_Datatype> datatypes;
+		if (not this->is_transferred(Variable())) {
 
-		if (this->is_transferred(Variable())) {
+			return std::make_tuple((void*) NULL, 0, MPI_BYTE);
+
+		} else {
+
+			std::vector<void*> addresses;
+			std::vector<int> counts;
+			std::vector<MPI_Datatype> datatypes;
+
 			std::tie(
 				addresses,
 				counts,
 				datatypes
-			) = this->get_one_mpi_datatype(
-				Variable(),
+			) = this->get_mpi_datatype_impl(
 				std::tuple<
 					std::vector<void*>,
 					std::vector<int>,
 					std::vector<MPI_Datatype>
 				>()
 			);
-		}
 
-		const size_t nr_vars_to_transfer = addresses.size();
-		if (nr_vars_to_transfer > std::numeric_limits<int>::max()) {
-			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
-		}
+			if (
+				addresses.size() != 1
+				or counts.size() != 1
+				or datatypes.size() != 1
+			) {
+				abort();
+			}
 
-		if (nr_vars_to_transfer == 0) {
-			// assume NULL won't be dereferenced if count = 0
-			return std::make_tuple((void*) NULL, 0, MPI_BYTE);
+			return std::make_tuple(
+				(void*) addresses[0],
+				counts[0],
+				datatypes[0]
+			);
 		}
-
-		// get displacements of variables to transfer
-		std::vector<MPI_Aint> displacements(nr_vars_to_transfer, 0);
-		for (size_t i = 1; i < nr_vars_to_transfer; i++) {
-			displacements[i]
-				= static_cast<char*>(addresses[i])
-				- static_cast<char*>(addresses[0]);
-		}
-
-		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
-		if (
-			MPI_Type_create_struct(
-				int(nr_vars_to_transfer),
-				counts.data(),
-				displacements.data(),
-				datatypes.data(),
-				&final_datatype
-			) != MPI_SUCCESS
-		) {
-			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
-		}
-
-		return std::make_tuple((void*) addresses[0], 1, final_datatype);
 	}
 
 };
