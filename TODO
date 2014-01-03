@@ -6,3 +6,6 @@ Allow creating cells from instances of variables, for example:
 struct test_variable1 { typedef int data_type; };
 const test_variable1 v1;
 auto cell = gensimcell::make_cell(v1);
+
+Add support for setting the transfer property of more than one
+variable per call to set_transfer(_all).
