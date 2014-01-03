@@ -78,14 +78,14 @@ template <
 Specializations of get_var_datatype for
 standard C++ types with an MPI equivalent.
 */
-#define GENSIMCELL_GET_VAR_DATATYPE(GIVEN_CPP_TYPE, GIVEN_MPI_TYPE)   \
-template <> std::tuple<                                               \
-	void*,                                                            \
-	int,                                                              \
+#define GENSIMCELL_GET_VAR_DATATYPE(GIVEN_CPP_TYPE, GIVEN_MPI_TYPE) \
+template <> std::tuple< \
+	void*, \
+	int, \
 	MPI_Datatype                                                      \
-> get_var_datatype(const GIVEN_CPP_TYPE& variable)    \
-{                                                                     \
-	return std::make_tuple((void*) &variable, 1, GIVEN_MPI_TYPE);     \
+> get_var_datatype(const GIVEN_CPP_TYPE& variable) \
+{ \
+	return std::make_tuple((void*) &variable, 1, GIVEN_MPI_TYPE); \
 };
 
 GENSIMCELL_GET_VAR_DATATYPE(bool, MPI_CXX_BOOL)
