@@ -33,7 +33,8 @@ EXECUTABLES = \
   tests/serial/transfer_many_cells_many_variables.exe \
   tests/serial/transfer_recursive.exe \
   tests/parallel/one_variable.exe \
-  tests/parallel/many_variables.exe
+  tests/parallel/many_variables.exe \
+  examples/game_of_life/serial.exe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \
