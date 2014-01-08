@@ -1,5 +1,5 @@
 CPPFLAGS = -I source -I tests
-CXXFLAGS = -std=c++0x -W -Wall -Wextra -pedantic
+CXXFLAGS = -std=c++0x -W -Wall -Wextra -pedantic -O3
 
 include makefiles/macosx_macports
 
@@ -34,7 +34,8 @@ EXECUTABLES = \
   tests/serial/transfer_recursive.exe \
   tests/parallel/one_variable.exe \
   tests/parallel/many_variables.exe \
-  examples/game_of_life/serial.exe
+  examples/game_of_life/serial.exe \
+  examples/advection/serial.exe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \
@@ -58,4 +59,4 @@ test: $(EXECUTABLES) $(TESTS)
 
 c: clean
 clean:
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS)
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png
