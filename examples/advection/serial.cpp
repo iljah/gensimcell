@@ -114,7 +114,7 @@ array<double, 2> get_cell_center(
 }
 
 
-/*
+/*!
 Returns the size of given cell in x and y directions
 at given x and y indices in the grid.
 */
