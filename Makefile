@@ -35,7 +35,8 @@ EXECUTABLES = \
   tests/parallel/one_variable.exe \
   tests/parallel/many_variables.exe \
   examples/game_of_life/serial.exe \
-  examples/advection/serial.exe
+  examples/advection/serial.exe \
+  examples/particle_propagation/serial.exe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \
@@ -59,4 +60,4 @@ test: $(EXECUTABLES) $(TESTS)
 
 c: clean
 clean:
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png

@@ -187,7 +187,7 @@ void initialize(grid_t& grid)
 
 
 /*!
-Returns the maximum allowes time step in given grid.
+Returns the maximum allowed time step in given grid.
 */
 double get_max_time_step(const grid_t& grid)
 {
