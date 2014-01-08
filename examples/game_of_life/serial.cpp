@@ -40,8 +40,8 @@ using 0 for live cells and . for dead cells.
 */
 template<class Game_Grid> void print_game(const Game_Grid& grid)
 {
-	for (auto& row: grid) {
-		for (auto& cell: row) {
+	for (const auto& row: grid) {
+		for (const auto& cell: row) {
 			if (cell(is_alive())) {
 				cout << "0";
 			} else {
