@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -28,47 +28,72 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GENSIMCELL_HPP
-#define GENSIMCELL_HPP
 
+#ifndef GOL_VARIABLES_HPP
+#define GOL_VARIABLES_HPP
 
-#include "gensimcell_impl.hpp"
+#include "gensimcell.hpp"
 
-
-/*!
-Namespace where everything related to gensimcell is defined.
-*/
-namespace gensimcell {
-
+//! see ../serial.cpp for the basics
 
 /*!
-\todo Write documentation.
+Avoid collisions between the names of
+variables of different simulations by
+using a unique namespace for each one.
 */
-template <
-	class... Variables
-> class Cell :
-	public detail::Cell_impl<sizeof...(Variables), Variables...>
+namespace gol {
+
+struct is_alive
 {
-public:
-	// allow the cell to be used as a variable
-	typedef detail::Cell_impl<sizeof...(Variables), Variables...> data_type;
-
-	// boost::tti has_member_function doesn't see the inherited one
-	std::tuple<
-		void*,
-		int,
-		MPI_Datatype
-	> get_mpi_datatype() const
-	{
-		return detail::Cell_impl<
-			sizeof...(Variables),
-			Variables...
-		>::get_mpi_datatype();
-	}
+	typedef bool data_type;
 };
+
+struct live_neighbors
+{
+	typedef int data_type;
+};
+
+typedef gensimcell::Cell<
+	gol::is_alive,
+	gol::live_neighbors
+> cell_t;
+
+
+/*!
+Stops the MPI transfer of all variables
+used in the game of life simulation.
+
+The actual variables of the game of life
+simulation are given as template parameters.
+*/
+template<
+	class Cell_T,
+	class Is_Alive,
+	class Live_Neighbors
+> void transfer_none()
+{
+	Cell_T::set_transfer_all(Is_Alive(), false);
+	Cell_T::set_transfer_all(Live_Neighbors(), false);
+}
+
+
+/*!
+Starts the MPI transfer of all variables
+required in a parallel game of life simulation.
+
+The actual variables of the game of life
+simulation are given as template parameters.
+*/
+template<
+	class Cell_T,
+	class Is_Alive,
+	class Live_Neighbors
+> void transfer_all()
+{
+	Cell_T::set_transfer_all(Is_Alive(), true);
+}
 
 
 } // namespace
 
-
-#endif // ifndef GENSIMCELL_HPP
+#endif // ifndef GOL_VARIABLES_HPP

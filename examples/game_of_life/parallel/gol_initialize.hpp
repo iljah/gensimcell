@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -28,47 +28,63 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GENSIMCELL_HPP
-#define GENSIMCELL_HPP
+#ifndef GOL_INITIALIZE_HPP
+#define GOL_INITIALIZE_HPP
 
+#include "cstdlib"
+#include "iostream"
+#include "vector"
 
-#include "gensimcell_impl.hpp"
+#include "dccrg.hpp"
+#include "dccrg_cartesian_geometry.hpp"
 
+#include "gensimcell.hpp"
+
+//! see ../serial.cpp for the basics
+
+namespace gol {
 
 /*!
-Namespace where everything related to gensimcell is defined.
+Initializes given grid with a row of live cells at the center.
+
+The row is parallel to the first dimension.
+Assumes maximum refinement level == 0.
 */
-namespace gensimcell {
+template<
+	class Cell_T,
+	class Is_Alive,
+	class Live_Neighbors
+> void initialize(
+	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
+) {
+	const auto
+		grid_start = grid.geometry.get_start(),
+		grid_end = grid.geometry.get_end();
 
+	const double middle = (grid_end[1] + grid_start[1]) / 2;
 
-/*!
-\todo Write documentation.
-*/
-template <
-	class... Variables
-> class Cell :
-	public detail::Cell_impl<sizeof...(Variables), Variables...>
-{
-public:
-	// allow the cell to be used as a variable
-	typedef detail::Cell_impl<sizeof...(Variables), Variables...> data_type;
+	const std::vector<uint64_t> cell_ids = grid.get_cells();
+	for (auto cell_id: cell_ids) {
 
-	// boost::tti has_member_function doesn't see the inherited one
-	std::tuple<
-		void*,
-		int,
-		MPI_Datatype
-	> get_mpi_datatype() const
-	{
-		return detail::Cell_impl<
-			sizeof...(Variables),
-			Variables...
-		>::get_mpi_datatype();
+		Cell_T* cell_data = grid[cell_id];
+		if (cell_data == NULL) {
+			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+			abort();
+		}
+
+		const auto
+			cell_min = grid.geometry.get_min(cell_id),
+			cell_max = grid.geometry.get_max(cell_id);
+
+		if (cell_max[1] > middle and cell_min[1] <= middle) {
+			(*cell_data)(Is_Alive()) = true;
+		} else {
+			(*cell_data)(Is_Alive()) = false;
+		}
+		(*cell_data)(Live_Neighbors()) = 0;
 	}
-};
-
+}
 
 } // namespace
 
-
-#endif // ifndef GENSIMCELL_HPP
+#endif // ifndef GOL_VARIABLES_HPP

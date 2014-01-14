@@ -1,4 +1,4 @@
 MPICXX = openmpic++
 MPIRUN = openmpirun -n 2
-CPPFLAGS +=
-CXXFLAGS +=
+DCCRG_FLAGS = -I $(HOME)/include
+ZOLTAN_FLAGS = -L $(HOME)/lib -lzoltan

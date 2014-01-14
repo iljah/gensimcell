@@ -14,6 +14,12 @@ HEADERS = \
 %.tst: %.exe
 	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
 
+# these require dccrg (the c++11 version from c++11 branch,
+# https://gitorious.org/dccrg) which also requires Zoltan
+%.dexe: %.cpp $(HEADERS) Makefile
+	@echo "MPICXX "$< && $(MPICXX) $(DCCRG_FLAGS) $(ZOLTAN_FLAGS) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+
 EXECUTABLES = \
   tests/compile/get_var_datatype_included.exe \
   tests/compile/cell_included.exe \
@@ -34,9 +40,18 @@ EXECUTABLES = \
   tests/serial/transfer_recursive.exe \
   tests/parallel/one_variable.exe \
   tests/parallel/many_variables.exe \
+  tests/compile/dccrg/enable_if.dexe \
+  tests/compile/dccrg/get_cell_mpi_datatype.dexe \
+  tests/compile/dccrg/included.dexe \
+  tests/compile/dccrg/instantiated.dexe \
+  tests/compile/dccrg/initialized.dexe \
+  tests/compile/dccrg/updated.dexe \
+  tests/compile/dccrg/saved.dexe \
   examples/game_of_life/serial.exe \
   examples/advection/serial.exe \
-  examples/particle_propagation/serial.exe
+  examples/particle_propagation/serial.exe \
+  examples/game_of_life/parallel/main.dexe \
+  examples/game_of_life/parallel/gol2gnuplot.dexe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \
@@ -60,4 +75,4 @@ test: $(EXECUTABLES) $(TESTS)
 
 c: clean
 clean:
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/game_of_life/parallel/*.dc examples/game_of_life/parallel/*.png examples/game_of_life/parallel/*.dat

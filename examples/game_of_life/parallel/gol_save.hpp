@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -28,47 +28,61 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GENSIMCELL_HPP
-#define GENSIMCELL_HPP
+#ifndef GOL_SAVE_HPP
+#define GOL_SAVE_HPP
 
+#include "cstdlib"
+#include "iomanip"
+#include "iostream"
+#include "mpi.h"
+#include "sstream"
+#include "string"
+#include "tuple"
 
-#include "gensimcell_impl.hpp"
+#include "dccrg.hpp"
+#include "dccrg_cartesian_geometry.hpp"
 
+#include "gensimcell.hpp"
+
+//! see ../serial.cpp for the basics
+
+namespace gol {
 
 /*!
-Namespace where everything related to gensimcell is defined.
+Saves the game in given grid into a file with name derived from given time. 
+
+The variable Is_Alive is used to refer to the actual data to be saved.
+Assumes that the transfer of all variables
+had been disabled before this function was called. 
 */
-namespace gensimcell {
+template<
+	class Cell_T,
+	class Is_Alive
+> void save(
+	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid,
+	const double simulation_time
+) {
+	// only save the life state of cells
+	Cell_T::set_transfer_all(Is_Alive(), true);
 
+	// get the file name
+	std::ostringstream time_string;
+	time_string
+		<< std::setw(4)
+		<< std::setfill('0')
+		<< size_t(simulation_time * 1000);
 
-/*!
-\todo Write documentation.
-*/
-template <
-	class... Variables
-> class Cell :
-	public detail::Cell_impl<sizeof...(Variables), Variables...>
-{
-public:
-	// allow the cell to be used as a variable
-	typedef detail::Cell_impl<sizeof...(Variables), Variables...> data_type;
+	// use an empty header with a sane address
+	char dummy;
+	std::tuple<void*, int, MPI_Datatype> header{(void*) &dummy, 0, MPI_BYTE};
 
-	// boost::tti has_member_function doesn't see the inherited one
-	std::tuple<
-		void*,
-		int,
-		MPI_Datatype
-	> get_mpi_datatype() const
-	{
-		return detail::Cell_impl<
-			sizeof...(Variables),
-			Variables...
-		>::get_mpi_datatype();
-	}
-};
-
+	grid.save_grid_data(
+		"gol_" + time_string.str() + ".dc",
+		0,
+		header
+	);
+}
 
 } // namespace
 
-
-#endif // ifndef GENSIMCELL_HPP
+#endif // ifndef GOL_SAVE_HPP
