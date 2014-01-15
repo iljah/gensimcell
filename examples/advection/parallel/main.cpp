@@ -28,6 +28,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+//! see ../serial.cpp and ../game_of_life/parallel/* for an intro
 
 #include "array"
 #include "boost/lexical_cast.hpp"
@@ -40,15 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dccrg_cartesian_geometry.hpp"
 #include "gensimcell.hpp"
 
-#include "gol_initialize.hpp"
-#include "gol_save.hpp"
-#include "gol_solve.hpp"
-#include "gol_variables.hpp"
+#include "advection_initialize.hpp"
+#include "advection_save.hpp"
+#include "advection_solve.hpp"
+#include "advection_variables.hpp"
 
 int main(int argc, char* argv[])
 {
 	// the cell type used by this program
-	using Cell = gol::Cell;
+	using Cell = advection::Cell;
 
 	/*
 	Set up MPI
@@ -71,7 +72,7 @@ int main(int argc, char* argv[])
 	dccrg::Dccrg<Cell, dccrg::Cartesian_Geometry> grid;
 
 	// initialize the grid
-	std::array<uint64_t, 3> grid_length = {25, 25, 1};
+	std::array<uint64_t, 3> grid_length = {50, 50, 1};
 	const unsigned int neighborhood_size = 1;
 	if (not grid.initialize(
 		grid_length,
@@ -106,78 +107,107 @@ int main(int argc, char* argv[])
 	/*
 	Play the game
 	*/
-	gol::initialize<Cell, gol::Is_Alive, gol::Live_Neighbors>(grid);
+	advection::initialize<
+		Cell,
+		advection::Density,
+		advection::Density_Flux,
+		advection::Velocity
+	>(grid);
 
 	const std::vector<uint64_t>
 		inner_cells = grid.get_local_cells_not_on_process_boundary(),
 		outer_cells = grid.get_local_cells_on_process_boundary();
 
-	double simulation_time = 0;
+	const double advection_save_interval = 0.1;
+
+	double
+		simulation_time = 0,
+		time_step = 0,
+		advection_next_save = 0;
 	while (simulation_time <= M_PI) {
 
+		double next_time_step = std::numeric_limits<double>::max();
+
 		/*
-		Save the simulation to disk.
-		save() itself decides what to "transfer" to the file so
-		switch off all transfers before and restore them after.
+		Save simulation to disk
 		*/
-		gol::transfer_none<Cell, gol::Is_Alive, gol::Live_Neighbors>();
+		if (advection_next_save <= simulation_time) {
+			advection_next_save += advection_save_interval;
 
-		gol::save<Cell, gol::Is_Alive>(grid, simulation_time);
+			advection::transfer_none<
+				Cell,
+				advection::Density,
+				advection::Density_Flux,
+				advection::Velocity
+			>();
 
-		gol::transfer_all<Cell, gol::Is_Alive, gol::Live_Neighbors>();
+			advection::save<
+				Cell,
+				advection::Density,
+				advection::Velocity
+			>(grid, simulation_time);
+
+			advection::transfer_all<
+				Cell,
+				advection::Density,
+				advection::Velocity
+			>();
+		}
 
 		if (simulation_time >= M_PI) {
-			// don't simulate an extra step, e.g. if only initial state needed 
 			break;
 		}
 
-		// start updating data required by the solver between processes
+		/*
+		Solve
+		*/
 		grid.start_remote_neighbor_copy_updates();
 
-		/*
-		While transfers are executing solve cells for
-		which data is not required from other processes.
-		*/
-		gol::solve<
-			Cell,
-			gol::Is_Alive,
-			gol::Live_Neighbors
-		>(inner_cells, grid);
+		next_time_step
+			= std::min(
+				next_time_step,
+				advection::solve<
+					Cell,
+					advection::Density,
+					advection::Density_Flux,
+					advection::Velocity
+				>(time_step, inner_cells, grid)
+			);
 
-		// wait for the required data to arrive
 		grid.wait_remote_neighbor_copy_update_receives();
 
-		// solve the rest of local cells
-		gol::solve<
-			Cell,
-			gol::Is_Alive,
-			gol::Live_Neighbors
-		>(outer_cells, grid);
+		next_time_step
+			= std::min(
+				next_time_step,
+				advection::solve<
+					Cell,
+					advection::Density,
+					advection::Density_Flux,
+					advection::Velocity
+				>(time_step, outer_cells, grid)
+			);
 
 		/*
-		Set the new state of cells whose data wasn't
-		required by other processes
+		Apply solution
 		*/
-		gol::apply_solution<
+		advection::apply_solution<
 			Cell,
-			gol::Is_Alive,
-			gol::Live_Neighbors
+			advection::Density,
+			advection::Density_Flux
 		>(inner_cells, grid);
 
-		/*
-		Wait for required data to arrive to other
-		processes before setting the new state to
-		those local cells
-		*/
 		grid.wait_remote_neighbor_copy_update_sends();
 
-		gol::apply_solution<
+		advection::apply_solution<
 			Cell,
-			gol::Is_Alive,
-			gol::Live_Neighbors
+			advection::Density,
+			advection::Density_Flux
 		>(outer_cells, grid);
 
-		simulation_time += M_PI / 40;
+		simulation_time += time_step;
+
+		const double CFL = 0.5;
+		time_step = CFL * next_time_step;
 	}
 
 	MPI_Finalize();

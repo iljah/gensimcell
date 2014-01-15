@@ -51,7 +51,9 @@ EXECUTABLES = \
   examples/advection/serial.exe \
   examples/particle_propagation/serial.exe \
   examples/game_of_life/parallel/main.dexe \
-  examples/game_of_life/parallel/gol2gnuplot.dexe
+  examples/game_of_life/parallel/gol2gnuplot.dexe \
+  examples/advection/parallel/main.dexe \
+  examples/advection/parallel/advection2gnuplot.dexe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \
@@ -73,6 +75,10 @@ t: test
 test: $(EXECUTABLES) $(TESTS)
 	@echo && echo "All tests passed."
 
+d: data
+data:
+	rm -f examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/*/parallel/*.dc examples/*/parallel/*.png examples/*/parallel/*.dat
+
 c: clean
-clean:
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS) examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/game_of_life/parallel/*.dc examples/game_of_life/parallel/*.png examples/game_of_life/parallel/*.dat
+clean: data
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS)

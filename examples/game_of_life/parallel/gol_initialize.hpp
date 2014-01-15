@@ -52,8 +52,8 @@ Assumes maximum refinement level == 0.
 */
 template<
 	class Cell_T,
-	class Is_Alive,
-	class Live_Neighbors
+	class Is_Alive_T,
+	class Live_Neighbors_T
 > void initialize(
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
 ) {
@@ -77,14 +77,14 @@ template<
 			cell_max = grid.geometry.get_max(cell_id);
 
 		if (cell_max[1] > middle and cell_min[1] <= middle) {
-			(*cell_data)(Is_Alive()) = true;
+			(*cell_data)(Is_Alive_T()) = true;
 		} else {
-			(*cell_data)(Is_Alive()) = false;
+			(*cell_data)(Is_Alive_T()) = false;
 		}
-		(*cell_data)(Live_Neighbors()) = 0;
+		(*cell_data)(Live_Neighbors_T()) = 0;
 	}
 }
 
 } // namespace
 
-#endif // ifndef GOL_VARIABLES_HPP
+#endif // ifndef GOL_INITIALIZE_HPP

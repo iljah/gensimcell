@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef GOL_VARIABLES_HPP
-#define GOL_VARIABLES_HPP
+#ifndef ADVECTION_VARIABLES_HPP
+#define ADVECTION_VARIABLES_HPP
 
 #include "gensimcell.hpp"
 
@@ -41,61 +41,72 @@ Avoid collisions between the names of
 variables of different simulations by
 using a unique namespace for each one.
 */
-namespace gol {
+namespace advection {
 
-struct Is_Alive
+// see ../serial.cpp for basics
+
+struct Density
 {
-	typedef bool data_type;
+	typedef double data_type;
 };
 
-struct Live_Neighbors
+struct Density_Flux
 {
-	typedef int data_type;
+	typedef double data_type;
+};
+
+struct Velocity
+{
+	typedef std::array<double, 2> data_type;
 };
 
 typedef gensimcell::Cell<
-	gol::Is_Alive,
-	gol::Live_Neighbors
+	Density,
+	Density_Flux,
+	Velocity
 > Cell;
 
 
 /*!
 Stops the MPI transfer of all variables
-used in a parallel game of life simulation.
+used in a parallel advection simulation.
 
-The actual variables used by a particular game of life
+The actual variables used by a particular advection
 simulation with the given cell type are given as
 template parameters.
 */
 template<
 	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
+	class Density_T,
+	class Density_Flux_T,
+	class Velocity_T
 > void transfer_none()
 {
-	Cell_T::set_transfer_all(Is_Alive_T(), false);
-	Cell_T::set_transfer_all(Live_Neighbors_T(), false);
+	Cell_T::set_transfer_all(Density_T(), false);
+	Cell_T::set_transfer_all(Density_Flux_T(), false);
+	Cell_T::set_transfer_all(Velocity_T(), false);
 }
 
 
 /*!
 Starts the MPI transfer of all variables
-required in a parallel game of life simulation.
+required in a parallel advection simulation.
 
-The actual variables used by a particular game of life
+The actual variables used by a particular advection
 simulation with the given cell type are given as
 template parameters.
 */
 template<
 	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
+	class Density_T,
+	class Velocity_T
 > void transfer_all()
 {
-	Cell_T::set_transfer_all(Is_Alive_T(), true);
+	Cell_T::set_transfer_all(Density_T(), true);
+	Cell_T::set_transfer_all(Velocity_T(), true);
 }
 
 
 } // namespace
 
-#endif // ifndef GOL_VARIABLES_HPP
+#endif // ifndef ADVECTION_VARIABLES_HPP

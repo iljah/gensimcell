@@ -51,19 +51,19 @@ namespace gol {
 /*!
 Saves the game in given grid into a file with name derived from given time. 
 
-The variable Is_Alive is used to refer to the actual data to be saved.
+The variable Is_Alive_T is used to refer to the actual data to be saved.
 Assumes that the transfer of all variables
 had been disabled before this function was called. 
 */
 template<
 	class Cell_T,
-	class Is_Alive
+	class Is_Alive_T
 > void save(
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid,
 	const double simulation_time
 ) {
 	// only save the life state of cells
-	Cell_T::set_transfer_all(Is_Alive(), true);
+	Cell_T::set_transfer_all(Is_Alive_T(), true);
 
 	// get the file name
 	std::ostringstream time_string;

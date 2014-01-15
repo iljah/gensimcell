@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 
-// see ../game_of_life/serial.cpp for basics
+//! see ../game_of_life/serial.cpp for basics
 
 struct Density
 {

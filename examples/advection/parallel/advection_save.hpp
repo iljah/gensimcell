@@ -28,74 +28,63 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef ADVECTION_SAVE_HPP
+#define ADVECTION_SAVE_HPP
 
-#ifndef GOL_VARIABLES_HPP
-#define GOL_VARIABLES_HPP
+#include "cstdlib"
+#include "iomanip"
+#include "mpi.h"
+#include "sstream"
+#include "string"
+#include "tuple"
+
+#include "dccrg.hpp"
+#include "dccrg_cartesian_geometry.hpp"
 
 #include "gensimcell.hpp"
 
 //! see ../serial.cpp for the basics
 
-/*!
-Avoid collisions between the names of
-variables of different simulations by
-using a unique namespace for each one.
-*/
-namespace gol {
-
-struct Is_Alive
-{
-	typedef bool data_type;
-};
-
-struct Live_Neighbors
-{
-	typedef int data_type;
-};
-
-typedef gensimcell::Cell<
-	gol::Is_Alive,
-	gol::Live_Neighbors
-> Cell;
-
+namespace advection {
 
 /*!
-Stops the MPI transfer of all variables
-used in a parallel game of life simulation.
+Saves the simulation in given grid into a file with name derived from given time. 
 
-The actual variables used by a particular game of life
-simulation with the given cell type are given as
-template parameters.
+The variables Density_T and Velocity_T are used to refer
+to the particular data to be saved.
+Assumes that the transfer of all variables
+had been disabled before this function was called. 
 */
 template<
 	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void transfer_none()
-{
-	Cell_T::set_transfer_all(Is_Alive_T(), false);
-	Cell_T::set_transfer_all(Live_Neighbors_T(), false);
+	class Density_T,
+	class Velocity_T
+> void save(
+	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid,
+	const double simulation_time
+) {
+	// save density and velocity
+	Cell_T::set_transfer_all(Density_T(), true);
+	Cell_T::set_transfer_all(Velocity_T(), true);
+
+	// get the file name
+	std::ostringstream time_string;
+	time_string
+		<< std::setw(4)
+		<< std::setfill('0')
+		<< size_t(simulation_time * 1000);
+
+	// use an empty header with a sane address
+	char dummy;
+	std::tuple<void*, int, MPI_Datatype> header{(void*) &dummy, 0, MPI_BYTE};
+
+	grid.save_grid_data(
+		"advection_" + time_string.str() + ".dc",
+		0,
+		header
+	);
 }
-
-
-/*!
-Starts the MPI transfer of all variables
-required in a parallel game of life simulation.
-
-The actual variables used by a particular game of life
-simulation with the given cell type are given as
-template parameters.
-*/
-template<
-	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void transfer_all()
-{
-	Cell_T::set_transfer_all(Is_Alive_T(), true);
-}
-
 
 } // namespace
 
-#endif // ifndef GOL_VARIABLES_HPP
+#endif // ifndef ADVECTION_SAVE_HPP

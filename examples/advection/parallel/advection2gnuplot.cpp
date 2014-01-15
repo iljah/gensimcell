@@ -28,12 +28,14 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+//! see ../../game_of_life/parallel/gol2gnuplot.cpp for basics
 
 #include "cstdint"
 #include "cstdlib"
 #include "fstream"
 #include "mpi.h"
 #include "string"
+#include "tuple"
 #include "unordered_map"
 #include "vector"
 
@@ -41,10 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dccrg_mapping.hpp"
 #include "dccrg_topology.hpp"
 
-#include "gol_variables.hpp"
+#include "advection_variables.hpp"
 
 using namespace std;
-using namespace gol;
+using namespace advection;
 
 int main(int argc, char* argv[])
 {
@@ -91,7 +93,12 @@ int main(int argc, char* argv[])
 		// skip unncessary data
 		MPI_Offset offset = sizeof(uint64_t);
 
-		mapping.read(file, offset);
+		if (not mapping.read(file, offset)) {
+			cerr << "Process " << rank
+				<< " couldn't set cell id mapping for file " << argv_string
+				<< endl;
+			continue;
+		}
 
 		offset
 			+= mapping.data_size()
@@ -116,7 +123,7 @@ int main(int argc, char* argv[])
 			continue;
 		}
 
-		// read cell ids and file offsets of cell data
+		// read cell ids and data offsets
 		vector<pair<uint64_t, uint64_t>> cells_offsets(total_cells);
 		MPI_File_read_at(
 			file,
@@ -127,37 +134,67 @@ int main(int argc, char* argv[])
 			MPI_STATUS_IGNORE
 		);
 
-		/*
-		Read cell data
-
-		Assumes that only one variable of type MPI_CXX_BOOL was
-		saved for each cell. For a more generic version which
-		only assumes that the size of each cells' data is known
-		before reading anything from the saved file see
-		../../advection/parallel/advection2gnuplot.cpp
-		*/
+		// read cell data
 		unordered_map<
 			uint64_t,
-			Is_Alive::data_type
+			Cell
 		> simulation_data;
+		// the flux isn't saved
+		Cell::set_transfer_all(Density_Flux(), false);
 
 		for (const auto& item: cells_offsets) {
 			const uint64_t
 				cell_id = item.first,
-				offset = item.second;
+				file_address = item.second;
 
 			simulation_data[cell_id];
 
+			/*
+			dccrg writes cell data without padding so store the
+			non-padded version of the cell's datatype into file_datatype
+			*/
+			void* memory_address = NULL;
+			int memory_count = -1;
+			MPI_Datatype
+				memory_datatype = MPI_DATATYPE_NULL,
+				file_datatype = MPI_DATATYPE_NULL;
+
+			tie(
+				memory_address,
+				memory_count,
+				memory_datatype
+			) = simulation_data.at(cell_id).get_mpi_datatype();
+
+			int sizeof_memory_datatype;
+			MPI_Type_size(memory_datatype, &sizeof_memory_datatype);
+			MPI_Type_contiguous(sizeof_memory_datatype, MPI_BYTE, &file_datatype);
+
+			// interpret data from the file using the non-padded type
+			MPI_Type_commit(&file_datatype);
+			MPI_File_set_view(
+				file,
+				file_address,
+				MPI_BYTE,
+				file_datatype,
+				const_cast<char*>("native"),
+				MPI_INFO_NULL
+			);
+
+			MPI_Type_commit(&memory_datatype);
 			MPI_File_read_at(
 				file,
-				(MPI_Offset) offset,
-				&(simulation_data.at(cell_id)),
-				1,
-				MPI_CXX_BOOL,
+				0,
+				memory_address,
+				memory_count,
+				memory_datatype,
 				MPI_STATUS_IGNORE
 			);
+
+			MPI_Type_free(&memory_datatype);
+			MPI_Type_free(&file_datatype);
 		}
 
+		MPI_File_close(&file);
 		cells_offsets.clear();
 
 		const string
@@ -169,7 +206,9 @@ int main(int argc, char* argv[])
 		gnuplot_file
 			<< "set term png enhanced\nset output '"
 			<< plot_file_name
-			<< "'\nset size square\n"
+			<< "'\nset xlabel 'X ([-1, 1])'\n"
+			   "set ylabel 'Y ([-1, 1])'\n"
+			   "set size square\n"
 			   "plot '-' matrix with image title ''\n";
 
 		// plot assumes data is ordered from top to bottom left to right
@@ -180,11 +219,7 @@ int main(int argc, char* argv[])
 				const auto cell_id
 					= mapping.get_cell_from_indices({x_i, y_i, 0}, 0);
 
-				if (simulation_data.at(cell_id)) {
-					gnuplot_file << "1 ";
-				} else {
-					gnuplot_file << "0 ";
-				}
+				gnuplot_file << simulation_data.at(cell_id)(Density()) << " ";
 			}
 
 			gnuplot_file << "\n";

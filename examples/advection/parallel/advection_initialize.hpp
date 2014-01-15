@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -28,8 +28,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef GOL_SOLVE_HPP
-#define GOL_SOLVE_HPP
+#ifndef ADVECTION_INITIALIZE_HPP
+#define ADVECTION_INITIALIZE_HPP
 
 #include "cstdlib"
 #include "iostream"
@@ -42,83 +42,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //! see ../serial.cpp for the basics
 
-namespace gol {
+namespace advection {
 
 /*!
-Calculates the number of live neighbors for given cells.
-
-Uses Is_Alive to access the data corresponding to
-the life state of a cell and Live_Neighbors to access
-the data corresponding to the number of live neighbors.
+The initial condition is from chapter 20.8.2 in
+R.J. LeVeque,
+Finite Volume Methods for Hyperbolic Problems,
+ISBN 978-0-521-00924-9.
 */
 template<
 	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void solve(
-	const std::vector<uint64_t>& cell_ids,
-	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& game_grid
+	class Density_T,
+	class Density_Flux_T,
+	class Velocity_T
+> void initialize(
+	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
 ) {
+	const std::vector<uint64_t> cell_ids = grid.get_cells();
 	for (auto cell_id: cell_ids) {
 
-		Cell_T* current_data = game_grid[cell_id];
-		if (current_data == NULL) {
+		Cell_T* cell_data_temp = grid[cell_id];
+		if (cell_data_temp == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
+		// make the notation a bit easier on the eyes
+		Cell_T& cell_data = *cell_data_temp;
 
-		const std::vector<uint64_t>* const neighbors
-			= game_grid.get_neighbors_of(cell_id);
+		const auto cell_center = grid.geometry.get_center(cell_id);
 
-		for (auto neighbor_id: *neighbors) {
+		const double
+			r = std::sqrt(
+				std::pow(cell_center[0] + 0.45, 2)
+				+ std::pow(cell_center[1], 2)
+			);
 
-			if (neighbor_id == dccrg::error_cell) {
-				continue;
-			}
+		/*
+		Initialize density
+		*/
+		cell_data(Density_T())      =
+		cell_data(Density_Flux_T()) = 0;
 
-			Cell_T* neighbor_data = game_grid[neighbor_id];
-			if (neighbor_data == NULL) {
-				std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-				abort();
-			}
+		// square
+		if (
+			cell_center[0] > 0.1
+			and cell_center[0] < 0.6
+			and cell_center[1] > -0.25
+			and cell_center[1] < 0.25
+		) {
+			cell_data(Density_T()) = 1;
 
-			if ((*neighbor_data)(Is_Alive_T())) {
-				(*current_data)(Live_Neighbors_T())++;
-			}
+		// cone
+		} else if (r < 0.35) {
+			cell_data(Density_T()) = 1 - r / 0.35;
 		}
+
+		/*
+		Initialize velocity
+		*/
+		cell_data(Velocity_T()) = {
+			+2 * cell_center[1],
+			-2 * cell_center[0]
+		};
 	}
 }
-
-
-/*!
-Applies the rules of Conway's Game of Life to given cells.
-*/
-template<
-	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void apply_solution(
-	const std::vector<uint64_t>& cell_ids,
-	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& game_grid
-) {
-	for (auto cell_id: cell_ids) {
-
-		Cell_T* data = game_grid[cell_id];
-		if (data == NULL) {
-			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-			abort();
-		}
-
-		if ((*data)(Live_Neighbors_T()) == 3) {
-			(*data)(Is_Alive_T()) = true;
-		} else if ((*data)(Live_Neighbors_T()) != 2) {
-			(*data)(Is_Alive_T()) = false;
-		}
-		(*data)(Live_Neighbors_T()) = 0;
-	}
-}
-
 
 } // namespace
 
-#endif // ifndef GOL_SOLVE_HPP
+#endif // ifndef ADVECTION_INITIALIZE_HPP
