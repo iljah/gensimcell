@@ -43,8 +43,6 @@ using a unique namespace for each one.
 */
 namespace advection {
 
-// see ../serial.cpp for basics
-
 struct Density
 {
 	typedef double data_type;
