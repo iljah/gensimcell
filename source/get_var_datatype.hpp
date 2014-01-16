@@ -28,6 +28,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "boost/function_types/property_tags.hpp"
 #include "boost/mpl/vector.hpp"
 #include "boost/tti/has_member_function.hpp"
 #include "complex"
@@ -64,11 +65,20 @@ template <
 	static_assert(
 		has_member_function_get_mpi_datatype<
 			Variable_T,
-			boost::mpl::vector<void*, int, MPI_Datatype>
+			std::tuple<void*, int, MPI_Datatype>
+		>::value
+		or
+		has_member_function_get_mpi_datatype<
+			Variable_T,
+			std::tuple<void*, int, MPI_Datatype>,
+			boost::mpl::vector<>,
+			boost::function_types::const_qualified
 		>::value,
-		"Given Variable_T does not have a get_mpi_datatype "
-		"member function that specifies the data to be "
-		"transferred by MPI."
+		"Given Variable_T does not have a get_mpi_datatype() "
+		"member function that must specify the data to be "
+		"transferred by MPI, see the Particles class in "
+		"gensimcell/examples/particle_propagation/parallel/particle_variables.hpp "
+		"for an example."
 	);
 	return variable.get_mpi_datatype();
 }
