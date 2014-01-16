@@ -115,15 +115,6 @@ protected:
 		> transfer_info
 	) const {
 
-		/*!
-		Put transfer info of variables closer
-		to start of memory in front
-		*/
-		transfer_info = Cell_impl<
-			number_of_variables,
-			Rest_Of_Variables...
-		>::get_mpi_datatype_impl(transfer_info);
-
 		if (this->is_transferred(Current_Variable())) {
 			void* address = NULL;
 			int count = -1;
@@ -139,6 +130,15 @@ protected:
 			std::get<1>(transfer_info).push_back(count);
 			std::get<2>(transfer_info).push_back(datatype);
 		}
+
+		/*
+		Make the order of variables in the final data type
+		the same as in the template arguments list to the cell
+		*/
+		transfer_info = Cell_impl<
+			number_of_variables,
+			Rest_Of_Variables...
+		>::get_mpi_datatype_impl(transfer_info);
 
 		return transfer_info;
 	}
