@@ -206,8 +206,9 @@ int main(int argc, char* argv[])
 
 		simulation_time += time_step;
 
+		MPI_Allreduce(&next_time_step, &time_step, 1, MPI_DOUBLE, MPI_MIN, comm);
 		const double CFL = 0.5;
-		time_step = CFL * next_time_step;
+		time_step *= CFL;
 	}
 
 	MPI_Finalize();
