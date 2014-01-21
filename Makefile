@@ -53,7 +53,9 @@ EXECUTABLES = \
   examples/game_of_life/parallel/main.dexe \
   examples/game_of_life/parallel/gol2gnuplot.dexe \
   examples/advection/parallel/main.dexe \
-  examples/advection/parallel/advection2gnuplot.dexe
+  examples/advection/parallel/advection2gnuplot.dexe \
+  examples/particle_propagation/parallel/main.dexe \
+  examples/particle_propagation/parallel/particle2gnuplot.dexe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \

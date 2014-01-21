@@ -28,7 +28,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-//! see ../serial.cpp and ../game_of_life/parallel/* for basics
+//! see ../serial.cpp and ../advection/parallel/* for basics
 
 #include "array"
 #include "boost/lexical_cast.hpp"
@@ -41,15 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dccrg_cartesian_geometry.hpp"
 #include "gensimcell.hpp"
 
-#include "advection_initialize.hpp"
-#include "advection_save.hpp"
-#include "advection_solve.hpp"
-#include "advection_variables.hpp"
+#include "particle_initialize.hpp"
+#include "particle_save.hpp"
+#include "particle_solve.hpp"
+#include "particle_variables.hpp"
 
 int main(int argc, char* argv[])
 {
-	// the cell type used by this program
-	using Cell = advection::Cell;
+	using Cell = particle::Cell;
 
 	/*
 	Set up MPI
@@ -72,7 +71,7 @@ int main(int argc, char* argv[])
 	dccrg::Dccrg<Cell, dccrg::Cartesian_Geometry> grid;
 
 	// initialize the grid
-	std::array<uint64_t, 3> grid_length = {50, 50, 1};
+	std::array<uint64_t, 3> grid_length = {20, 20, 1};
 	const unsigned int neighborhood_size = 1;
 	if (not grid.initialize(
 		grid_length,
@@ -83,7 +82,7 @@ int main(int argc, char* argv[])
 		false, false, false
 	)) {
 		std::cerr << __FILE__ << ":" << __LINE__
-			<< ": Couldn't initialize game grid."
+			<< ": Couldn't initialize grid."
 			<< std::endl;
 		abort();
 	}
@@ -91,8 +90,8 @@ int main(int argc, char* argv[])
 	// set the grid's geometry
 	dccrg::Cartesian_Geometry::Parameters geom_params;
 	geom_params.start[0] =
-	geom_params.start[1] =
-	geom_params.start[2] = -1;
+	geom_params.start[1] = -1;
+	geom_params.start[2] = -1.0 / grid_length[0];
 	geom_params.level_0_cell_length[0] =
 	geom_params.level_0_cell_length[1] =
 	geom_params.level_0_cell_length[2] = 2.0 / grid_length[0];
@@ -108,23 +107,25 @@ int main(int argc, char* argv[])
 	/*
 	Simulate
 	*/
-	advection::initialize<
+
+	particle::initialize<
 		Cell,
-		advection::Density,
-		advection::Density_Flux,
-		advection::Velocity
+		particle::Number_Of_Particles,
+		particle::Particle_Destinations,
+		particle::Velocity,
+		particle::Internal_Particles
 	>(grid);
 
 	const std::vector<uint64_t>
 		inner_cells = grid.get_local_cells_not_on_process_boundary(),
 		outer_cells = grid.get_local_cells_on_process_boundary();
 
-	const double advection_save_interval = 0.1;
+	const double particle_save_interval = 0.1;
 
 	double
 		simulation_time = 0,
 		time_step = 0,
-		advection_next_save = 0;
+		particle_next_save = 0;
 	while (simulation_time <= M_PI) {
 
 		double next_time_step = std::numeric_limits<double>::max();
@@ -132,26 +133,31 @@ int main(int argc, char* argv[])
 		/*
 		Save simulation to disk
 		*/
-		if (advection_next_save <= simulation_time) {
-			advection_next_save += advection_save_interval;
+		if (particle_next_save <= simulation_time) {
+			particle_next_save += particle_save_interval;
 
-			advection::transfer_none<
+			particle::transfer_none<
 				Cell,
-				advection::Density,
-				advection::Density_Flux,
-				advection::Velocity
+				particle::Number_Of_Particles,
+				particle::Particle_Destinations,
+				particle::Velocity,
+				particle::Internal_Particles,
+				particle::External_Particles
 			>();
 
-			advection::save<
+			particle::save<
 				Cell,
-				advection::Density,
-				advection::Velocity
+				particle::Number_Of_Particles,
+				particle::Velocity,
+				particle::Internal_Particles
 			>(grid, simulation_time);
 
-			advection::transfer_all<
+			particle::transfer_all<
 				Cell,
-				advection::Density,
-				advection::Velocity
+				particle::Number_Of_Particles,
+				particle::Particle_Destinations,
+				particle::Velocity,
+				particle::External_Particles
 			>();
 		}
 
@@ -162,47 +168,94 @@ int main(int argc, char* argv[])
 		/*
 		Solve
 		*/
-		grid.start_remote_neighbor_copy_updates();
 
 		next_time_step
 			= std::min(
 				next_time_step,
-				advection::solve<
+				particle::solve<
 					Cell,
-					advection::Density,
-					advection::Density_Flux,
-					advection::Velocity
+					particle::Number_Of_Particles,
+					particle::Particle_Destinations,
+					particle::Velocity,
+					particle::Internal_Particles,
+					particle::External_Particles
 				>(time_step, inner_cells, grid)
 			);
 
-		grid.wait_remote_neighbor_copy_update_receives();
-
 		next_time_step
 			= std::min(
 				next_time_step,
-				advection::solve<
+				particle::solve<
 					Cell,
-					advection::Density,
-					advection::Density_Flux,
-					advection::Velocity
+					particle::Number_Of_Particles,
+					particle::Particle_Destinations,
+					particle::Velocity,
+					particle::Internal_Particles,
+					particle::External_Particles
 				>(time_step, outer_cells, grid)
 			);
+
+		// update particle counts so space can be allocated by receiving cells
+		particle::transfer_none<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::Velocity,
+			particle::Internal_Particles,
+			particle::External_Particles
+		>();
+		Cell::set_transfer_all(particle::Number_Of_Particles(), true);
+		grid.start_remote_neighbor_copy_updates();
+		// wait for particle count transfers to complete and allocate
+		grid.wait_remote_neighbor_copy_updates();
+		particle::resize_receiving_containers<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::External_Particles
+		>(grid);
+
+		// start updating particle coordinates
+		particle::transfer_all<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::Velocity,
+			particle::External_Particles
+		>();
+		Cell::set_transfer_all(particle::Number_Of_Particles(), false);
+		grid.start_remote_neighbor_copy_updates();
+		grid.wait_remote_neighbor_copy_update_receives();
+		grid.wait_remote_neighbor_copy_update_sends();
 
 		/*
 		Apply solution
 		*/
-		advection::apply_solution<
+		particle::move_particles<
 			Cell,
-			advection::Density,
-			advection::Density_Flux
+			particle::Particle_Destinations,
+			particle::Internal_Particles,
+			particle::External_Particles
 		>(inner_cells, grid);
 
-		grid.wait_remote_neighbor_copy_update_sends();
-
-		advection::apply_solution<
+		particle::move_particles<
 			Cell,
-			advection::Density,
-			advection::Density_Flux
+			particle::Particle_Destinations,
+			particle::Internal_Particles,
+			particle::External_Particles
+		>(outer_cells, grid);
+
+		particle::remove_external_particles<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::External_Particles
+		>(inner_cells, grid);
+
+		particle::remove_external_particles<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::External_Particles
 		>(outer_cells, grid);
 
 		simulation_time += time_step;

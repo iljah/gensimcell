@@ -102,9 +102,10 @@ int main(int argc, char* argv[])
 		abort();
 	}
 
+	grid.balance_load();
 
 	/*
-	Play the game
+	Simulate
 	*/
 	gol::initialize<Cell, gol::Is_Alive, gol::Live_Neighbors>(grid);
 

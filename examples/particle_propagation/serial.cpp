@@ -348,10 +348,11 @@ void apply_solution(grid_t& grid)
 
 			if (
 				coordinate[0] >= cell_center[0] - cell_size[0] / 2
-				and coordinate[0] < cell_center[0] + cell_size[0] / 2
+				and coordinate[0] <= cell_center[0] + cell_size[0] / 2
 				and coordinate[1] >= cell_center[1] - cell_size[1] / 2
-				and coordinate[1] < cell_center[1] + cell_size[1] / 2
+				and coordinate[1] <= cell_center[1] + cell_size[1] / 2
 			) {
+				// particle is still inside the same cell
 				continue;
 			} else {
 				coords.erase(coords.begin() + particle_i);
