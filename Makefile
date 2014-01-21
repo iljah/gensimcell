@@ -40,6 +40,7 @@ EXECUTABLES = \
   tests/serial/transfer_recursive.exe \
   tests/parallel/one_variable.exe \
   tests/parallel/many_variables.exe \
+  tests/parallel/memory_ordering.exe \
   tests/compile/dccrg/enable_if.dexe \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
@@ -69,7 +70,8 @@ TESTS = \
   tests/serial/transfer_many_cells_many_variables.tst \
   tests/serial/transfer_recursive.tst \
   tests/parallel/one_variable.tst \
-  tests/parallel/many_variables.tst
+  tests/parallel/many_variables.tst \
+  tests/parallel/memory_ordering.tst
 
 all: test
 
