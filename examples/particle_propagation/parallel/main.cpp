@@ -136,14 +136,14 @@ int main(int argc, char* argv[])
 		if (particle_next_save <= simulation_time) {
 			particle_next_save += particle_save_interval;
 
-			particle::transfer_none<
-				Cell,
-				particle::Number_Of_Particles,
-				particle::Particle_Destinations,
-				particle::Velocity,
-				particle::Internal_Particles,
-				particle::External_Particles
-			>();
+			Cell::set_transfer_all(
+				false,
+				particle::Number_Of_Particles(),
+				particle::Particle_Destinations(),
+				particle::Velocity(),
+				particle::Internal_Particles(),
+				particle::External_Particles()
+			);
 
 			particle::save<
 				Cell,
@@ -152,36 +152,24 @@ int main(int argc, char* argv[])
 				particle::Internal_Particles
 			>(grid, simulation_time);
 
-			particle::transfer_all<
-				Cell,
-				particle::Number_Of_Particles,
-				particle::Particle_Destinations,
-				particle::Velocity,
-				particle::External_Particles
-			>();
+			Cell::set_transfer_all(
+				true,
+				particle::Number_Of_Particles(),
+				particle::Particle_Destinations(),
+				particle::Velocity(),
+				particle::External_Particles()
+			);
 		}
 
 		if (simulation_time >= M_PI) {
 			break;
 		}
 
+
 		/*
-		Solve
+		Propagate particles in outer cells first so the number
+		of external particles can be sent to other processes.
 		*/
-
-		next_time_step
-			= std::min(
-				next_time_step,
-				particle::solve<
-					Cell,
-					particle::Number_Of_Particles,
-					particle::Particle_Destinations,
-					particle::Velocity,
-					particle::Internal_Particles,
-					particle::External_Particles
-				>(time_step, inner_cells, grid)
-			);
-
 		next_time_step
 			= std::min(
 				next_time_step,
@@ -195,55 +183,98 @@ int main(int argc, char* argv[])
 				>(time_step, outer_cells, grid)
 			);
 
-		// update particle counts so space can be allocated by receiving cells
-		particle::transfer_none<
-			Cell,
-			particle::Number_Of_Particles,
-			particle::Particle_Destinations,
-			particle::Velocity,
-			particle::Internal_Particles,
-			particle::External_Particles
-		>();
-		Cell::set_transfer_all(particle::Number_Of_Particles(), true);
+		/*
+		Update number of particles in external lists of outer cells
+		so that receiving processes can allocate memory for coordinates.
+		*/
+		Cell::set_transfer_all(true, particle::Number_Of_Particles());
+		Cell::set_transfer_all(
+			false,
+			particle::Particle_Destinations(),
+			particle::Velocity(),
+			particle::Internal_Particles(),
+			particle::External_Particles()
+		);
 		grid.start_remote_neighbor_copy_updates();
-		// wait for particle count transfers to complete and allocate
-		grid.wait_remote_neighbor_copy_updates();
+
+		/*
+		Propagate particles in inner cells while number of
+		particles in external lists of outer cells is transferred.
+		*/
+		next_time_step
+			= std::min(
+				next_time_step,
+				particle::solve<
+					Cell,
+					particle::Number_Of_Particles,
+					particle::Particle_Destinations,
+					particle::Velocity,
+					particle::Internal_Particles,
+					particle::External_Particles
+				>(time_step, inner_cells, grid)
+			);
+
+		/*
+		Wait for particle counts in external lists of
+		outer cells to arrive and allocate memory required
+		for particle coordinates.
+		*/
+		grid.wait_remote_neighbor_copy_update_receives();
 		particle::resize_receiving_containers<
 			Cell,
 			particle::Number_Of_Particles,
 			particle::External_Particles
 		>(grid);
 
-		// start updating particle coordinates
-		particle::transfer_all<
-			Cell,
-			particle::Number_Of_Particles,
-			particle::Particle_Destinations,
-			particle::Velocity,
-			particle::External_Particles
-		>();
-		Cell::set_transfer_all(particle::Number_Of_Particles(), false);
-		grid.start_remote_neighbor_copy_updates();
-		grid.wait_remote_neighbor_copy_update_receives();
 		grid.wait_remote_neighbor_copy_update_sends();
 
 		/*
-		Apply solution
+		Start transferring coordinates of particles in external lists
+		of outer cells between processes.
 		*/
-		particle::move_particles<
+		Cell::set_transfer_all(false, particle::Number_Of_Particles());
+		Cell::set_transfer_all(
+			true,
+			particle::Number_Of_Particles(),
+			particle::Particle_Destinations(),
+			particle::Velocity(),
+			particle::External_Particles()
+		);
+		grid.start_remote_neighbor_copy_updates();
+
+		/*
+		Copy particles in external lists of neighbors
+		of inner cells to internal lists of inner cells.
+		*/
+		particle::incorporate_external_particles<
 			Cell,
 			particle::Particle_Destinations,
 			particle::Internal_Particles,
 			particle::External_Particles
 		>(inner_cells, grid);
 
-		particle::move_particles<
+		/*
+		Wait for particles in external lists of other
+		processes' cells to arrive.
+		*/
+		grid.wait_remote_neighbor_copy_update_receives();
+
+		/*
+		After receiving external lists of neighbors of
+		outer cells their particles can be copied to the
+		internal lists of local cells.
+		*/
+		particle::incorporate_external_particles<
 			Cell,
 			particle::Particle_Destinations,
 			particle::Internal_Particles,
 			particle::External_Particles
 		>(outer_cells, grid);
 
+		/*
+		All local cells have incorporated the particles in
+		external lists of inner cells so they can be removed.
+		*/
 		particle::remove_external_particles<
 			Cell,
 			particle::Number_Of_Particles,
@@ -251,6 +282,16 @@ int main(int argc, char* argv[])
 			particle::External_Particles
 		>(inner_cells, grid);
 
+		/*
+		Wait for coordinates of local particles in external
+		lists of outer cells to arrive to other processes.
+		*/
+		grid.wait_remote_neighbor_copy_update_sends();
+
+		/*
+		Once local external lists have arrived to other
+		processes they can be removed on this one.
+		*/
 		particle::remove_external_particles<
 			Cell,
 			particle::Number_Of_Particles,

@@ -66,7 +66,7 @@ int main(int, char**)
 	CHECK_TRUE(c3_2.is_transferred(v3))
 
 	// test static variable logic
-	c1_1.set_transfer_all(v2, false);
+	c1_1.set_transfer_all(false, v2);
 	CHECK_TRUE(not c1_1.is_transferred(v2))
 	CHECK_TRUE(not c1_2.is_transferred(v2))
 	CHECK_TRUE(c2_1.is_transferred(v2))
@@ -75,15 +75,15 @@ int main(int, char**)
 	CHECK_TRUE(c3_2.is_transferred(v2))
 
 	// test combinations of static and cell specific logic
-	c3_1.set_transfer_all(v2, boost::logic::indeterminate);
-	c3_1.set_transfer(v2, false);
+	c3_1.set_transfer_all(boost::logic::indeterminate, v2);
+	c3_1.set_transfer(false, v2);
 	CHECK_TRUE(not c3_1.is_transferred(v2))
 	CHECK_TRUE(c3_2.is_transferred(v2))
 
-	c2_2.set_transfer(v3, false);
-	c2_2.set_transfer_all(v3, true);
-	c3_1.set_transfer_all(v3, boost::logic::indeterminate);
-	c3_2.set_transfer(v3, false);
+	c2_2.set_transfer(false, v3);
+	c2_2.set_transfer_all(true, v3);
+	c3_1.set_transfer_all(boost::logic::indeterminate, v3);
+	c3_2.set_transfer(false, v3);
 	CHECK_TRUE(c2_1.is_transferred(v3))
 	CHECK_TRUE(c2_2.is_transferred(v3))
 	CHECK_TRUE(not c3_2.is_transferred(v3))

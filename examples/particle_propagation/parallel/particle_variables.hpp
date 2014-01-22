@@ -158,54 +158,6 @@ typedef gensimcell::Cell<
 > Cell;
 
 
-/*!
-Stops the MPI transfer of all variables
-used in a parallel particle simulation.
-
-The actual variables used by a particular particle
-simulation with the given cell type are given as
-template parameters.
-*/
-template<
-	class Cell_T,
-	class Number_Of_Particles_T,
-	class Particle_Destinations_T,
-	class Velocity_T,
-	class Internal_Particles_T,
-	class External_Particles_T
-> void transfer_none()
-{
-	Cell_T::set_transfer_all(Number_Of_Particles_T(), false);
-	Cell_T::set_transfer_all(Particle_Destinations_T(), false);
-	Cell_T::set_transfer_all(Velocity_T(), false);
-	Cell_T::set_transfer_all(Internal_Particles_T(), false);
-	Cell_T::set_transfer_all(External_Particles_T(), false);
-}
-
-
-/*!
-Starts the MPI transfer of all variables
-required in a particle advection simulation.
-
-The actual variables used by a particular particle
-simulation with the given cell type are given as
-template parameters.
-*/
-template<
-	class Cell_T,
-	class Number_Of_Particles_T,
-	class Particle_Destinations_T,
-	class Velocity_T,
-	class External_Particles_T
-> void transfer_all()
-{
-	Cell_T::set_transfer_all(Number_Of_Particles_T(), true);
-	Cell_T::set_transfer_all(Particle_Destinations_T(), true);
-	Cell_T::set_transfer_all(Velocity_T(), true);
-	Cell_T::set_transfer_all(External_Particles_T(), true);
-}
-
-
 } // namespace
 
 #endif // ifndef PARTICLE_VARIABLES_HPP

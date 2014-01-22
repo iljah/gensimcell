@@ -58,44 +58,6 @@ typedef gensimcell::Cell<
 	gol::Live_Neighbors
 > Cell;
 
-
-/*!
-Stops the MPI transfer of all variables
-used in a parallel game of life simulation.
-
-The actual variables used by a particular game of life
-simulation with the given cell type are given as
-template parameters.
-*/
-template<
-	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void transfer_none()
-{
-	Cell_T::set_transfer_all(Is_Alive_T(), false);
-	Cell_T::set_transfer_all(Live_Neighbors_T(), false);
-}
-
-
-/*!
-Starts the MPI transfer of all variables
-required in a parallel game of life simulation.
-
-The actual variables used by a particular game of life
-simulation with the given cell type are given as
-template parameters.
-*/
-template<
-	class Cell_T,
-	class Is_Alive_T,
-	class Live_Neighbors_T
-> void transfer_all()
-{
-	Cell_T::set_transfer_all(Is_Alive_T(), true);
-}
-
-
 } // namespace
 
 #endif // ifndef GOL_VARIABLES_HPP

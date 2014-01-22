@@ -103,6 +103,22 @@ private:
 protected:
 
 
+	static void set_transfer_all_impl(
+		const boost::logic::tribool given_transfer,
+		const Current_Variable&
+	) {
+		transfer_all = given_transfer;
+	}
+
+
+	void set_transfer_impl(
+		const bool given_transfer,
+		const Current_Variable&
+	) {
+		this->transfer = given_transfer;
+	}
+
+
 	std::tuple<
 		std::vector<void*>,
 		std::vector<int>,
@@ -153,9 +169,9 @@ public:
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator();
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all_impl;
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_impl;
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer;
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
@@ -171,12 +187,30 @@ public:
 	};
 
 
-	static void set_transfer_all(
-		const Current_Variable&,
-		const boost::logic::tribool given
+	template<class... Given_Vars> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const Given_Vars&...
+	);
+
+	template<
+		class First_Given_Var,
+		class... Rest_Given_Vars
+	> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const First_Given_Var& first,
+		const Rest_Given_Vars&... rest
 	) {
-		transfer_all = given;
+		set_transfer_all_impl(given_transfer, first);
+		set_transfer_all(given_transfer, rest...);
 	}
+
+	template<class Given_Var> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const Given_Var& var
+	) {
+		set_transfer_all_impl(given_transfer, var);
+	}
+
 
 	static boost::logic::tribool get_transfer_all(const Current_Variable&)
 	{
@@ -184,12 +218,30 @@ public:
 	}
 
 
-	void set_transfer(
-		const Current_Variable&,
-		const bool given
+	template<class... Given_Vars> void set_transfer(
+		const bool given_transfer,
+		const Given_Vars&...
+	);
+
+	template<
+		class First_Given_Var,
+		class... Rest_Given_Vars
+	> void set_transfer(
+		const bool given_transfer,
+		const First_Given_Var& first,
+		const Rest_Given_Vars&... rest
 	) {
-		this->transfer = given;
+		this->set_transfer_impl(given_transfer, first);
+		this->set_transfer(given_transfer, rest...);
 	}
+
+	template<class Given_Var> void set_transfer(
+		const bool given_transfer,
+		const Given_Var& var
+	) {
+		this->set_transfer_impl(given_transfer, var);
+	}
+
 
 	bool get_transfer(const Current_Variable&) const
 	{
@@ -341,6 +393,20 @@ private:
 protected:
 
 
+	static void set_transfer_all_impl(
+		const boost::logic::tribool given_transfer,
+		const Variable&
+	) {
+		transfer_all = given_transfer;
+	}
+
+
+	void set_transfer_impl(const bool given_transfer, const Variable&)
+	{
+		this->transfer = given_transfer;
+	}
+
+
 	std::tuple<
 		std::vector<void*>,
 		std::vector<int>,
@@ -388,12 +454,30 @@ public:
 	}
 
 
-	static void set_transfer_all(
-		const Variable&,
-		const boost::logic::tribool given
+	template<class... Given_Vars> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const Given_Vars&...
+	);
+
+	template<
+		class First_Given_Var,
+		class... Rest_Given_Vars
+	> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const First_Given_Var& first,
+		const Rest_Given_Vars&... rest
 	) {
-		transfer_all = given;
+		set_transfer_all_impl(given_transfer, first);
+		set_transfer_all(given_transfer, rest...);
 	}
+
+	template<class Given_Var> static void set_transfer_all(
+		const boost::logic::tribool given_transfer,
+		const Given_Var& var
+	) {
+		set_transfer_all_impl(given_transfer, var);
+	}
+
 
 	static boost::logic::tribool get_transfer_all(const Variable&)
 	{
@@ -401,10 +485,30 @@ public:
 	}
 
 
-	void set_transfer(const Variable&, const bool given)
-	{
-		this->transfer = given;
+	template<class... Given_Vars> void set_transfer(
+		const bool given_transfer,
+		const Given_Vars&...
+	);
+
+	template<
+		class First_Given_Var,
+		class... Rest_Given_Vars
+	> void set_transfer(
+		const bool given_transfer,
+		const First_Given_Var& first,
+		const Rest_Given_Vars&... rest
+	) {
+		this->set_transfer(given_transfer, rest...);
+		this->set_transfer_impl(given_transfer, first);
 	}
+
+	template<class Given_Var> void set_transfer(
+		const bool given_transfer,
+		const Given_Var& var
+	) {
+		this->set_transfer_impl(given_transfer, var);
+	}
+
 
 	bool get_transfer(const Variable&) const
 	{

@@ -23,16 +23,26 @@ int main(int, char**)
 	CHECK_TRUE(c1.is_transferred(v1))
 
 	// test logic between static and instance specific transfers
-	c1.set_transfer(v1, false);
+	c1.set_transfer(false, v1);
 	CHECK_TRUE(c1.is_transferred(v1))
 
-	c1.set_transfer_all(v1, boost::logic::indeterminate);
+	c1.set_transfer_all(boost::logic::indeterminate, v1);
 	CHECK_TRUE(not c1.is_transferred(v1))
 
-	c1.set_transfer_all(v1, false);
-	c1.set_transfer(v1, true);
+	c1.set_transfer_all(false, v1);
+	c1.set_transfer(true, v1);
 	CHECK_TRUE(not c1.is_transferred(v1))
 
+	// check variadic version
+	c1.set_transfer_all(true, v1, v1);
+	CHECK_TRUE(c1.is_transferred(v1))
+
+	c1.set_transfer_all(boost::logic::indeterminate, v1, v1, v1);
+	c1.set_transfer(false, v1, v1, v1, v1);
+	CHECK_TRUE(not c1.is_transferred(v1))
+
+	c1.set_transfer(true, v1, v1, v1);
+	CHECK_TRUE(c1.is_transferred(v1))
 
 	return EXIT_SUCCESS;
 }

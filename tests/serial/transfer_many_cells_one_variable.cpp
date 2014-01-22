@@ -27,19 +27,19 @@ int main(int, char**)
 	CHECK_TRUE(c1_3.is_transferred(v1))
 
 	// test logic between static and instance specific transfers
-	c1_1.set_transfer_all(v1, false);
+	c1_1.set_transfer_all(false, v1);
 	CHECK_TRUE(not c1_2.get_transfer_all(v1))
 	CHECK_TRUE(not c1_3.get_transfer_all(v1))
 	CHECK_TRUE(not c1_2.is_transferred(v1))
 	CHECK_TRUE(not c1_3.is_transferred(v1))
 
-	c1_2.set_transfer_all(v1, boost::logic::indeterminate);
-	c1_2.set_transfer(v1, false);
+	c1_2.set_transfer_all(boost::logic::indeterminate, v1);
+	c1_2.set_transfer(false, v1);
 	CHECK_TRUE(c1_1.is_transferred(v1))
 	CHECK_TRUE(not c1_2.is_transferred(v1))
 	CHECK_TRUE(c1_3.is_transferred(v1))
 
-	c1_3.set_transfer(v1, false);
+	c1_3.set_transfer(false, v1);
 	CHECK_TRUE(c1_1.is_transferred(v1))
 	CHECK_TRUE(not c1_2.is_transferred(v1))
 	CHECK_TRUE(not c1_3.is_transferred(v1))

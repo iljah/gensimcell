@@ -64,8 +64,7 @@ template<
 	const double simulation_time
 ) {
 	// save density and velocity
-	Cell_T::set_transfer_all(Density_T(), true);
-	Cell_T::set_transfer_all(Velocity_T(), true);
+	Cell_T::set_transfer_all(true, Density_T(), Velocity_T());
 
 	// get the file name
 	std::ostringstream time_string;

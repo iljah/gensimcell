@@ -39,19 +39,40 @@ int main(int, char**)
 	CHECK_TRUE(c1.is_transferred(v2))
 
 	// check that variables don't affect each other
-	c1.set_transfer_all(v1, false);
+	c1.set_transfer_all(false, v1);
 	CHECK_TRUE(c1.is_transferred(v2))
 	CHECK_TRUE(c1.is_transferred(v3))
 
-	c1.set_transfer_all(v1, boost::logic::indeterminate);
-	c1.set_transfer_all(v2, boost::logic::indeterminate);
-	c1.set_transfer_all(v3, boost::logic::indeterminate);
+	c1.set_transfer_all(boost::logic::indeterminate, v1);
+	c1.set_transfer_all(boost::logic::indeterminate, v2);
+	c1.set_transfer_all(boost::logic::indeterminate, v3);
 
-	c1.set_transfer(v2, false);
-	c1.set_transfer(v3, false);
+	c1.set_transfer(false, v2);
+	c1.set_transfer(false, v3);
 	CHECK_TRUE(c1.is_transferred(v1))
 	CHECK_TRUE(not c1.is_transferred(v2))
 	CHECK_TRUE(not c1.is_transferred(v3))
+
+	// vardic versions
+	c1.set_transfer(true, v2, v3);
+	CHECK_TRUE(c1.is_transferred(v2))
+	CHECK_TRUE(c1.is_transferred(v3))
+
+	c1.set_transfer_all(false, v1, v2, v3);
+	CHECK_TRUE(not c1.is_transferred(v1))
+	CHECK_TRUE(not c1.is_transferred(v2))
+	CHECK_TRUE(not c1.is_transferred(v3))
+
+	c1.set_transfer_all(boost::logic::indeterminate, v1, v2, v3);
+	c1.set_transfer(false, v1, v2, v3);
+	CHECK_TRUE(not c1.is_transferred(v1))
+	CHECK_TRUE(not c1.is_transferred(v2))
+	CHECK_TRUE(not c1.is_transferred(v3))
+
+	c1.set_transfer(true, v1, v2, v3);
+	CHECK_TRUE(c1.is_transferred(v1))
+	CHECK_TRUE(c1.is_transferred(v2))
+	CHECK_TRUE(c1.is_transferred(v3))
 
 	return EXIT_SUCCESS;
 }

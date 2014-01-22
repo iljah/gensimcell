@@ -57,7 +57,7 @@ int main(int, char**)
 	CHECK_TRUE(c1.is_transferred(v1))
 	CHECK_TRUE(c2(v2).is_transferred(v1))
 	CHECK_TRUE(c3(v3).is_transferred(v1))
-	c1.set_transfer_all(v1, false);
+	c1.set_transfer_all(false, v1);
 	CHECK_TRUE(not c1.is_transferred(v1))
 	CHECK_TRUE(not c2(v2).is_transferred(v1))
 	CHECK_TRUE(not c3(v3).is_transferred(v1))
@@ -65,23 +65,31 @@ int main(int, char**)
 	CHECK_TRUE(not c4(v3).is_transferred(v1))
 
 	// check cell/variable specific logic
-	c1.set_transfer_all(v1, boost::logic::indeterminate);
-	c2(v2).set_transfer(v1, false);
+	c1.set_transfer_all(boost::logic::indeterminate, v1);
+	c2(v2).set_transfer(false, v1);
 	CHECK_TRUE(not c2(v2).is_transferred(v1))
 	CHECK_TRUE(c3(v3).is_transferred(v1))
 	CHECK_TRUE(c4(v2).is_transferred(v1))
 	CHECK_TRUE(c4(v3).is_transferred(v1))
 
-	c4(v2).set_transfer(v1, false);
+	c4(v2).set_transfer(false, v1);
 	CHECK_TRUE(not c4(v2).is_transferred(v1))
 	CHECK_TRUE(c4(v3).is_transferred(v1))
 
-	c1.set_transfer_all(v1, true);
+	c1.set_transfer_all(true, v1);
 	CHECK_TRUE(c1.is_transferred(v1))
 	CHECK_TRUE(c2(v2).is_transferred(v1))
 	CHECK_TRUE(c3(v3).is_transferred(v1))
 	CHECK_TRUE(c4(v2).is_transferred(v1))
 	CHECK_TRUE(c4(v3).is_transferred(v1))
+
+	c4.set_transfer_all(false, v1, v2, v3);
+	CHECK_TRUE(not c4.is_transferred(v1))
+	CHECK_TRUE(not c4.is_transferred(v2))
+	CHECK_TRUE(not c4.is_transferred(v3))
+
+	c4(v3).set_transfer_all(false, v1, v1, v1);
+	CHECK_TRUE(not c4(v3).is_transferred(v1))
 
 
 	return EXIT_SUCCESS;

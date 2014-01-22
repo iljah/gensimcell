@@ -236,14 +236,15 @@ template<
 
 
 /*!
-Moves particles from the neighbors of given cells into given cells.
+Copies particles from the external particle lists of neighbors
+of given cells into internal particle lists of given cells.
 */
 template<
 	class Cell_T,
 	class Particle_Destinations_T,
 	class Internal_Particles_T,
 	class External_Particles_T
-> void move_particles(
+> void incorporate_external_particles(
 	const std::vector<uint64_t>& cell_ids,
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
 ) {

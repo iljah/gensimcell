@@ -121,11 +121,11 @@ int main(int argc, char* argv[])
 		save() itself decides what to "transfer" to the file so
 		switch off all transfers before and restore them after.
 		*/
-		gol::transfer_none<Cell, gol::Is_Alive, gol::Live_Neighbors>();
+		Cell::set_transfer_all(false, gol::Is_Alive(), gol::Live_Neighbors());
 
 		gol::save<Cell, gol::Is_Alive>(grid, simulation_time);
 
-		gol::transfer_all<Cell, gol::Is_Alive, gol::Live_Neighbors>();
+		Cell::set_transfer_all(true, gol::Is_Alive(), gol::Live_Neighbors());
 
 		if (simulation_time >= M_PI) {
 			// don't simulate an extra step, e.g. if only initial state needed 

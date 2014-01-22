@@ -63,7 +63,7 @@ template<
 	const double simulation_time
 ) {
 	// only save the life state of cells
-	Cell_T::set_transfer_all(Is_Alive_T(), true);
+	Cell_T::set_transfer_all(true, Is_Alive_T());
 
 	// get the file name
 	std::ostringstream time_string;

@@ -135,12 +135,12 @@ int main(int argc, char* argv[])
 		if (advection_next_save <= simulation_time) {
 			advection_next_save += advection_save_interval;
 
-			advection::transfer_none<
-				Cell,
-				advection::Density,
-				advection::Density_Flux,
-				advection::Velocity
-			>();
+			Cell::set_transfer_all(
+				false,
+				advection::Density(),
+				advection::Density_Flux(),
+				advection::Velocity()
+			);
 
 			advection::save<
 				Cell,
@@ -148,11 +148,11 @@ int main(int argc, char* argv[])
 				advection::Velocity
 			>(grid, simulation_time);
 
-			advection::transfer_all<
-				Cell,
-				advection::Density,
-				advection::Velocity
-			>();
+			Cell::set_transfer_all(
+				true,
+				advection::Density(),
+				advection::Velocity()
+			);
 		}
 
 		if (simulation_time >= M_PI) {

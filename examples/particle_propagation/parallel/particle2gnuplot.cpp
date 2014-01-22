@@ -149,17 +149,17 @@ int main(int argc, char* argv[])
 		*/
 
 		// read the variables on a cell-by-cell basis
-		particle::transfer_none<
-			Cell,
-			particle::Number_Of_Particles,
-			particle::Particle_Destinations,
-			particle::Velocity,
-			particle::Internal_Particles,
-			particle::External_Particles
-		>();
-		Cell::set_transfer_all(Number_Of_Particles(), boost::logic::indeterminate);
-		Cell::set_transfer_all(Velocity(), boost::logic::indeterminate);
-		Cell::set_transfer_all(Internal_Particles(), boost::logic::indeterminate);
+		Cell::set_transfer_all(
+			boost::logic::indeterminate,
+			Number_Of_Particles(),
+			Velocity(),
+			Internal_Particles()
+		);
+		Cell::set_transfer_all(
+			false,
+			particle::Particle_Destinations(),
+			particle::External_Particles()
+		);
 
 		for (const auto& item: cells_offsets) {
 			const uint64_t cell_id = item.first;
@@ -175,9 +175,8 @@ int main(int argc, char* argv[])
 				file_datatype = MPI_DATATYPE_NULL;
 
 			// read constant sized data
-			cell_data.set_transfer(Number_Of_Particles(), true);
-			cell_data.set_transfer(Velocity(), true);
-			cell_data.set_transfer(Internal_Particles(), false);
+			cell_data.set_transfer(true, Number_Of_Particles(), Velocity());
+			cell_data.set_transfer(false, Internal_Particles());
 
 			tie(
 				memory_address,
@@ -215,9 +214,8 @@ int main(int argc, char* argv[])
 			cell_data(Internal_Particles()).resize(cell_data(Number_Of_Particles()));
 
 			// read the particle coordinates and velocity
-			cell_data.set_transfer(Number_Of_Particles(), false);
-			cell_data.set_transfer(Velocity(), false);
-			cell_data.set_transfer(Internal_Particles(), true);
+			cell_data.set_transfer(false, Number_Of_Particles(), Velocity());
+			cell_data.set_transfer(true, Internal_Particles());
 
 			tie(
 				memory_address,
@@ -285,9 +283,9 @@ int main(int argc, char* argv[])
 		gnuplot_file << "end\n";
 		gnuplot_file.close();
 
-		cout << "Total number of particles in file " << argv_string
-			<< ": " << total_particles
-			<< endl;
+               cout << "Total number of particles in file " << argv_string
+                       << ": " << total_particles
+                       << endl;
 
 		system(("gnuplot " + gnuplot_file_name).c_str());
 	}

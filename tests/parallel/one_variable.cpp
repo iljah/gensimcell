@@ -60,7 +60,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 
 
 		// don't send v1
-		c1_1.set_transfer_all(v1, false);
+		c1_1.set_transfer_all(false, v1);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -83,8 +83,8 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 
 
 		// send v1
-		c1_1.set_transfer_all(v1, boost::logic::indeterminate);
-		c1_1.set_transfer(v1, true);
+		c1_1.set_transfer_all(boost::logic::indeterminate, v1);
+		c1_1.set_transfer(true, v1);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -159,7 +159,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		c1_1(v1) = -1;
 
 
-		c1_1.set_transfer_all(v1, false);
+		c1_1.set_transfer_all(false, v1);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -182,8 +182,8 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		CHECK_TRUE(c1_1(v1) == -1)
 
 
-		c1_1.set_transfer_all(v1, boost::logic::indeterminate);
-		c1_1.set_transfer(v1, true);
+		c1_1.set_transfer_all(boost::logic::indeterminate, v1);
+		c1_1.set_transfer(true, v1);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -278,7 +278,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		c1s[0].set_transfer_all(v1, false);
+		c1s[0].set_transfer_all(false, v1);
 		for (auto& cell: c1s) {
 			std::tie(address, count, datatype) = cell.get_mpi_datatype();
 			if (count < 0) {
@@ -301,12 +301,12 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		c1s[0].set_transfer_all(v1, boost::logic::indeterminate);
+		c1s[0].set_transfer_all(boost::logic::indeterminate, v1);
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				c1s[i].set_transfer(v1, true);
+				c1s[i].set_transfer(true, v1);
 			} else {
-				c1s[i].set_transfer(v1, false);
+				c1s[i].set_transfer(false, v1);
 			}
 		}
 
@@ -374,7 +374,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		c2s[0].set_transfer_all(v2, false);
+		c2s[0].set_transfer_all(false, v2);
 		for (auto& cell: c2s) {
 			std::tie(address, count, datatype) = cell.get_mpi_datatype();
 			if (count < 0) {
@@ -433,7 +433,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		c1s[0].set_transfer_all(v1, false);
+		c1s[0].set_transfer_all(false, v1);
 		for (auto& cell: c1s) {
 			std::tie(address, count, datatype) = cell.get_mpi_datatype();
 			if (count < 0) {
@@ -460,12 +460,12 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
-		c1s[0].set_transfer_all(v1, boost::logic::indeterminate);
+		c1s[0].set_transfer_all(boost::logic::indeterminate, v1);
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				c1s[i].set_transfer(v1, true);
+				c1s[i].set_transfer(true, v1);
 			} else {
-				c1s[i].set_transfer(v1, false);
+				c1s[i].set_transfer(false, v1);
 			}
 		}
 
@@ -537,7 +537,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			}
 		}
 
-		c2s[0].set_transfer_all(v2, false);
+		c2s[0].set_transfer_all(false, v2);
 		for (auto& cell: c2s) {
 			std::tie(address, count, datatype) = cell.get_mpi_datatype();
 			if (count < 0) {

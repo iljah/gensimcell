@@ -64,9 +64,12 @@ template<
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid,
 	const double simulation_time
 ) {
-	Cell_T::set_transfer_all(Number_Of_Particles_T(), true);
-	Cell_T::set_transfer_all(Velocity_T(), true);
-	Cell_T::set_transfer_all(Internal_Particles_T(), true);
+	Cell_T::set_transfer_all(
+		true,
+		Number_Of_Particles_T(),
+		Velocity_T(),
+		Internal_Particles_T()
+	);
 
 	// use Number_Of_Particles_T to mark internal particles
 	for (auto& item: grid) {

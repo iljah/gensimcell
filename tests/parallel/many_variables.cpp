@@ -88,8 +88,7 @@ void transfer_c1(MPI_Comm comm, const int rank)
 
 
 		// don't send v1 and v3
-		c1_1.set_transfer_all(v1, false);
-		c1_1.set_transfer_all(v3, false);
+		c1_1.set_transfer_all(false, v1, v3);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -116,8 +115,8 @@ void transfer_c1(MPI_Comm comm, const int rank)
 
 
 		// send v3 from process 1 to 0
-		c1_1.set_transfer_all(v3, true);
-		c1_1.set_transfer_all(v2, false);
+		c1_1.set_transfer_all(true, v3);
+		c1_1.set_transfer_all(false, v2);
 		c1_1(v1) = -1;
 		c1_1(v2) = {-1, -1, -1};
 		c1_1(v3) = -1;
@@ -191,8 +190,7 @@ void transfer_c1(MPI_Comm comm, const int rank)
 		c1_1(v3) = -1;
 
 
-		c1_1.set_transfer_all(v1, false);
-		c1_1.set_transfer_all(v3, false);
+		c1_1.set_transfer_all(false, v1, v3);
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -220,8 +218,8 @@ void transfer_c1(MPI_Comm comm, const int rank)
 		c1_1(v2) = {-1, -1, -1};
 
 
-		c1_1.set_transfer_all(v3, true);
-		c1_1.set_transfer_all(v2, false);
+		c1_1.set_transfer_all(true, v3);
+		c1_1.set_transfer_all(false, v2);
 		c1_1(v1) = 2;
 		c1_1(v2) = {5.5, 6.25, 7.75};
 		c1_1(v3) = 8.5;
@@ -318,21 +316,14 @@ void transfer_cN(MPI_Comm comm, const int rank)
 
 
 		// send every other variable from every other cell
-		c1s[0].set_transfer_all(v1, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v2, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v3, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v4, boost::logic::indeterminate);
+		c1s[0].set_transfer_all(boost::logic::indeterminate, v1, v2, v3, v4);
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				c1s[i].set_transfer(v1, false);
-				c1s[i].set_transfer(v2, true);
-				c1s[i].set_transfer(v3, false);
-				c1s[i].set_transfer(v4, true);
+				c1s[i].set_transfer(false, v1, v3);
+				c1s[i].set_transfer(true, v2, v4);
 			} else {
-				c1s[i].set_transfer(v1, true);
-				c1s[i].set_transfer(v2, false);
-				c1s[i].set_transfer(v3, true);
-				c1s[i].set_transfer(v4, false);
+				c1s[i].set_transfer(true, v1, v3);
+				c1s[i].set_transfer(false, v2, v4);
 			}
 		}
 
@@ -430,21 +421,14 @@ void transfer_cN(MPI_Comm comm, const int rank)
 		}
 
 
-		c1s[0].set_transfer_all(v1, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v2, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v3, boost::logic::indeterminate);
-		c1s[0].set_transfer_all(v4, boost::logic::indeterminate);
+		c1s[0].set_transfer_all(boost::logic::indeterminate, v1, v2, v3, v4);
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				c1s[i].set_transfer(v1, false);
-				c1s[i].set_transfer(v2, true);
-				c1s[i].set_transfer(v3, false);
-				c1s[i].set_transfer(v4, true);
+				c1s[i].set_transfer(false, v1, v3);
+				c1s[i].set_transfer(true, v2, v4);
 			} else {
-				c1s[i].set_transfer(v1, true);
-				c1s[i].set_transfer(v2, false);
-				c1s[i].set_transfer(v3, true);
-				c1s[i].set_transfer(v4, false);
+				c1s[i].set_transfer(true, v1, v3);
+				c1s[i].set_transfer(false, v2, v4);
 			}
 		}
 
