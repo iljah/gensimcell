@@ -74,8 +74,8 @@ typedef gensimcell::Cell<
 
 //! horizontal and vertical size of the grid
 constexpr size_t
-	width = 50,
-	height = 50;
+	width = 20,
+	height = 20;
 
 /*!
 Use row wise storage so, for example, to access

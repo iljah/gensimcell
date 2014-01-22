@@ -29,35 +29,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef GOL_VARIABLES_HPP
-#define GOL_VARIABLES_HPP
+#ifndef COMBINED_VARIABLES_HPP
+#define COMBINED_VARIABLES_HPP
+
 
 #include "gensimcell.hpp"
 
-//! see ../serial.cpp for the basics
+#include "gol_variables.hpp"
+#include "advection_variables.hpp"
+#include "particle_variables.hpp"
 
-/*!
-Avoid collisions between the names of
-variables of different simulations by
-using a unique namespace for each one.
-*/
-namespace gol {
-
-struct Is_Alive
-{
-	typedef bool data_type;
-};
-
-struct Live_Neighbors
-{
-	typedef int data_type;
-};
+namespace combined {
 
 typedef gensimcell::Cell<
-	Is_Alive,
-	Live_Neighbors
+	gol::Is_Alive,
+	gol::Live_Neighbors,
+	advection::Density,
+	advection::Density_Flux,
+	advection::Velocity,
+	particle::Number_Of_Particles,
+	particle::Particle_Destinations,
+	particle::Velocity,
+	particle::Internal_Particles,
+	particle::External_Particles
 > Cell;
 
 } // namespace
 
-#endif // ifndef GOL_VARIABLES_HPP
+#endif // ifndef COMBINED_VARIABLES_HPP

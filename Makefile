@@ -88,7 +88,7 @@ test: $(EXECUTABLES) $(TESTS)
 
 d: data
 data:
-	rm -f examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/*/parallel/*.dc examples/*/parallel/*.png examples/*/parallel/*.dat
+	rm -f examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/*/parallel/*.dc examples/*/parallel/*.png examples/*/parallel/*.dat examples/combined/*.dc examples/combined/*.dat examples/combined/*.png
 
 c: clean
 clean: data

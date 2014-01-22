@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "particle_save.hpp"
 #include "particle_solve.hpp"
 #include "particle_variables.hpp"
+#include "combined_variables.hpp"
 
 int main(int argc, char* argv[])
 {

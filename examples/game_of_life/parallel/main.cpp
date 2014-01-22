@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 
 	double
 		simulation_time = 0,
-		time_step = 0;
+		time_step = 0.1;
 	while (simulation_time <= M_PI) {
 
 		/*
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 			gol::Live_Neighbors
 		>(outer_cells, grid);
 
-		simulation_time += M_PI / 40;
+		simulation_time += time_step;
 	}
 
 	MPI_Finalize();
