@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	dccrg::Dccrg<Cell, dccrg::Cartesian_Geometry> grid;
 
 	// initialize the grid
-	std::array<uint64_t, 3> grid_length = {25, 25, 1};
+	std::array<uint64_t, 3> grid_length = {20, 20, 1};
 	const unsigned int neighborhood_size = 1;
 	if (not grid.initialize(
 		grid_length,
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 		false, false, false
 	)) {
 		std::cerr << __FILE__ << ":" << __LINE__
-			<< ": Couldn't initialize game grid."
+			<< ": Couldn't initialize grid."
 			<< std::endl;
 		abort();
 	}
@@ -90,8 +90,8 @@ int main(int argc, char* argv[])
 	// set the grid's geometry
 	dccrg::Cartesian_Geometry::Parameters geom_params;
 	geom_params.start[0] =
-	geom_params.start[1] =
-	geom_params.start[2] = -1;
+	geom_params.start[1] = -1;
+	geom_params.start[2] = -1.0 / grid_length[0];
 	geom_params.level_0_cell_length[0] =
 	geom_params.level_0_cell_length[1] =
 	geom_params.level_0_cell_length[2] = 2.0 / grid_length[0];
@@ -107,13 +107,20 @@ int main(int argc, char* argv[])
 	/*
 	Simulate
 	*/
-	gol::initialize<Cell, gol::Is_Alive, gol::Live_Neighbors>(grid);
+
+	gol::initialize<
+		Cell,
+		gol::Is_Alive,
+		gol::Live_Neighbors
+	>(grid);
 
 	const std::vector<uint64_t>
 		inner_cells = grid.get_local_cells_not_on_process_boundary(),
 		outer_cells = grid.get_local_cells_on_process_boundary();
 
-	double simulation_time = 0;
+	double
+		simulation_time = 0,
+		time_step = 0;
 	while (simulation_time <= M_PI) {
 
 		/*
@@ -121,11 +128,13 @@ int main(int argc, char* argv[])
 		save() itself decides what to "transfer" to the file so
 		switch off all transfers before and restore them after.
 		*/
-		Cell::set_transfer_all(false, gol::Is_Alive(), gol::Live_Neighbors());
+		Cell::set_transfer_all(
+			false,
+			gol::Is_Alive(),
+			gol::Live_Neighbors()
+		);
 
 		gol::save<Cell, gol::Is_Alive>(grid, simulation_time);
-
-		Cell::set_transfer_all(true, gol::Is_Alive(), gol::Live_Neighbors());
 
 		if (simulation_time >= M_PI) {
 			// don't simulate an extra step, e.g. if only initial state needed 
@@ -133,6 +142,7 @@ int main(int argc, char* argv[])
 		}
 
 		// start updating data required by the solver between processes
+		Cell::set_transfer_all(true, gol::Is_Alive());
 		grid.start_remote_neighbor_copy_updates();
 
 		/*

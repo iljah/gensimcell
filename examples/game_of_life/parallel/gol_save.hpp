@@ -81,6 +81,8 @@ template<
 		0,
 		header
 	);
+
+	Cell_T::set_transfer_all(false, Is_Alive_T());
 }
 
 } // namespace

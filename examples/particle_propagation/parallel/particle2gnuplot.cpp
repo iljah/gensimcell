@@ -283,10 +283,6 @@ int main(int argc, char* argv[])
 		gnuplot_file << "end\n";
 		gnuplot_file.close();
 
-               cout << "Total number of particles in file " << argv_string
-                       << ": " << total_particles
-                       << endl;
-
 		system(("gnuplot " + gnuplot_file_name).c_str());
 	}
 

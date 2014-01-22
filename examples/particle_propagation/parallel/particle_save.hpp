@@ -99,6 +99,13 @@ template<
 		0,
 		header
 	);
+
+	Cell_T::set_transfer_all(
+		false,
+		Number_Of_Particles_T(),
+		Velocity_T(),
+		Internal_Particles_T()
+	);
 }
 
 } // namespace

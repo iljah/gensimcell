@@ -1,4 +1,10 @@
-CPPFLAGS = -I source -I tests
+CPPFLAGS = \
+  -I source \
+  -I tests \
+  -I examples/game_of_life/parallel \
+  -I examples/advection/parallel \
+  -I examples/particle_propagation/parallel
+
 CXXFLAGS = -std=c++0x -W -Wall -Wextra -pedantic -O3
 
 include makefiles/macosx_macports
@@ -56,7 +62,8 @@ EXECUTABLES = \
   examples/advection/parallel/main.dexe \
   examples/advection/parallel/advection2gnuplot.dexe \
   examples/particle_propagation/parallel/main.dexe \
-  examples/particle_propagation/parallel/particle2gnuplot.dexe
+  examples/particle_propagation/parallel/particle2gnuplot.dexe \
+  examples/combined/parallel.dexe
 
 TESTS = \
   tests/serial/get_var_datatype_std.tst \

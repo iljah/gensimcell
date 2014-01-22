@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char* argv[])
 {
+	// the cell type used by this program
 	using Cell = particle::Cell;
 
 	/*
@@ -122,10 +123,11 @@ int main(int argc, char* argv[])
 
 	const double particle_save_interval = 0.1;
 
+	double particle_next_save = 0;
+
 	double
 		simulation_time = 0,
-		time_step = 0,
-		particle_next_save = 0;
+		time_step = 0;
 	while (simulation_time <= M_PI) {
 
 		double next_time_step = std::numeric_limits<double>::max();
@@ -133,17 +135,17 @@ int main(int argc, char* argv[])
 		/*
 		Save simulation to disk
 		*/
+		Cell::set_transfer_all(
+			false,
+			particle::Number_Of_Particles(),
+			particle::Particle_Destinations(),
+			particle::Velocity(),
+			particle::Internal_Particles(),
+			particle::External_Particles()
+		);
+
 		if (particle_next_save <= simulation_time) {
 			particle_next_save += particle_save_interval;
-
-			Cell::set_transfer_all(
-				false,
-				particle::Number_Of_Particles(),
-				particle::Particle_Destinations(),
-				particle::Velocity(),
-				particle::Internal_Particles(),
-				particle::External_Particles()
-			);
 
 			particle::save<
 				Cell,
@@ -151,15 +153,8 @@ int main(int argc, char* argv[])
 				particle::Velocity,
 				particle::Internal_Particles
 			>(grid, simulation_time);
-
-			Cell::set_transfer_all(
-				true,
-				particle::Number_Of_Particles(),
-				particle::Particle_Destinations(),
-				particle::Velocity(),
-				particle::External_Particles()
-			);
 		}
+
 
 		if (simulation_time >= M_PI) {
 			break;
@@ -188,13 +183,6 @@ int main(int argc, char* argv[])
 		so that receiving processes can allocate memory for coordinates.
 		*/
 		Cell::set_transfer_all(true, particle::Number_Of_Particles());
-		Cell::set_transfer_all(
-			false,
-			particle::Particle_Destinations(),
-			particle::Velocity(),
-			particle::Internal_Particles(),
-			particle::External_Particles()
-		);
 		grid.start_remote_neighbor_copy_updates();
 
 		/*
@@ -235,7 +223,6 @@ int main(int argc, char* argv[])
 		Cell::set_transfer_all(false, particle::Number_Of_Particles());
 		Cell::set_transfer_all(
 			true,
-			particle::Number_Of_Particles(),
 			particle::Particle_Destinations(),
 			particle::Velocity(),
 			particle::External_Particles()

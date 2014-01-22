@@ -485,6 +485,10 @@ public:
 	}
 
 
+	/*!
+	Note that this information is not transferred over MPI
+	if the datatype is obtained from get_mpi_datatype().
+	*/
 	template<class... Given_Vars> void set_transfer(
 		const bool given_transfer,
 		const Given_Vars&...

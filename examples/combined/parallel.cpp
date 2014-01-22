@@ -28,7 +28,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-//! see ../serial.cpp and ../game_of_life/parallel/* for basics
+//! see ../*/parallel/* for basics
 
 #include "array"
 #include "boost/lexical_cast.hpp"
@@ -41,15 +41,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dccrg_cartesian_geometry.hpp"
 #include "gensimcell.hpp"
 
+#include "gol_initialize.hpp"
+#include "gol_save.hpp"
+#include "gol_solve.hpp"
+#include "gol_variables.hpp"
 #include "advection_initialize.hpp"
 #include "advection_save.hpp"
 #include "advection_solve.hpp"
 #include "advection_variables.hpp"
+#include "particle_initialize.hpp"
+#include "particle_save.hpp"
+#include "particle_solve.hpp"
+#include "particle_variables.hpp"
 
 int main(int argc, char* argv[])
 {
 	// the cell type used by this program
-	using Cell = advection::Cell;
+	using Cell = combined::Cell;
 
 	/*
 	Set up MPI
@@ -108,6 +116,13 @@ int main(int argc, char* argv[])
 	/*
 	Simulate
 	*/
+
+	gol::initialize<
+		Cell,
+		gol::Is_Alive,
+		gol::Live_Neighbors
+	>(grid);
+
 	advection::initialize<
 		Cell,
 		advection::Density,
@@ -115,13 +130,23 @@ int main(int argc, char* argv[])
 		advection::Velocity
 	>(grid);
 
+	particle::initialize<
+		Cell,
+		particle::Number_Of_Particles,
+		particle::Particle_Destinations,
+		particle::Velocity,
+		particle::Internal_Particles
+	>(grid);
+
 	const std::vector<uint64_t>
 		inner_cells = grid.get_local_cells_not_on_process_boundary(),
 		outer_cells = grid.get_local_cells_on_process_boundary();
 
 	const double advection_save_interval = 0.1;
+	const double particle_save_interval = 0.1;
 
 	double advection_next_save = 0;
+	double particle_next_save = 0;
 
 	double
 		simulation_time = 0,
@@ -131,14 +156,34 @@ int main(int argc, char* argv[])
 		double next_time_step = std::numeric_limits<double>::max();
 
 		/*
-		Save simulation to disk
+		Save simulations
 		*/
+
+		// let the saving functions decide what to "transfer"
+		Cell::set_transfer_all(
+			false,
+			gol::Is_Alive(),
+			gol::Live_Neighbors()
+		);
+
 		Cell::set_transfer_all(
 			false,
 			advection::Density(),
 			advection::Density_Flux(),
 			advection::Velocity()
 		);
+
+		Cell::set_transfer_all(
+			false,
+			particle::Number_Of_Particles(),
+			particle::Particle_Destinations(),
+			particle::Velocity(),
+			particle::Internal_Particles(),
+			particle::External_Particles()
+		);
+
+
+		gol::save<Cell, gol::Is_Alive>(grid, simulation_time);
 
 		if (advection_next_save <= simulation_time) {
 			advection_next_save += advection_save_interval;
@@ -147,6 +192,17 @@ int main(int argc, char* argv[])
 				Cell,
 				advection::Density,
 				advection::Velocity
+			>(grid, simulation_time);
+		}
+
+		if (particle_next_save <= simulation_time) {
+			particle_next_save += particle_save_interval;
+
+			particle::save<
+				Cell,
+				particle::Number_Of_Particles,
+				particle::Velocity,
+				particle::Internal_Particles
 			>(grid, simulation_time);
 		}
 
@@ -159,12 +215,68 @@ int main(int argc, char* argv[])
 		/*
 		Solve
 		*/
+
+		next_time_step
+			= std::min(
+				next_time_step,
+				particle::solve<
+					Cell,
+					particle::Number_Of_Particles,
+					particle::Particle_Destinations,
+					particle::Velocity,
+					particle::Internal_Particles,
+					particle::External_Particles
+				>(time_step, outer_cells, grid)
+			);
+
+		Cell::set_transfer_all(true, particle::Number_Of_Particles());
+		grid.start_remote_neighbor_copy_updates();
+
+		next_time_step
+			= std::min(
+				next_time_step,
+				particle::solve<
+					Cell,
+					particle::Number_Of_Particles,
+					particle::Particle_Destinations,
+					particle::Velocity,
+					particle::Internal_Particles,
+					particle::External_Particles
+				>(time_step, inner_cells, grid)
+			);
+
+
+		grid.wait_remote_neighbor_copy_update_receives();
+		particle::resize_receiving_containers<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::External_Particles
+		>(grid);
+
+		grid.wait_remote_neighbor_copy_update_sends();
+
+
+		Cell::set_transfer_all(true, gol::Is_Alive());
 		Cell::set_transfer_all(
 			true,
 			advection::Density(),
 			advection::Velocity()
 		);
+		Cell::set_transfer_all(false, particle::Number_Of_Particles());
+		Cell::set_transfer_all(
+			true,
+			particle::Particle_Destinations(),
+			particle::Velocity(),
+			particle::External_Particles()
+		);
 		grid.start_remote_neighbor_copy_updates();
+
+
+		gol::solve<
+			Cell,
+			gol::Is_Alive,
+			gol::Live_Neighbors
+		>(inner_cells, grid);
 
 		next_time_step
 			= std::min(
@@ -177,7 +289,21 @@ int main(int argc, char* argv[])
 				>(time_step, inner_cells, grid)
 			);
 
+		particle::incorporate_external_particles<
+			Cell,
+			particle::Particle_Destinations,
+			particle::Internal_Particles,
+			particle::External_Particles
+		>(inner_cells, grid);
+
 		grid.wait_remote_neighbor_copy_update_receives();
+
+
+		gol::solve<
+			Cell,
+			gol::Is_Alive,
+			gol::Live_Neighbors
+		>(outer_cells, grid);
 
 		next_time_step
 			= std::min(
@@ -190,21 +316,52 @@ int main(int argc, char* argv[])
 				>(time_step, outer_cells, grid)
 			);
 
-		/*
-		Apply solution
-		*/
+		gol::apply_solution<
+			Cell,
+			gol::Is_Alive,
+			gol::Live_Neighbors
+		>(inner_cells, grid);
+
 		advection::apply_solution<
 			Cell,
 			advection::Density,
 			advection::Density_Flux
 		>(inner_cells, grid);
 
+		particle::incorporate_external_particles<
+			Cell,
+			particle::Particle_Destinations,
+			particle::Internal_Particles,
+			particle::External_Particles
+		>(outer_cells, grid);
+
+		particle::remove_external_particles<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::External_Particles
+		>(inner_cells, grid);
+
 		grid.wait_remote_neighbor_copy_update_sends();
+
+
+		gol::apply_solution<
+			Cell,
+			gol::Is_Alive,
+			gol::Live_Neighbors
+		>(outer_cells, grid);
 
 		advection::apply_solution<
 			Cell,
 			advection::Density,
 			advection::Density_Flux
+		>(outer_cells, grid);
+
+		particle::remove_external_particles<
+			Cell,
+			particle::Number_Of_Particles,
+			particle::Particle_Destinations,
+			particle::External_Particles
 		>(outer_cells, grid);
 
 		simulation_time += time_step;
