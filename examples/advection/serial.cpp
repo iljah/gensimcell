@@ -160,8 +160,8 @@ void initialize(grid_t& grid)
 		/*
 		Initialize density
 		*/
-		cell(Density())      =
-		cell(Density_Flux()) = 0;
+		cell[Density()]      =
+		cell[Density_Flux()] = 0;
 
 		// square
 		if (
@@ -170,18 +170,18 @@ void initialize(grid_t& grid)
 			and center[1] > -0.25
 			and center[1] < 0.25
 		) {
-			cell(Density()) = 1;
+			cell[Density()] = 1;
 
 		// cone
 		} else if (r < 0.35) {
-			cell(Density()) = 1 - r / 0.35;
+			cell[Density()] = 1 - r / 0.35;
 		}
 
 		/*
 		Initialize velocity
 		*/
-		cell(Velocity())[0] = 2 * center[1];
-		cell(Velocity())[1] = -2 * center[0];
+		cell[Velocity()][0] = 2 * center[1];
+		cell[Velocity()][1] = -2 * center[0];
 	}
 }
 
@@ -198,7 +198,7 @@ double get_max_time_step(const grid_t& grid)
 
 		const array<double, 2>
 			cell_size = get_cell_size(grid, {x_i, y_i}),
-			vel = grid[x_i][y_i](Velocity());
+			vel = grid[x_i][y_i][Velocity()];
 
 		ret_val =
 			min(ret_val,
@@ -232,10 +232,10 @@ void solve(grid_t& grid, const double dt)
 
 		cell_t& cell = grid[y_i][x_i];
 
-		const double density = cell(Density());
+		const double density = cell[Density()];
 		const array<double, 2>
 			cell_size = get_cell_size(grid, {x_i, y_i}),
-			velocity = cell(Velocity());
+			velocity = cell[Velocity()];
 
 		const double
 			// advection out of current cell in x direction
@@ -244,27 +244,27 @@ void solve(grid_t& grid, const double dt)
 			flux_y = density * (velocity[1] * dt / cell_size[1]);
 
 		// save the flux out of the current cell
-		cell(Density_Flux()) -= fabs(flux_x) + fabs(flux_y);
+		cell[Density_Flux()] -= fabs(flux_x) + fabs(flux_y);
 
 		// figure out where the density from current cell goes
 		if (flux_x < 0) {
 			// stuff flows into neighbor on the negative x side
 			cell_t& neighbor = grid[y_i][(x_i + (width - 1)) % width];
-			neighbor(Density_Flux()) += fabs(flux_x);
+			neighbor[Density_Flux()] += fabs(flux_x);
 		} else {
 			// stuff flows into neighbor on the positive x side
 			cell_t& neighbor = grid[y_i][(x_i + 1) % width];
-			neighbor(Density_Flux()) += flux_x;
+			neighbor[Density_Flux()] += flux_x;
 		}
 
 		if (flux_y < 0) {
 			// stuff flows into neighbor on the negative y side
 			cell_t& neighbor = grid[(y_i + (height - 1)) % height][x_i];
-			neighbor(Density_Flux()) += fabs(flux_y);
+			neighbor[Density_Flux()] += fabs(flux_y);
 		} else {
 			// stuff flows into neighbor on the positive y side
 			cell_t& neighbor = grid[(y_i + 1) % height][x_i];
-			neighbor(Density_Flux()) += flux_y;
+			neighbor[Density_Flux()] += flux_y;
 		}
 	}
 }
@@ -279,8 +279,8 @@ void apply_solution(grid_t& grid)
 {
 	for (auto& row: grid)
 	for (auto& cell: row) {
-		cell(Density()) += cell(Density_Flux());
-		cell(Density_Flux()) = 0;
+		cell[Density()] += cell[Density_Flux()];
+		cell[Density_Flux()] = 0;
 	}
 }
 
@@ -326,7 +326,7 @@ string save(
 	// plotting 'with image' requires row data from bottom to top
 	for (const auto& row: boost::adaptors::reverse(grid)) {
 		for (const auto& cell: row) {
-			gnuplot_file << cell(Density()) << " ";
+			gnuplot_file << cell[Density()] << " ";
 		}
 		gnuplot_file << "\n";
 	}

@@ -85,9 +85,9 @@ template<
 		}
 		Cell_T& cell_data = *cell_data_temp;
 
-		cell_data(Number_Of_Particles_T()) = 0;
-		cell_data(Particle_Destinations_T()).fill(dccrg::error_cell);
-		cell_data(Velocity_T()) = {2 * center[1], -2 * center[0]};
+		cell_data[Number_Of_Particles_T()] = 0;
+		cell_data[Particle_Destinations_T()].fill(dccrg::error_cell);
+		cell_data[Velocity_T()] = {2 * center[1], -2 * center[0]};
 
 		if (
 			center[0] < particles_start[0]
@@ -98,18 +98,18 @@ template<
 			continue;
 		}
 
-		cell_data(Number_Of_Particles_T()) = 3;
-		cell_data(Internal_Particles_T()).coordinates.push_back({
+		cell_data[Number_Of_Particles_T()] = 3;
+		cell_data[Internal_Particles_T()].coordinates.push_back({
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				0
 		});
-		cell_data(Internal_Particles_T()).coordinates.push_back({
+		cell_data[Internal_Particles_T()].coordinates.push_back({
 				center[0],
 				center[1] + length[1] / 4,
 				0
 		});
-		cell_data(Internal_Particles_T()).coordinates.push_back({
+		cell_data[Internal_Particles_T()].coordinates.push_back({
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				0

@@ -80,8 +80,8 @@ template<
 		/*
 		Initialize density
 		*/
-		cell_data(Density_T())      =
-		cell_data(Density_Flux_T()) = 0;
+		cell_data[Density_T()]      =
+		cell_data[Density_Flux_T()] = 0;
 
 		// square
 		if (
@@ -90,17 +90,17 @@ template<
 			and cell_center[1] > -0.25
 			and cell_center[1] < 0.25
 		) {
-			cell_data(Density_T()) = 1;
+			cell_data[Density_T()] = 1;
 
 		// cone
 		} else if (r < 0.35) {
-			cell_data(Density_T()) = 1 - r / 0.35;
+			cell_data[Density_T()] = 1 - r / 0.35;
 		}
 
 		/*
 		Initialize velocity
 		*/
-		cell_data(Velocity_T()) = {
+		cell_data[Velocity_T()] = {
 			+2 * cell_center[1],
 			-2 * cell_center[0]
 		};

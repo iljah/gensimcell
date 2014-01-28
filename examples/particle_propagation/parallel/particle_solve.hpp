@@ -68,8 +68,8 @@ template<
 			abort();
 		}
 
-		(*data)(External_Particles_T())
-			.resize((*data)(Number_Of_Particles_T()));
+		(*data)[External_Particles_T()]
+			.resize((*data)[Number_Of_Particles_T()]);
 	}
 }
 
@@ -111,11 +111,11 @@ template<
 		}
 
 		// shorthand notation
-		const auto& v = (*cell_data)(Velocity_T());
-		auto& destinations = (*cell_data)(Particle_Destinations_T());
+		const auto& v = (*cell_data)[Velocity_T()];
+		auto& destinations = (*cell_data)[Particle_Destinations_T()];
 		auto
-			&int_coords = (*cell_data)(Internal_Particles_T()).coordinates,
-			&ext_coords = (*cell_data)(External_Particles_T()).coordinates;
+			&int_coords = (*cell_data)[Internal_Particles_T()].coordinates,
+			&ext_coords = (*cell_data)[External_Particles_T()].coordinates;
 
 		// propagate particles
 		const auto
@@ -219,7 +219,7 @@ template<
 				item.second.cend()
 			);
 		}
-		(*cell_data)(Number_Of_Particles_T()) = ext_coords.size();
+		(*cell_data)[Number_Of_Particles_T()] = ext_coords.size();
 
 		// check time step
 		const auto length = grid.geometry.get_length(cell_id);
@@ -256,7 +256,7 @@ template<
 			abort();
 		}
 
-		auto& int_coords = (*cell_data)(Internal_Particles_T()).coordinates;
+		auto& int_coords = (*cell_data)[Internal_Particles_T()].coordinates;
 
 		// assign some particles from neighbors' external list to this cell
 		const std::vector<uint64_t>* const neighbors = grid.get_neighbors_of(cell_id);
@@ -276,8 +276,8 @@ template<
 				abort();
 			}
 
-			const auto& destinations = (*neighbor_data)(Particle_Destinations_T());
-			const auto& ext_coords = (*neighbor_data)(External_Particles_T()).coordinates;
+			const auto& destinations = (*neighbor_data)[Particle_Destinations_T()];
+			const auto& ext_coords = (*neighbor_data)[External_Particles_T()].coordinates;
 
 			for (size_t
 				dest_i = 0, coord_i = 0;
@@ -327,9 +327,9 @@ template<
 			abort();
 		}
 
-		(*cell_data)(Number_Of_Particles_T()) = 0;
-		(*cell_data)(Particle_Destinations_T()).fill(dccrg::error_cell);
-		(*cell_data)(External_Particles_T()).coordinates.clear();
+		(*cell_data)[Number_Of_Particles_T()] = 0;
+		(*cell_data)[Particle_Destinations_T()].fill(dccrg::error_cell);
+		(*cell_data)[External_Particles_T()].coordinates.clear();
 	}
 }
 

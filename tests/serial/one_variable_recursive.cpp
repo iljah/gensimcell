@@ -22,16 +22,16 @@ struct test_variable3 {
 int main(int, char**)
 {
 	gensimcell::Cell<test_variable1> cell1;
-	cell1(test_variable1()) = 3;
-	CHECK_TRUE(cell1(test_variable1()) == 3)
+	cell1[test_variable1()] = 3;
+	CHECK_TRUE(cell1[test_variable1()] == 3)
 
 	gensimcell::Cell<test_variable2> cell2;
-	cell2(test_variable2())(test_variable1()) = 4;
-	CHECK_TRUE(cell2(test_variable2())(test_variable1()) == 4)
+	cell2[test_variable2()][test_variable1()] = 4;
+	CHECK_TRUE(cell2[test_variable2()][test_variable1()] == 4)
 
 	gensimcell::Cell<test_variable3> cell3;
-	cell3(test_variable3())(test_variable2())(test_variable1()) = 5;
-	CHECK_TRUE(cell3(test_variable3())(test_variable2())(test_variable1()) == 5)
+	cell3[test_variable3()][test_variable2()][test_variable1()] = 5;
+	CHECK_TRUE(cell3[test_variable3()][test_variable2()][test_variable1()] == 5)
 
 
 	return EXIT_SUCCESS;

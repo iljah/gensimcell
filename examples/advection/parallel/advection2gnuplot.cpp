@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
 				const auto cell_id
 					= mapping.get_cell_from_indices({x_i, y_i, 0}, 0);
 
-				gnuplot_file << simulation_data.at(cell_id)(Density()) << " ";
+				gnuplot_file << simulation_data.at(cell_id)[Density()] << " ";
 			}
 
 			gnuplot_file << "\n";

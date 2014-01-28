@@ -79,8 +79,8 @@ template<
 			abort();
 		}
 
-		(*cell_data)(Number_Of_Particles_T())
-			= (*cell_data)(Internal_Particles_T()).coordinates.size();
+		(*cell_data)[Number_Of_Particles_T()]
+			= (*cell_data)[Internal_Particles_T()].coordinates.size();
 	}
 
 	// get the file name

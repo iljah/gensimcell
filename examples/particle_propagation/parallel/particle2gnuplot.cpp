@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 			MPI_Type_free(&memory_datatype);
 			MPI_Type_free(&file_datatype);
 
-			cell_data(Internal_Particles()).resize(cell_data(Number_Of_Particles()));
+			cell_data[Internal_Particles()].resize(cell_data[Number_Of_Particles()]);
 
 			// read the particle coordinates and velocity
 			cell_data.set_transfer(false, Number_Of_Particles(), Velocity());
@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
 		for (const auto& item: simulation_data) {
 			const auto& cell_id = item.first;
 			const auto& cell_data = item.second;
-			for (const auto& coordinate: cell_data(Internal_Particles()).coordinates) {
+			for (const auto& coordinate: cell_data[Internal_Particles()].coordinates) {
 				total_particles++;
 				gnuplot_file
 					<< coordinate[0] << " "

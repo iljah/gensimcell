@@ -38,7 +38,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 
 		// send v1 from process 0 to 1
 		c1_1.set_transfer_all(true, v1);
-		c1_1(v1) = 1;
+		c1_1[v1] = 1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -57,7 +57,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
+		CHECK_TRUE(c1_1[v1] == 1)
 
 
 		// don't send v1
@@ -80,7 +80,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
+		CHECK_TRUE(c1_1[v1] == 1)
 
 
 		// send v1
@@ -104,11 +104,11 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
+		CHECK_TRUE(c1_1[v1] == 1)
 
 
 		// send v1 from process 1 to 0
-		c1_1(v1) = -1;
+		c1_1[v1] = -1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -128,8 +128,8 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 2)
-		c1_1(v1) = -1;
+		CHECK_TRUE(c1_1[v1] == 2)
+		c1_1[v1] = -1;
 
 
 	} else if (rank == 1) {
@@ -137,7 +137,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 		// comments in the proc == 0 part
 
 		c1_1.set_transfer_all(true, v1);
-		c1_1(v1) = -1;
+		c1_1[v1] = -1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -157,8 +157,8 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
-		c1_1(v1) = -1;
+		CHECK_TRUE(c1_1[v1] == 1)
+		c1_1[v1] = -1;
 
 
 		c1_1.set_transfer_all(false, v1);
@@ -181,7 +181,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == -1)
+		CHECK_TRUE(c1_1[v1] == -1)
 
 
 		c1_1.set_transfer_all(boost::logic::indeterminate, v1);
@@ -205,11 +205,11 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
-		c1_1(v1) = -1;
+		CHECK_TRUE(c1_1[v1] == 1)
+		c1_1[v1] = -1;
 
 
-		c1_1(v1) = 2;
+		c1_1[v1] = 2;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -228,8 +228,8 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 2)
-		c1_1(v1) = -1;
+		CHECK_TRUE(c1_1[v1] == 2)
+		c1_1[v1] = -1;
 
 	}
 }
@@ -252,7 +252,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		// send all cells from 0 to 1
 		c1s[0].set_transfer_all(true, v1);
 		for (size_t i = 0; i < c1s.size(); i++) {
-			c1s[i](v1) = i;
+			c1s[i][v1] = i;
 		}
 
 		for (auto& cell: c1s) {
@@ -277,7 +277,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
+			CHECK_TRUE(c1s[i][v1] == int(i))
 		}
 
 
@@ -335,14 +335,14 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
+			CHECK_TRUE(c1s[i][v1] == int(i))
 		}
 
 
 		c2s[0].set_transfer_all(true, v2);
 		for (size_t i = 0; i < c2s.size(); i++) {
-			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
-				c2s[i](v2)[j] = i * 10 + j;
+			for (size_t j = 0; j < c2s[i][v2].size(); j++) {
+				c2s[i][v2][j] = i * 10 + j;
 			}
 		}
 
@@ -372,8 +372,8 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c2s.size(); i++) {
-			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
-				CHECK_TRUE(c2s[i](v2)[j] == i * 10 + j)
+			for (size_t j = 0; j < c2s[i][v2].size(); j++) {
+				CHECK_TRUE(c2s[i][v2][j] == i * 10 + j)
 			}
 		}
 
@@ -407,7 +407,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
  
 		c1s[0].set_transfer_all(true, v1);
 		for (auto& cell: c1s) {
-			cell(v1) = -1;
+			cell[v1] = -1;
 		}
 
 		for (auto& cell: c1s) {
@@ -433,8 +433,8 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
-			c1s[i](v1) = -1;
+			CHECK_TRUE(c1s[i][v1] == int(i))
+			c1s[i][v1] = -1;
 		}
 
 
@@ -461,7 +461,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 			}
 		}
 		for (auto& cell: c1s) {
-			CHECK_TRUE(cell(v1) == -1)
+			CHECK_TRUE(cell[v1] == -1)
 		}
 
 
@@ -498,18 +498,18 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				CHECK_TRUE(c1s[i](v1) == int(i))
+				CHECK_TRUE(c1s[i][v1] == int(i))
 			} else {
-				CHECK_TRUE(c1s[i](v1) == -1)
+				CHECK_TRUE(c1s[i][v1] == -1)
 			}
-			c1s[i](v1) = -1;
+			c1s[i][v1] = -1;
 		}
 
 
 		c2s[0].set_transfer_all(true, v2);
 		for (size_t i = 0; i < c2s.size(); i++) {
-			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
-				c2s[i](v2)[j] = -1;
+			for (size_t j = 0; j < c2s[i][v2].size(); j++) {
+				c2s[i][v2][j] = -1;
 			}
 		}
 
@@ -537,9 +537,9 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 
 		for (size_t i = 0; i < c2s.size(); i++) {
-			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
-				CHECK_TRUE(c2s[i](v2)[j] == i * 10 + j)
-				c2s[i](v2)[j] = -1;
+			for (size_t j = 0; j < c2s[i][v2].size(); j++) {
+				CHECK_TRUE(c2s[i][v2][j] == i * 10 + j)
+				c2s[i][v2][j] = -1;
 			}
 		}
 
@@ -567,8 +567,8 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c2s.size(); i++) {
-			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
-				CHECK_TRUE(c2s[i](v2)[j] == -1)
+			for (size_t j = 0; j < c2s[i][v2].size(); j++) {
+				CHECK_TRUE(c2s[i][v2][j] == -1)
 			}
 		}
 	}

@@ -168,7 +168,7 @@ public:
 	Make all public functions of the inherited implementation(s)
 	available also through the current iteration over user's variables.
 	*/
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator();
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all_impl;
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_impl;
@@ -176,12 +176,12 @@ public:
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
 
-	typename Current_Variable::data_type& operator()(const Current_Variable&)
+	typename Current_Variable::data_type& operator[](const Current_Variable&)
 	{
 		return this->data;
 	};
 
-	const typename Current_Variable::data_type& operator()(const Current_Variable&) const
+	const typename Current_Variable::data_type& operator[](const Current_Variable&) const
 	{
 		return this->data;
 	};
@@ -443,12 +443,12 @@ protected:
 public:
 
 
-	typename Variable::data_type& operator()(const Variable&)
+	typename Variable::data_type& operator[](const Variable&)
 	{
 		return this->data;
 	}
 
-	const typename Variable::data_type& operator()(const Variable&) const
+	const typename Variable::data_type& operator[](const Variable&) const
 	{
 		return this->data;
 	}

@@ -27,12 +27,12 @@ int main(int, char**)
 		test_variable2,
 		test_variable3
 	> cell;
-	cell(test_variable1()) = 3;
-	cell(test_variable2()) = 1.5;
-	cell(test_variable3()) = '3';
-	CHECK_TRUE(cell(test_variable1()) == 3)
-	CHECK_TRUE(cell(test_variable2()) == 1.5)
-	CHECK_TRUE(cell(test_variable3()) == '3')
+	cell[test_variable1()] = 3;
+	cell[test_variable2()] = 1.5;
+	cell[test_variable3()] = '3';
+	CHECK_TRUE(cell[test_variable1()] == 3)
+	CHECK_TRUE(cell[test_variable2()] == 1.5)
+	CHECK_TRUE(cell[test_variable3()] == '3')
 
 
 	tuple<
@@ -50,20 +50,20 @@ int main(int, char**)
 			test_variable3
 		>
 	> cell_tuple;
-	get<0>(cell_tuple)(test_variable1()) = -10;
-	get<0>(cell_tuple)(test_variable2()) = -2.5;
-	get<1>(cell_tuple)(test_variable2()) = 2.5;
-	get<1>(cell_tuple)(test_variable3()) = '4';
-	get<2>(cell_tuple)(test_variable1()) = -20;
-	get<2>(cell_tuple)(test_variable2()) = 4.5;
-	get<2>(cell_tuple)(test_variable3()) = '5';
-	CHECK_TRUE(get<0>(cell_tuple)(test_variable1()) == -10)
-	CHECK_TRUE(get<0>(cell_tuple)(test_variable2()) == -2.5)
-	CHECK_TRUE(get<1>(cell_tuple)(test_variable2()) == 2.5)
-	CHECK_TRUE(get<1>(cell_tuple)(test_variable3()) == '4')
-	CHECK_TRUE(get<2>(cell_tuple)(test_variable1()) == -20)
-	CHECK_TRUE(get<2>(cell_tuple)(test_variable2()) == 4.5)
-	CHECK_TRUE(get<2>(cell_tuple)(test_variable3()) == '5')
+	get<0>(cell_tuple)[test_variable1()] = -10;
+	get<0>(cell_tuple)[test_variable2()] = -2.5;
+	get<1>(cell_tuple)[test_variable2()] = 2.5;
+	get<1>(cell_tuple)[test_variable3()] = '4';
+	get<2>(cell_tuple)[test_variable1()] = -20;
+	get<2>(cell_tuple)[test_variable2()] = 4.5;
+	get<2>(cell_tuple)[test_variable3()] = '5';
+	CHECK_TRUE(get<0>(cell_tuple)[test_variable1()] == -10)
+	CHECK_TRUE(get<0>(cell_tuple)[test_variable2()] == -2.5)
+	CHECK_TRUE(get<1>(cell_tuple)[test_variable2()] == 2.5)
+	CHECK_TRUE(get<1>(cell_tuple)[test_variable3()] == '4')
+	CHECK_TRUE(get<2>(cell_tuple)[test_variable1()] == -20)
+	CHECK_TRUE(get<2>(cell_tuple)[test_variable2()] == 4.5)
+	CHECK_TRUE(get<2>(cell_tuple)[test_variable3()] == '5')
 
 
 	return EXIT_SUCCESS;

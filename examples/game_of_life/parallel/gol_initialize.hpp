@@ -77,11 +77,11 @@ template<
 			cell_max = grid.geometry.get_max(cell_id);
 
 		if (cell_max[1] > middle and cell_min[1] <= middle) {
-			(*cell_data)(Is_Alive_T()) = true;
+			(*cell_data)[Is_Alive_T()] = true;
 		} else {
-			(*cell_data)(Is_Alive_T()) = false;
+			(*cell_data)[Is_Alive_T()] = false;
 		}
-		(*cell_data)(Live_Neighbors_T()) = 0;
+		(*cell_data)[Live_Neighbors_T()] = 0;
 	}
 }
 

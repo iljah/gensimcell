@@ -78,9 +78,9 @@ template<
 		}
 
 		// shorthand notation
-		const auto& n = (*data)(Density_T());
-		const auto& v = (*data)(Velocity_T());
-		auto& flux = (*data)(Density_Flux_T());
+		const auto& n = (*data)[Density_T()];
+		const auto& v = (*data)[Velocity_T()];
+		auto& flux = (*data)[Density_Flux_T()];
 
 		// substract density flowing out of this cell
 		const auto length = grid.geometry.get_length(cell_id);
@@ -113,8 +113,8 @@ template<
 				abort();
 			}
 
-			const auto& neigh_n = (*neighbor_data)(Density_T());
-			const auto& neigh_v = (*neighbor_data)(Velocity_T());
+			const auto& neigh_n = (*neighbor_data)[Density_T()];
+			const auto& neigh_v = (*neighbor_data)[Velocity_T()];
 
 			if (
 				(dir < 0 and neigh_v[dim] < 0)
@@ -157,8 +157,8 @@ template<
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
-		(*data)(Density_T()) += (*data)(Density_Flux_T());
-		(*data)(Density_Flux_T()) = 0;
+		(*data)[Density_T()] += (*data)[Density_Flux_T()];
+		(*data)[Density_Flux_T()] = 0;
 	}
 }
 

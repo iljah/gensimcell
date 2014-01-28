@@ -54,9 +54,9 @@ void transfer_c1(MPI_Comm comm, const int rank)
 		c1_1.set_transfer_all(true, v1, v2, v3);
 		c1_1.set_transfer(true, v1, v2, v3);
 
-		c1_1(v1) = 1;
-		c1_1(v2) = {1.5, 2.25, 3.75};
-		c1_1(v3) = 1.5;
+		c1_1[v1] = 1;
+		c1_1[v2] = {1.5, 2.25, 3.75};
+		c1_1[v3] = 1.5;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -83,11 +83,11 @@ void transfer_c1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
-		CHECK_TRUE(c1_1(v2)[0] == 1.5)
-		CHECK_TRUE(c1_1(v2)[1] == 2.25)
-		CHECK_TRUE(c1_1(v2)[2] == 3.75)
-		CHECK_TRUE(c1_1(v3) == 1.5)
+		CHECK_TRUE(c1_1[v1] == 1)
+		CHECK_TRUE(c1_1[v2][0] == 1.5)
+		CHECK_TRUE(c1_1[v2][1] == 2.25)
+		CHECK_TRUE(c1_1[v2][2] == 3.75)
+		CHECK_TRUE(c1_1[v3] == 1.5)
 
 
 		// don't send v1 and v3
@@ -110,19 +110,19 @@ void transfer_c1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
-		CHECK_TRUE(c1_1(v2)[0] == 1.5)
-		CHECK_TRUE(c1_1(v2)[1] == 2.25)
-		CHECK_TRUE(c1_1(v2)[2] == 3.75)
-		CHECK_TRUE(c1_1(v3) == 1.5)
+		CHECK_TRUE(c1_1[v1] == 1)
+		CHECK_TRUE(c1_1[v2][0] == 1.5)
+		CHECK_TRUE(c1_1[v2][1] == 2.25)
+		CHECK_TRUE(c1_1[v2][2] == 3.75)
+		CHECK_TRUE(c1_1[v3] == 1.5)
 
 
 		// send v3 from process 1 to 0
 		c1_1.set_transfer_all(true, v3);
 		c1_1.set_transfer_all(false, v2);
-		c1_1(v1) = -1;
-		c1_1(v2) = {-1, -1, -1};
-		c1_1(v3) = -1;
+		c1_1[v1] = -1;
+		c1_1[v2] = {-1, -1, -1};
+		c1_1[v3] = -1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -142,11 +142,11 @@ void transfer_c1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't send c1_1 to process 1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == -1)
-		CHECK_TRUE(c1_1(v2)[0] == -1)
-		CHECK_TRUE(c1_1(v2)[1] == -1)
-		CHECK_TRUE(c1_1(v2)[2] == -1)
-		CHECK_TRUE(c1_1(v3) == 8.5)
+		CHECK_TRUE(c1_1[v1] == -1)
+		CHECK_TRUE(c1_1[v2][0] == -1)
+		CHECK_TRUE(c1_1[v2][1] == -1)
+		CHECK_TRUE(c1_1[v2][2] == -1)
+		CHECK_TRUE(c1_1[v3] == 8.5)
 
 
 	} else if (rank == 1) {
@@ -155,9 +155,9 @@ void transfer_c1(MPI_Comm comm, const int rank)
 		c1_1.set_transfer_all(true, v1, v2, v3);
 		c1_1.set_transfer(true, v1, v2, v3);
 
-		c1_1(v1) = -1;
-		c1_1(v2) = {-1, -1, -1};
-		c1_1(v3) = -1;
+		c1_1[v1] = -1;
+		c1_1[v2] = {-1, -1, -1};
+		c1_1[v3] = -1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -185,14 +185,14 @@ void transfer_c1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't free datatype of c1_1.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == 1)
-		CHECK_TRUE(c1_1(v2)[0] == 1.5)
-		CHECK_TRUE(c1_1(v2)[1] == 2.25)
-		CHECK_TRUE(c1_1(v2)[2] == 3.75)
-		CHECK_TRUE(c1_1(v3) == 1.5)
-		c1_1(v1) = -1;
-		c1_1(v2) = {-1, -1, -1};
-		c1_1(v3) = -1;
+		CHECK_TRUE(c1_1[v1] == 1)
+		CHECK_TRUE(c1_1[v2][0] == 1.5)
+		CHECK_TRUE(c1_1[v2][1] == 2.25)
+		CHECK_TRUE(c1_1[v2][2] == 3.75)
+		CHECK_TRUE(c1_1[v3] == 1.5)
+		c1_1[v1] = -1;
+		c1_1[v2] = {-1, -1, -1};
+		c1_1[v3] = -1;
 
 
 		c1_1.set_transfer_all(false, v1, v3);
@@ -215,19 +215,19 @@ void transfer_c1(MPI_Comm comm, const int rank)
 			PRINT_ERROR(rank, "Couldn't receive c1_1 from process 0.")
 			abort();
 		}
-		CHECK_TRUE(c1_1(v1) == -1)
-		CHECK_TRUE(c1_1(v2)[0] == 1.5)
-		CHECK_TRUE(c1_1(v2)[1] == 2.25)
-		CHECK_TRUE(c1_1(v2)[2] == 3.75)
-		CHECK_TRUE(c1_1(v3) == -1)
-		c1_1(v2) = {-1, -1, -1};
+		CHECK_TRUE(c1_1[v1] == -1)
+		CHECK_TRUE(c1_1[v2][0] == 1.5)
+		CHECK_TRUE(c1_1[v2][1] == 2.25)
+		CHECK_TRUE(c1_1[v2][2] == 3.75)
+		CHECK_TRUE(c1_1[v3] == -1)
+		c1_1[v2] = {-1, -1, -1};
 
 
 		c1_1.set_transfer_all(true, v3);
 		c1_1.set_transfer_all(false, v2);
-		c1_1(v1) = 2;
-		c1_1(v2) = {5.5, 6.25, 7.75};
-		c1_1(v3) = 8.5;
+		c1_1[v1] = 2;
+		c1_1[v2] = {5.5, 6.25, 7.75};
+		c1_1[v3] = 8.5;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
 			PRINT_ERROR(rank, "Couldn't get datatype from c1_1.")
@@ -278,10 +278,10 @@ void transfer_cN(MPI_Comm comm, const int rank)
 
 		for (size_t i = 0; i < c1s.size(); i++) {
 			c1s[i].set_transfer(true, v1, v2, v3, v4);
-			c1s[i](v1) = int(i);
-			c1s[i](v2) = {i + 0.25, i + 0.5, i + 0.75};
-			c1s[i](v3) = i + 5.5;
-			c1s[i](v4) = i + 5;
+			c1s[i][v1] = int(i);
+			c1s[i][v2] = {i + 0.25, i + 0.5, i + 0.75};
+			c1s[i][v3] = i + 5.5;
+			c1s[i][v4] = i + 5;
 		}
 
 		for (auto& cell: c1s) {
@@ -314,12 +314,12 @@ void transfer_cN(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
-			CHECK_TRUE(c1s[i](v2)[0] == i + 0.25)
-			CHECK_TRUE(c1s[i](v2)[1] == i + 0.5)
-			CHECK_TRUE(c1s[i](v2)[2] == i + 0.75)
-			CHECK_TRUE(c1s[i](v3) == i + 5.5)
-			CHECK_TRUE(c1s[i](v4) == i + 5)
+			CHECK_TRUE(c1s[i][v1] == int(i))
+			CHECK_TRUE(c1s[i][v2][0] == i + 0.25)
+			CHECK_TRUE(c1s[i][v2][1] == i + 0.5)
+			CHECK_TRUE(c1s[i][v2][2] == i + 0.75)
+			CHECK_TRUE(c1s[i][v3] == i + 5.5)
+			CHECK_TRUE(c1s[i][v4] == i + 5)
 		}
 
 
@@ -365,12 +365,12 @@ void transfer_cN(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
-			CHECK_TRUE(c1s[i](v2)[0] == i + 0.25)
-			CHECK_TRUE(c1s[i](v2)[1] == i + 0.5)
-			CHECK_TRUE(c1s[i](v2)[2] == i + 0.75)
-			CHECK_TRUE(c1s[i](v3) == i + 5.5)
-			CHECK_TRUE(c1s[i](v4) == i + 5)
+			CHECK_TRUE(c1s[i][v1] == int(i))
+			CHECK_TRUE(c1s[i][v2][0] == i + 0.25)
+			CHECK_TRUE(c1s[i][v2][1] == i + 0.5)
+			CHECK_TRUE(c1s[i][v2][2] == i + 0.75)
+			CHECK_TRUE(c1s[i][v3] == i + 5.5)
+			CHECK_TRUE(c1s[i][v4] == i + 5)
 		}
 
 
@@ -381,10 +381,10 @@ void transfer_cN(MPI_Comm comm, const int rank)
 
 		for (size_t i = 0; i < c1s.size(); i++) {
 			c1s[i].set_transfer(true, v1, v2, v3, v4);
-			c1s[i](v1) = -1;
-			c1s[i](v2) = {-1, -1, -1};
-			c1s[i](v3) = -1;
-			c1s[i](v4) = 0;
+			c1s[i][v1] = -1;
+			c1s[i][v2] = {-1, -1, -1};
+			c1s[i][v3] = -1;
+			c1s[i][v4] = 0;
 		}
 
 		for (auto& cell: c1s) {
@@ -418,16 +418,16 @@ void transfer_cN(MPI_Comm comm, const int rank)
 		}
 
 		for (size_t i = 0; i < c1s.size(); i++) {
-			CHECK_TRUE(c1s[i](v1) == int(i))
-			CHECK_TRUE(c1s[i](v2)[0] == i + 0.25)
-			CHECK_TRUE(c1s[i](v2)[1] == i + 0.5)
-			CHECK_TRUE(c1s[i](v2)[2] == i + 0.75)
-			CHECK_TRUE(c1s[i](v3) == i + 5.5)
-			CHECK_TRUE(c1s[i](v4) == i + 5)
-			c1s[i](v1) = -1;
-			c1s[i](v2) = {-1, -1, -1};
-			c1s[i](v3) = -1;
-			c1s[i](v4) = 0;
+			CHECK_TRUE(c1s[i][v1] == int(i))
+			CHECK_TRUE(c1s[i][v2][0] == i + 0.25)
+			CHECK_TRUE(c1s[i][v2][1] == i + 0.5)
+			CHECK_TRUE(c1s[i][v2][2] == i + 0.75)
+			CHECK_TRUE(c1s[i][v3] == i + 5.5)
+			CHECK_TRUE(c1s[i][v4] == i + 5)
+			c1s[i][v1] = -1;
+			c1s[i][v2] = {-1, -1, -1};
+			c1s[i][v3] = -1;
+			c1s[i][v4] = 0;
 		}
 
 
@@ -474,19 +474,19 @@ void transfer_cN(MPI_Comm comm, const int rank)
 
 		for (size_t i = 0; i < c1s.size(); i++) {
 			if (i % 2 == 0) {
-				CHECK_TRUE(c1s[i](v1) == -1)
-				CHECK_TRUE(c1s[i](v2)[0] == i + 0.25)
-				CHECK_TRUE(c1s[i](v2)[1] == i + 0.5)
-				CHECK_TRUE(c1s[i](v2)[2] == i + 0.75)
-				CHECK_TRUE(c1s[i](v3) == -1)
-				CHECK_TRUE(c1s[i](v4) == i + 5)
+				CHECK_TRUE(c1s[i][v1] == -1)
+				CHECK_TRUE(c1s[i][v2][0] == i + 0.25)
+				CHECK_TRUE(c1s[i][v2][1] == i + 0.5)
+				CHECK_TRUE(c1s[i][v2][2] == i + 0.75)
+				CHECK_TRUE(c1s[i][v3] == -1)
+				CHECK_TRUE(c1s[i][v4] == i + 5)
 			} else {
-				CHECK_TRUE(c1s[i](v1) == int(i))
-				CHECK_TRUE(c1s[i](v2)[0] == -1)
-				CHECK_TRUE(c1s[i](v2)[1] == -1)
-				CHECK_TRUE(c1s[i](v2)[2] == -1)
-				CHECK_TRUE(c1s[i](v3) == i + 5.5)
-				CHECK_TRUE(c1s[i](v4) == 0)
+				CHECK_TRUE(c1s[i][v1] == int(i))
+				CHECK_TRUE(c1s[i][v2][0] == -1)
+				CHECK_TRUE(c1s[i][v2][1] == -1)
+				CHECK_TRUE(c1s[i][v2][2] == -1)
+				CHECK_TRUE(c1s[i][v3] == i + 5.5)
+				CHECK_TRUE(c1s[i][v4] == 0)
 			}
 		}
 	}

@@ -42,7 +42,7 @@ template<class Game_Grid> void print_game(const Game_Grid& grid)
 {
 	for (const auto& row: grid) {
 		for (const auto& cell: row) {
-			if (cell(is_alive())) {
+			if (cell[is_alive()]) {
 				cout << "0";
 			} else {
 				cout << ".";
@@ -67,15 +67,15 @@ int main(int, char**)
 	// initialize the game with a glider at upper left
 	for (auto& row: game_grid) {
 		for (auto& cell: row) {
-			cell(is_alive()) = false;
-			cell(live_neighbors()) = 0;
+			cell[is_alive()] = false;
+			cell[live_neighbors()] = 0;
 		}
 	}
-	game_grid[1][2](is_alive()) = true;
-	game_grid[2][3](is_alive()) = true;
-	game_grid[3][3](is_alive()) = true;
-	game_grid[3][2](is_alive()) = true;
-	game_grid[3][1](is_alive()) = true;
+	game_grid[1][2][is_alive()] = true;
+	game_grid[2][3][is_alive()] = true;
+	game_grid[3][3][is_alive()] = true;
+	game_grid[3][2][is_alive()] = true;
+	game_grid[3][1][is_alive()] = true;
 
 
 	constexpr size_t max_turns = 4;
@@ -103,8 +103,8 @@ int main(int, char**)
 						(cell_i + cell_offset) % width
 					];
 
-				if (neighbor(is_alive())) {
-					current_cell(live_neighbors())++;
+				if (neighbor[is_alive()]) {
+					current_cell[live_neighbors()]++;
 				}
 			}
 		}
@@ -114,12 +114,12 @@ int main(int, char**)
 		for (size_t cell_i = 0; cell_i < game_grid[row_i].size(); cell_i++) {
 
 			cell_t& cell = game_grid[row_i][cell_i];
-			if (cell(live_neighbors()) == 3) {
-				cell(is_alive()) = true;
-			} else if (cell(live_neighbors()) != 2) {
-				cell(is_alive()) = false;
+			if (cell[live_neighbors()] == 3) {
+				cell[is_alive()] = true;
+			} else if (cell[live_neighbors()] != 2) {
+				cell[is_alive()] = false;
 			}
-			cell(live_neighbors()) = 0;
+			cell[live_neighbors()] = 0;
 		}
 	}
 

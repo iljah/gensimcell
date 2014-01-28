@@ -82,8 +82,8 @@ template<
 				abort();
 			}
 
-			if ((*neighbor_data)(Is_Alive_T())) {
-				(*current_data)(Live_Neighbors_T())++;
+			if ((*neighbor_data)[Is_Alive_T()]) {
+				(*current_data)[Live_Neighbors_T()]++;
 			}
 		}
 	}
@@ -109,12 +109,12 @@ template<
 			abort();
 		}
 
-		if ((*data)(Live_Neighbors_T()) == 3) {
-			(*data)(Is_Alive_T()) = true;
-		} else if ((*data)(Live_Neighbors_T()) != 2) {
-			(*data)(Is_Alive_T()) = false;
+		if ((*data)[Live_Neighbors_T()] == 3) {
+			(*data)[Is_Alive_T()] = true;
+		} else if ((*data)[Live_Neighbors_T()] != 2) {
+			(*data)[Is_Alive_T()] = false;
 		}
-		(*data)(Live_Neighbors_T()) = 0;
+		(*data)[Live_Neighbors_T()] = 0;
 	}
 }
 

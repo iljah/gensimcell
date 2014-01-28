@@ -155,7 +155,7 @@ string save(
 
 	for (const auto& row: grid)
 	for (const auto& cell: row)
-	for (const auto& coordinate: cell(Particles()).coordinates) {
+	for (const auto& coordinate: cell[Particles()].coordinates) {
 		gnuplot_file
 			<< coordinate[0] << " "
 			<< coordinate[1] << " "
@@ -233,8 +233,8 @@ void initialize(grid_t& grid)
 			cell_size = get_cell_size(grid, {cell_i, row_i});
 
 		cell_t& cell = grid[row_i][cell_i];
-		cell(Velocity())[0] = 2 * center[1];
-		cell(Velocity())[1] = -2 * center[0];
+		cell[Velocity()][0] = 2 * center[1];
+		cell[Velocity()][1] = -2 * center[0];
 
 		// don't create particles too close to the edges
 		if (
@@ -246,15 +246,15 @@ void initialize(grid_t& grid)
 			continue;
 		}
 
-		cell(Particles()).coordinates.push_back({
+		cell[Particles()].coordinates.push_back({
 				center[0] - cell_size[0] / 4,
 				center[1] - cell_size[1] / 4
 		});
-		cell(Particles()).coordinates.push_back({
+		cell[Particles()].coordinates.push_back({
 				center[0],
 				center[1] + cell_size[1] / 4
 		});
-		cell(Particles()).coordinates.push_back({
+		cell[Particles()].coordinates.push_back({
 				center[0] + cell_size[0] / 4,
 				center[1] - cell_size[1] / 4
 		});
@@ -274,7 +274,7 @@ double get_max_time_step(const grid_t& grid)
 
 		const array<double, 2>
 			cell_size = get_cell_size(grid, {x_i, y_i}),
-			vel = grid[x_i][y_i](Velocity());
+			vel = grid[x_i][y_i][Velocity()];
 
 		ret_val =
 			min(ret_val,
@@ -298,10 +298,10 @@ void solve(grid_t& grid, const double dt)
 
 		cell_t& cell = grid[y_i][x_i];
 
-		for (auto& particle: cell(Particles()).coordinates) {
+		for (auto& particle: cell[Particles()].coordinates) {
 
-			particle[0] += cell(Velocity())[0] * dt;
-			particle[1] += cell(Velocity())[1] * dt;
+			particle[0] += cell[Velocity()][0] * dt;
+			particle[1] += cell[Velocity()][1] * dt;
 
 			// make sure particles stay inside the grid
 			for (size_t
@@ -339,7 +339,7 @@ void apply_solution(grid_t& grid)
 			cell_size = get_cell_size(grid, {x_i, y_i});
 
 		// shorten the notation for current coordinate list
-		vector<array<double, 2>>& coords = cell(Particles()).coordinates;
+		vector<array<double, 2>>& coords = cell[Particles()].coordinates;
 
 		for (size_t particle_i = 0; particle_i < coords.size(); particle_i++) {
 
@@ -394,7 +394,7 @@ void apply_solution(grid_t& grid)
 			}
 
 			cell_t& neighbor = grid[closest_y][closest_x];
-			neighbor(Particles()).coordinates.push_back(coordinate);
+			neighbor[Particles()].coordinates.push_back(coordinate);
 		}
 	}
 }
