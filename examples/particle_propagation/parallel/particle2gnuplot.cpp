@@ -155,11 +155,6 @@ int main(int argc, char* argv[])
 			Velocity(),
 			Internal_Particles()
 		);
-		Cell::set_transfer_all(
-			false,
-			particle::Particle_Destinations(),
-			particle::External_Particles()
-		);
 
 		for (const auto& item: cells_offsets) {
 			const uint64_t cell_id = item.first;
@@ -176,7 +171,6 @@ int main(int argc, char* argv[])
 
 			// read constant sized data
 			cell_data.set_transfer(true, Number_Of_Particles(), Velocity());
-			cell_data.set_transfer(false, Internal_Particles());
 
 			tie(
 				memory_address,

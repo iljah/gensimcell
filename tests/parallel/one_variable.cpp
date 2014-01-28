@@ -37,6 +37,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 	if (rank == 0) {
 
 		// send v1 from process 0 to 1
+		c1_1.set_transfer_all(true, v1);
 		c1_1(v1) = 1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
@@ -135,6 +136,7 @@ void transfer_c1_v1(MPI_Comm comm, const int rank)
 
 		// comments in the proc == 0 part
 
+		c1_1.set_transfer_all(true, v1);
 		c1_1(v1) = -1;
 		std::tie(address, count, datatype) = c1_1.get_mpi_datatype();
 		if (count < 0) {
@@ -248,6 +250,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 
 		// send all cells from 0 to 1
+		c1s[0].set_transfer_all(true, v1);
 		for (size_t i = 0; i < c1s.size(); i++) {
 			c1s[i](v1) = i;
 		}
@@ -336,6 +339,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
+		c2s[0].set_transfer_all(true, v2);
 		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				c2s[i](v2)[j] = i * 10 + j;
@@ -401,6 +405,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 
 		// comments in the proc == 0 part
  
+		c1s[0].set_transfer_all(true, v1);
 		for (auto& cell: c1s) {
 			cell(v1) = -1;
 		}
@@ -501,6 +506,7 @@ void transfer_cN_v1(MPI_Comm comm, const int rank)
 		}
 
 
+		c2s[0].set_transfer_all(true, v2);
 		for (size_t i = 0; i < c2s.size(); i++) {
 			for (size_t j = 0; j < c2s[i](v2).size(); j++) {
 				c2s[i](v2)[j] = -1;

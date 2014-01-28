@@ -139,8 +139,7 @@ int main(int argc, char* argv[])
 			uint64_t,
 			Cell
 		> simulation_data;
-		// the flux isn't saved
-		Cell::set_transfer_all(false, Density_Flux());
+		Cell::set_transfer_all(true, Density(), Velocity());
 
 		for (const auto& item: cells_offsets) {
 			const uint64_t

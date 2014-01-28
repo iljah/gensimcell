@@ -46,47 +46,49 @@ int main(int, char**)
 	cell3_t c3_1, c3_2;
 
 	// check default properties
-	CHECK_TRUE(c3_1.get_transfer_all(v1))
-	CHECK_TRUE(c3_1.get_transfer(v1))
-	CHECK_TRUE(c3_1.is_transferred(v1))
-	CHECK_TRUE(c3_2.get_transfer_all(v1))
-	CHECK_TRUE(c3_2.get_transfer(v1))
-	CHECK_TRUE(c3_2.is_transferred(v1))
-	CHECK_TRUE(c3_1.get_transfer_all(v2))
-	CHECK_TRUE(c3_1.get_transfer(v2))
-	CHECK_TRUE(c3_1.is_transferred(v2))
-	CHECK_TRUE(c3_2.get_transfer_all(v2))
-	CHECK_TRUE(c3_2.get_transfer(v2))
-	CHECK_TRUE(c3_2.is_transferred(v2))
-	CHECK_TRUE(c3_1.get_transfer_all(v3))
-	CHECK_TRUE(c3_1.get_transfer(v3))
-	CHECK_TRUE(c3_1.is_transferred(v3))
-	CHECK_TRUE(c3_2.get_transfer_all(v3))
-	CHECK_TRUE(c3_2.get_transfer(v3))
-	CHECK_TRUE(c3_2.is_transferred(v3))
+	CHECK_TRUE(not c3_1.get_transfer_all(v1))
+	CHECK_TRUE(not c3_1.get_transfer(v1))
+	CHECK_TRUE(not c3_1.is_transferred(v1))
+	CHECK_TRUE(not c3_2.get_transfer_all(v1))
+	CHECK_TRUE(not c3_2.get_transfer(v1))
+	CHECK_TRUE(not c3_2.is_transferred(v1))
+	CHECK_TRUE(not c3_1.get_transfer_all(v2))
+	CHECK_TRUE(not c3_1.get_transfer(v2))
+	CHECK_TRUE(not c3_1.is_transferred(v2))
+	CHECK_TRUE(not c3_2.get_transfer_all(v2))
+	CHECK_TRUE(not c3_2.get_transfer(v2))
+	CHECK_TRUE(not c3_2.is_transferred(v2))
+	CHECK_TRUE(not c3_1.get_transfer_all(v3))
+	CHECK_TRUE(not c3_1.get_transfer(v3))
+	CHECK_TRUE(not c3_1.is_transferred(v3))
+	CHECK_TRUE(not c3_2.get_transfer_all(v3))
+	CHECK_TRUE(not c3_2.get_transfer(v3))
+	CHECK_TRUE(not c3_2.is_transferred(v3))
 
 	// test static variable logic
-	c1_1.set_transfer_all(false, v2);
-	CHECK_TRUE(not c1_1.is_transferred(v2))
-	CHECK_TRUE(not c1_2.is_transferred(v2))
-	CHECK_TRUE(c2_1.is_transferred(v2))
-	CHECK_TRUE(c2_2.is_transferred(v2))
-	CHECK_TRUE(c3_1.is_transferred(v2))
-	CHECK_TRUE(c3_2.is_transferred(v2))
+	c1_1.set_transfer_all(true, v2);
+	CHECK_TRUE(c1_1.is_transferred(v2))
+	CHECK_TRUE(c1_2.is_transferred(v2))
+	CHECK_TRUE(not c2_1.is_transferred(v2))
+	CHECK_TRUE(not c2_2.is_transferred(v2))
+	CHECK_TRUE(not c3_1.is_transferred(v2))
+	CHECK_TRUE(not c3_2.is_transferred(v2))
 
 	// test combinations of static and cell specific logic
 	c3_1.set_transfer_all(boost::logic::indeterminate, v2);
-	c3_1.set_transfer(false, v2);
-	CHECK_TRUE(not c3_1.is_transferred(v2))
-	CHECK_TRUE(c3_2.is_transferred(v2))
+	c3_1.set_transfer(true, v2);
+	CHECK_TRUE(c3_1.is_transferred(v2))
+	CHECK_TRUE(not c3_2.is_transferred(v2))
 
-	c2_2.set_transfer(false, v3);
-	c2_2.set_transfer_all(true, v3);
+	c2_2.set_transfer(true, v3);
+	c2_2.set_transfer_all(boost::logic::indeterminate, v3);
 	c3_1.set_transfer_all(boost::logic::indeterminate, v3);
-	c3_2.set_transfer(false, v3);
-	CHECK_TRUE(c2_1.is_transferred(v3))
+	c3_1.set_transfer(false, v3);
+	c3_2.set_transfer(true, v3);
+	CHECK_TRUE(not c2_1.is_transferred(v3))
 	CHECK_TRUE(c2_2.is_transferred(v3))
-	CHECK_TRUE(not c3_2.is_transferred(v3))
+	CHECK_TRUE(not c3_1.is_transferred(v3))
+	CHECK_TRUE(c3_2.is_transferred(v3))
 
 
 	return EXIT_SUCCESS;

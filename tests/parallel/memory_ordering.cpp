@@ -93,6 +93,9 @@ int main(int argc, char* argv[])
 
 
 	cell123_t cell123;
+	cell123.set_transfer_all(true, v1, v2, v3);
+	cell123.set_transfer(true, v1, v2, v3);
+
 	cell123(v1) = 0x11;
 	cell123(v2) = 0x12;
 	cell123(v3) = 0x13;
@@ -149,6 +152,9 @@ int main(int argc, char* argv[])
 
 
 	cell321_t cell321;
+	cell321.set_transfer_all(true, v1, v2, v3);
+	cell321.set_transfer(true, v1, v2, v3);
+
 	cell321(v1) = 0x31;
 	cell321(v2) = 0x32;
 	cell321(v3) = 0x33;

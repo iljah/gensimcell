@@ -96,7 +96,7 @@ private:
 	Whether this instance sends this variable
 	if transfer_all is indeterminite
 	*/
-	bool transfer = true;
+	bool transfer = false;
 
 
 
@@ -353,7 +353,7 @@ template <
 	number_of_variables,
 	Current_Variable,
 	Rest_Of_Variables...
->::transfer_all = true;
+>::transfer_all = false;
 
 
 
@@ -386,7 +386,7 @@ private:
 	Whether this instance sends this variable
 	if transfer_all is indeterminite
 	*/
-	bool transfer = true;
+	bool transfer = false;
 
 
 
@@ -588,7 +588,7 @@ template <
 > boost::logic::tribool Cell_impl<
 	number_of_variables,
 	Variable
->::transfer_all = true;
+>::transfer_all = false;
 
 
 

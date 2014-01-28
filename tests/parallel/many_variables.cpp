@@ -51,6 +51,9 @@ void transfer_c1(MPI_Comm comm, const int rank)
 	if (rank == 0) {
 
 		// send all from process 0 to 1
+		c1_1.set_transfer_all(true, v1, v2, v3);
+		c1_1.set_transfer(true, v1, v2, v3);
+
 		c1_1(v1) = 1;
 		c1_1(v2) = {1.5, 2.25, 3.75};
 		c1_1(v3) = 1.5;
@@ -149,6 +152,8 @@ void transfer_c1(MPI_Comm comm, const int rank)
 	} else if (rank == 1) {
 
 		// comments in the proc == 0 part
+		c1_1.set_transfer_all(true, v1, v2, v3);
+		c1_1.set_transfer(true, v1, v2, v3);
 
 		c1_1(v1) = -1;
 		c1_1(v2) = {-1, -1, -1};
@@ -269,7 +274,10 @@ void transfer_cN(MPI_Comm comm, const int rank)
 
 
 		// send all cells from 0 to 1
+		c1s[0].set_transfer_all(true, v1, v2, v3, v4);
+
 		for (size_t i = 0; i < c1s.size(); i++) {
+			c1s[i].set_transfer(true, v1, v2, v3, v4);
 			c1s[i](v1) = int(i);
 			c1s[i](v2) = {i + 0.25, i + 0.5, i + 0.75};
 			c1s[i](v3) = i + 5.5;
@@ -369,8 +377,10 @@ void transfer_cN(MPI_Comm comm, const int rank)
 	} else if (rank == 1) {
 
 		// comments in the proc == 0 part
- 
+		c1s[0].set_transfer_all(true, v1, v2, v3, v4);
+
 		for (size_t i = 0; i < c1s.size(); i++) {
+			c1s[i].set_transfer(true, v1, v2, v3, v4);
 			c1s[i](v1) = -1;
 			c1s[i](v2) = {-1, -1, -1};
 			c1s[i](v3) = -1;
