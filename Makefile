@@ -34,6 +34,7 @@ EXECUTABLES = \
   tests/compile/many_variables.exe \
   tests/compile/one_variable_recursive.exe \
   tests/compile/many_variables_recursive.exe \
+  tests/compile/identical_names.exe \
   tests/serial/get_var_datatype_std.exe \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe \
