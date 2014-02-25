@@ -27,6 +27,7 @@ HEADERS = \
 
 
 EXECUTABLES = \
+  tests/compile/enable_if.dexe \
   tests/compile/get_var_datatype_included.exe \
   tests/compile/cell_included.exe \
   tests/compile/one_variable.exe \
@@ -48,7 +49,6 @@ EXECUTABLES = \
   tests/parallel/one_variable.exe \
   tests/parallel/many_variables.exe \
   tests/parallel/memory_ordering.exe \
-  tests/compile/dccrg/enable_if.dexe \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
   tests/compile/dccrg/instantiated.dexe \

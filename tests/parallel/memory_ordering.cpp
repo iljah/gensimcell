@@ -1,4 +1,6 @@
 /*
+Tests the ordering of the cell's variables when transferred by MPI.
+
 Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
@@ -12,9 +14,9 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-* Neither the name of NASA nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+* Neither the name of copyright holders nor the names of their contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -29,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*!
-Tests the ordering of variables when transferred by MPI.
-
 First variable given as a template argument should
 end up as first in memory when transferred.
 */

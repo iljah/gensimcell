@@ -1,5 +1,5 @@
 /*
-Tests whether instantiating dccrg with the cell as data compiles.
+Tests BOOST_TTI_HAS_MEMBER_FUNCTION with the cell's get_mpi_datatype.
 
 Copyright (c) 2013, 2014, Ilja Honkonen
 All rights reserved.
@@ -30,15 +30,27 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "dccrg.hpp"
+#include "boost/function_types/property_tags.hpp"
+#include "boost/tti/has_member_function.hpp"
+
 #include "gensimcell.hpp"
 
-struct cell_t {
+BOOST_TTI_HAS_MEMBER_FUNCTION(get_mpi_datatype)
+
+struct variable_t {
 	typedef int data_type;
 };
 
-int main(int, char**)
-{
-	dccrg::Dccrg<cell_t> grid;
-	return 0;
-}
+typedef gensimcell::Cell<variable_t> cell_t;
+
+static_assert(
+	has_member_function_get_mpi_datatype<
+		cell_t,
+		std::tuple<void*, int, MPI_Datatype>,
+		boost::mpl::vector<>,
+		boost::function_types::const_qualified
+	>::value,
+	"No get_mpi_datatype() const found in given cell class."
+);
+
+int main(int, char**) { return 0; }
