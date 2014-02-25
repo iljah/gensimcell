@@ -33,32 +33,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gensimcell.hpp"
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable3 {
-	typedef double data_type;
+	using data_type = double;
 };
 
 struct test_variable4 {
-	typedef char data_type;
+	using data_type = char;
 };
 
 struct test_variable5 {
-	typedef gensimcell::Cell<
+	using data_type = gensimcell::Cell<
 		test_variable4,
 		test_variable3,
 		test_variable2,
 		test_variable1
-	> data_type;
+	>;
 };
 
 struct test_variable6 {
-	typedef gensimcell::Cell<test_variable5, test_variable4> data_type;
+	using data_type = gensimcell::Cell<test_variable5, test_variable4>;
 };
 
 

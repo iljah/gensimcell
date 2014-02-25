@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 BOOST_TTI_HAS_MEMBER_FUNCTION(get_mpi_datatype)
 
 struct variable_t {
-	typedef int data_type;
+	using data_type = int;
 };
 
 typedef gensimcell::Cell<variable_t> cell_t;

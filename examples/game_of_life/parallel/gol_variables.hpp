@@ -1,4 +1,6 @@
 /*
+Variables for parallel game of life program.
+
 Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
@@ -12,9 +14,9 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-* Neither the name of NASA nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+* Neither the name of copyright holders nor the names of their contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,7 +29,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 
 #ifndef GOL_VARIABLES_HPP
 #define GOL_VARIABLES_HPP
@@ -45,18 +46,18 @@ namespace gol {
 
 struct Is_Alive
 {
-	typedef bool data_type;
+	using data_type = bool;
 };
 
 struct Live_Neighbors
 {
-	typedef int data_type;
+	using data_type = int;
 };
 
-typedef gensimcell::Cell<
+using Cell = gensimcell::Cell<
 	Is_Alive,
 	Live_Neighbors
-> Cell;
+>;
 
 } // namespace
 

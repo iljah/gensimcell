@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gensimcell.hpp"
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef double data_type;
+	using data_type = double;
 };
 
 

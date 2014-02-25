@@ -1,5 +1,7 @@
 /*
-Copyright (c) 2013, Ilja Honkonen
+Serial example program propagating particles in a const in time velocity field.
+
+Copyright (c) 2013, 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -12,9 +14,9 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-* Neither the name of NASA nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+* Neither the name of copyright holders nor the names of their contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,7 +29,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 
 #include "algorithm"
 #include "array"
@@ -54,7 +55,7 @@ using namespace std;
 
 struct Velocity
 {
-	typedef array<double, 2> data_type;
+	using data_type = array<double, 2>;
 };
 
 /*!
@@ -66,7 +67,7 @@ It is not used in this serial program.
 */
 struct Number_Of_Particles
 {
-	typedef unsigned long int data_type;
+	using data_type = unsigned long int;
 };
 
 /*!
@@ -91,22 +92,22 @@ struct Particles
 		}
 	};
 
-	typedef Storage data_type;
+	using data_type = Storage;
 };
 
 
-typedef gensimcell::Cell<
+using cell_t = gensimcell::Cell<
 	Velocity,
 	Number_Of_Particles,
 	Particles
-> cell_t;
+>;
 
 
 constexpr size_t
 	width = 20,
 	height = 20;
 
-typedef array<array<cell_t, width>, height> grid_t;
+using grid_t = array<array<cell_t, width>, height>;
 grid_t grid;
 
 

@@ -44,28 +44,28 @@ end up as first in memory when transferred.
 using namespace std;
 
 struct test_variable1 {
-	typedef char data_type;
+	using data_type = char;
 };
 
 struct test_variable2 {
-	typedef char data_type;
+	using data_type = char;
 };
 
 struct test_variable3 {
-	typedef char data_type;
+	using data_type = char;
 };
 
-typedef gensimcell::Cell<
+using cell123_t = gensimcell::Cell<
 	test_variable1,
 	test_variable2,
 	test_variable3
-> cell123_t;
+>;
 
-typedef gensimcell::Cell<
+using cell321_t = gensimcell::Cell<
 	test_variable3,
 	test_variable2,
 	test_variable1
-> cell321_t;
+>;
 
 
 int main(int argc, char* argv[])

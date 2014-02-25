@@ -1,4 +1,6 @@
 /*
+Variables for parallel particle propagator.
+
 Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
@@ -12,9 +14,9 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-* Neither the name of NASA nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+* Neither the name of copyright holders nor the names of their contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,7 +29,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 
 #ifndef PARTICLE_VARIABLES_HPP
 #define PARTICLE_VARIABLES_HPP
@@ -57,7 +58,7 @@ provides the corresponding MPI transfer information.
 */
 struct Particle_Storage
 {
-	typedef std::vector<std::array<double, 3>> storage_type;
+	using storage_type = std::vector<std::array<double, 3>>;
 	storage_type coordinates;
 
 	std::tuple<
@@ -87,7 +88,7 @@ the cell in which they are stored.
 */
 struct Internal_Particles
 {
-	typedef Particle_Storage data_type;
+	using data_type = Particle_Storage;
 };
 
 
@@ -98,7 +99,7 @@ assigned to the storage of a different cell.
 */
 struct External_Particles
 {
-	typedef Particle_Storage data_type;
+	using data_type = Particle_Storage;
 };
 
 
@@ -113,7 +114,7 @@ particle list at that time.
 */
 struct Number_Of_Particles
 {
-	typedef unsigned long int data_type;
+	using data_type = unsigned long int;
 };
 
 
@@ -132,13 +133,13 @@ struct Particle_Destinations
 	number of particles to assign to 2nd destination
 	starting from the next unassigned particle, etc.
 	*/
-	typedef std::array<unsigned long long int, 16> data_type;
+	using data_type = std::array<unsigned long long int, 16>;
 };
 
 
 struct Velocity
 {
-	typedef std::array<double, 2> data_type;
+	using data_type = std::array<double, 2>;
 };
 
 
@@ -149,13 +150,13 @@ Fixed size variables are ordered first in the
 transfer information for MPI to allow reading
 files saved by dccrg more easily.
 */
-typedef gensimcell::Cell<
+using Cell = gensimcell::Cell<
 	Number_Of_Particles,
 	Particle_Destinations,
 	Velocity,
 	Internal_Particles,
 	External_Particles
-> Cell;
+>;
 
 
 } // namespace

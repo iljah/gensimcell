@@ -39,31 +39,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
-typedef gensimcell::Cell<test_variable1> cell1_t;
+using cell1_t = gensimcell::Cell<test_variable1>;
 
 
 struct test_variable2 {
-	typedef gensimcell::Cell<test_variable1> data_type;
+	using data_type = gensimcell::Cell<test_variable1>;
 };
 
-typedef gensimcell::Cell<test_variable2> cell2_t;
+using cell2_t = gensimcell::Cell<test_variable2>;
 
 
 struct test_variable3 {
-	typedef cell1_t data_type;
+	using data_type = cell1_t;
 };
 
-typedef gensimcell::Cell<test_variable3> cell3_t;
+using cell3_t = gensimcell::Cell<test_variable3>;
 
 
-typedef gensimcell::Cell<
+using cell4_t = gensimcell::Cell<
 	test_variable1,
 	test_variable2,
 	test_variable3
-> cell4_t;
+>;
 
 
 int main(int, char**)

@@ -39,15 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef gensimcell::Cell<test_variable1> data_type;
+	using data_type = gensimcell::Cell<test_variable1>;
 };
 
 struct test_variable3 {
-	typedef gensimcell::Cell<test_variable2> data_type;
+	using data_type = gensimcell::Cell<test_variable2>;
 };
 
 

@@ -42,19 +42,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef std::array<double, 3> data_type;
+	using data_type = std::array<double, 3>;
 };
 
 struct test_variable3 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable4 {
-	typedef unsigned int data_type;
+	using data_type = unsigned int;
 };
 
 

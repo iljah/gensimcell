@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gensimcell.hpp"
 
 struct cell_t {
-	typedef int data_type;
+	using data_type = int;
 };
 
 int main(int, char**)

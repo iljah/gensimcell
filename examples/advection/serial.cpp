@@ -1,5 +1,7 @@
 /*
-Copyright (c) 2013, Ilja Honkonen
+Serial example program solving the advection equation.
+
+Copyright (c) 2013, 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -12,9 +14,9 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-* Neither the name of NASA nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+* Neither the name of copyright holders nor the names of their contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,7 +29,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 
 #include "algorithm"
 #include "array"
@@ -52,24 +53,24 @@ using namespace std;
 
 struct Density
 {
-	typedef double data_type;
+	using data_type = double;
 };
 
 struct Density_Flux
 {
-	typedef double data_type;
+	using data_type = double;
 };
 
 struct Velocity
 {
-	typedef std::array<double, 2> data_type;
+	using data_type = std::array<double, 2>;
 };
 
-typedef gensimcell::Cell<
+using cell_t = gensimcell::Cell<
 	Density,
 	Density_Flux,
 	Velocity
-> cell_t;
+>;
 
 
 //! horizontal and vertical size of the grid
@@ -83,7 +84,7 @@ the cell at horizontal (x) index = 2 and
 vertical (y) index = 4 use grid[4][2]
 (indices start from 0)
 */
-typedef array<array<cell_t, width>, height> grid_t;
+using grid_t = array<array<cell_t, width>, height>;
 grid_t grid;
 
 

@@ -44,38 +44,38 @@ using namespace std;
 
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable3 {
-	typedef std::array<char, 2> data_type;
+	using data_type = std::array<char, 2>;
 };
 
 
 struct test_variable4 {
-	typedef gensimcell::Cell<
+	using data_type = gensimcell::Cell<
 		test_variable1,
 		test_variable2,
 		test_variable3
-	> data_type;
+	>;
 };
 
 struct test_variable5 {
-	typedef gensimcell::Cell<
+	using data_type = gensimcell::Cell<
 		test_variable1,
 		test_variable4
-	> data_type;
+	>;
 };
 
 struct test_variable6 {
-	typedef gensimcell::Cell<
+	using data_type = gensimcell::Cell<
 		test_variable4,
 		test_variable5
-	> data_type;
+	>;
 };
 
 

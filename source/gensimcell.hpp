@@ -51,7 +51,7 @@ template <
 {
 public:
 	// allow the cell to be used as a variable
-	typedef detail::Cell_impl<sizeof...(Variables), Variables...> data_type;
+	using data_type = detail::Cell_impl<sizeof...(Variables), Variables...>;
 
 	// boost::tti has_member_function doesn't see the inherited one
 	std::tuple<

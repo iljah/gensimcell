@@ -40,15 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable3 {
-	typedef char data_type;
+	using data_type = char;
 };
 
 

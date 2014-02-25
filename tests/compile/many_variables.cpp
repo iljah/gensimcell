@@ -38,31 +38,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gensimcell.hpp"
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef double data_type;
+	using data_type = double;
 };
 
 struct test_variable3 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable4 {
-	typedef uint64_t data_type;
+	using data_type = uint64_t;
 };
 
 struct test_variable5 {
-	typedef std::array<double, 3> data_type;
+	using data_type = std::array<double, 3>;
 };
 
 struct test_variable6 {
-	typedef std::tuple<int, float, test_variable5> data_type;
+	using data_type = std::tuple<int, float, test_variable5>;
 };
 
 struct test_variable7 {
-	typedef std::vector<int> data_type;
+	using data_type = std::vector<int>;
 };
 
 

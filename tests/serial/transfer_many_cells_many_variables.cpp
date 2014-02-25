@@ -38,33 +38,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
 struct test_variable2 {
-	typedef float data_type;
+	using data_type = float;
 };
 
 struct test_variable3 {
-	typedef char data_type;
+	using data_type = char;
 };
 
 
-typedef gensimcell::Cell<
+using cell1_t = gensimcell::Cell<
 	test_variable1,
 	test_variable2
-> cell1_t;
+>;
 
-typedef gensimcell::Cell<
+using cell2_t = gensimcell::Cell<
 	test_variable2,
 	test_variable3
-> cell2_t;
+>;
 
-typedef gensimcell::Cell<
+using cell3_t = gensimcell::Cell<
 	test_variable1,
 	test_variable2,
 	test_variable3
-> cell3_t;
+>;
 
 
 int main(int, char**)

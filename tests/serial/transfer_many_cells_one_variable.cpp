@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 struct test_variable1 {
-	typedef int data_type;
+	using data_type = int;
 };
 
-typedef gensimcell::Cell<test_variable1> cell1_t;
+using cell1_t = gensimcell::Cell<test_variable1>;
 
 
 int main(int, char**)
