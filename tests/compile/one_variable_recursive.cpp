@@ -30,6 +30,10 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifdef HAVE_MPI
+#include "mpi.h"
+#endif
+
 #include "gensimcell.hpp"
 
 struct test_variable {
@@ -43,7 +47,8 @@ int main(int, char**)
 		gensimcell::Cell<
 			test_variable
 		>
-	> cell;
+	> cell1, cell2;
+	cell1 = cell2;
 
 	return 0;
 }

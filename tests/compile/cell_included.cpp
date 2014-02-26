@@ -30,6 +30,12 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifdef HAVE_MPI
+#include "mpi.h"
+#endif
+
+#include "mpi.h"
+
 #include "gensimcell.hpp"
 
 int main(int, char**) { return 0; }

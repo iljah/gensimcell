@@ -64,8 +64,11 @@ struct test_variable6 {
 
 int main(int, char**)
 {
-	gensimcell::Cell<test_variable5> cell1;
-	gensimcell::Cell<test_variable6> cell2;
+	gensimcell::Cell<test_variable5> cell1, cell2;
+	cell1 = cell2;
+
+	gensimcell::Cell<test_variable6> cell3, cell4;
+	cell3 = cell4;
 
 	gensimcell::Cell<
 		test_variable2,
@@ -74,7 +77,8 @@ int main(int, char**)
 			test_variable5
 		>,
 		test_variable6
-	> cell3;
+	> cell5, cell6;
+	cell5 = cell6;
 
 	return 0;
 }

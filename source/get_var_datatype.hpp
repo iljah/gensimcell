@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef GET_VAR_DATATYPE_HPP
 #define GET_VAR_DATATYPE_HPP
 
+#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 #include "boost/function_types/property_tags.hpp"
 #include "boost/mpl/vector.hpp"
@@ -166,5 +167,7 @@ GENSIMCELL_GET_ARRAY_VAR_DATATYPE(wchar_t, MPI_WCHAR)
 
 } // namespace detail
 } // namespace gensimcell
+
+#endif // ifdef MPI_VERSION
 
 #endif // ifndef  GET_VAR_DATATYPE_HPP

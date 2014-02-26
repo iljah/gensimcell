@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "boost/logic/tribool.hpp"
 #include "cstdlib"
+#include "mpi.h"
 
 #include "check_true.hpp"
 #include "gensimcell.hpp"

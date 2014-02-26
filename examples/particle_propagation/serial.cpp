@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "iomanip"
 #include "iostream"
 #include "limits"
-#include "mpi.h"
 #include "sstream"
 #include "string"
 #include "tuple"
@@ -59,46 +58,16 @@ struct Velocity
 };
 
 /*!
-The number of particles in a cell is useful
-to have as a separate variable in the parallel
-case, see parallel/particle_cell.hpp for details.
-
-It is not used in this serial program.
-*/
-struct Number_Of_Particles
-{
-	using data_type = unsigned long int;
-};
-
-/*!
 Class storing an arbitrary number of 2-dimensional particle coordinates.
 */
 struct Particles
 {
-	/*!
-	In the parallel version non trivial cell data must have
-	a get_mpi_datatype function in addition to variable's
-	storage so wrap coordinate data and that function
-	into this class.
-	*/
-	struct Storage
-	{
-		std::vector<std::array<double, 2>> coordinates;
-
-		std::tuple<void*, int, MPI_Datatype> get_mpi_datatype()
-		{
-			// the serial version doesn't use this functionality
-			return make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
-		}
-	};
-
-	using data_type = Storage;
+	using data_type = vector<array<double, 2>>;
 };
 
 
 using cell_t = gensimcell::Cell<
 	Velocity,
-	Number_Of_Particles,
 	Particles
 >;
 
@@ -156,7 +125,7 @@ string save(
 
 	for (const auto& row: grid)
 	for (const auto& cell: row)
-	for (const auto& coordinate: cell[Particles()].coordinates) {
+	for (const auto& coordinate: cell[Particles()]) {
 		gnuplot_file
 			<< coordinate[0] << " "
 			<< coordinate[1] << " "
@@ -247,15 +216,15 @@ void initialize(grid_t& grid)
 			continue;
 		}
 
-		cell[Particles()].coordinates.push_back({
+		cell[Particles()].push_back({
 				center[0] - cell_size[0] / 4,
 				center[1] - cell_size[1] / 4
 		});
-		cell[Particles()].coordinates.push_back({
+		cell[Particles()].push_back({
 				center[0],
 				center[1] + cell_size[1] / 4
 		});
-		cell[Particles()].coordinates.push_back({
+		cell[Particles()].push_back({
 				center[0] + cell_size[0] / 4,
 				center[1] - cell_size[1] / 4
 		});
@@ -299,7 +268,7 @@ void solve(grid_t& grid, const double dt)
 
 		cell_t& cell = grid[y_i][x_i];
 
-		for (auto& particle: cell[Particles()].coordinates) {
+		for (auto& particle: cell[Particles()]) {
 
 			particle[0] += cell[Velocity()][0] * dt;
 			particle[1] += cell[Velocity()][1] * dt;
@@ -340,7 +309,7 @@ void apply_solution(grid_t& grid)
 			cell_size = get_cell_size(grid, {x_i, y_i});
 
 		// shorten the notation for current coordinate list
-		vector<array<double, 2>>& coords = cell[Particles()].coordinates;
+		vector<array<double, 2>>& coords = cell[Particles()];
 
 		for (size_t particle_i = 0; particle_i < coords.size(); particle_i++) {
 
@@ -395,7 +364,7 @@ void apply_solution(grid_t& grid)
 			}
 
 			cell_t& neighbor = grid[closest_y][closest_x];
-			neighbor[Particles()].coordinates.push_back(coordinate);
+			neighbor[Particles()].push_back(coordinate);
 		}
 	}
 }

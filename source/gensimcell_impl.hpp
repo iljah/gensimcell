@@ -32,14 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENSIMCELL_IMPL_HPP
 
 
-#include "boost/logic/tribool.hpp"
 #include "cstdlib"
 #include "limits"
-#include "mpi.h"
 #include "vector"
 
+
+#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
+
+#include "boost/logic/tribool.hpp"
+
+#endif // ifdef MPI_VERSION
+
+
 #include "get_var_datatype.hpp"
-#include "iostream"
+
 
 namespace gensimcell {
 
@@ -87,6 +93,8 @@ private:
 	typename Current_Variable::data_type data;
 
 
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
+
 	/*!
 	Whether each instance tranfers
 	this variable or not using MPI
@@ -98,10 +106,13 @@ private:
 	*/
 	bool transfer = false;
 
+	#endif // ifdef MPI_VERSION
 
 
 protected:
 
+
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 	static void set_transfer_all_impl(
 		const boost::logic::tribool given_transfer,
@@ -159,6 +170,8 @@ protected:
 		return transfer_info;
 	}
 
+	#endif // ifdef MPI_VERSION
+
 
 
 public:
@@ -169,11 +182,6 @@ public:
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all_impl;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_impl;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
 
 	typename Current_Variable::data_type& operator[](const Current_Variable&)
@@ -185,6 +193,15 @@ public:
 	{
 		return this->data;
 	};
+
+
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
+
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all_impl;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_impl;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer;
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
 
 	template<class... Given_Vars> static void set_transfer_all(
@@ -343,7 +360,10 @@ public:
 		}
 	}
 
+	#endif // ifdef MPI_VERSION
 };
+
+#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 template <
 	size_t number_of_variables,
@@ -355,6 +375,7 @@ template <
 	Rest_Of_Variables...
 >::transfer_all = false;
 
+#endif // ifdef MPI_VERSION
 
 
 /*!
@@ -377,6 +398,8 @@ private:
 	typename Variable::data_type data;
 
 
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
+
 	/*!
 	Whether each instance tranfers
 	this variable or not using MPI
@@ -388,10 +411,14 @@ private:
 	*/
 	bool transfer = false;
 
+	#endif // ifdef MPI_VERSION
+
 
 
 protected:
 
+
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 	static void set_transfer_all_impl(
 		const boost::logic::tribool given_transfer,
@@ -438,6 +465,7 @@ protected:
 		return transfer_info;
 	}
 
+	#endif // ifdef MPI_VERSION
 
 
 public:
@@ -453,6 +481,8 @@ public:
 		return this->data;
 	}
 
+
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 	template<class... Given_Vars> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
@@ -580,7 +610,11 @@ public:
 		}
 	}
 
+	#endif // ifdef MPI_VERSION
 };
+
+
+#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 template <
 	size_t number_of_variables,
@@ -589,6 +623,8 @@ template <
 	number_of_variables,
 	Variable
 >::transfer_all = false;
+
+#endif // ifdef MPI_VERSION
 
 
 

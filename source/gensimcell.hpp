@@ -53,6 +53,9 @@ public:
 	// allow the cell to be used as a variable
 	using data_type = detail::Cell_impl<sizeof...(Variables), Variables...>;
 
+
+	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
+
 	// boost::tti has_member_function doesn't see the inherited one
 	std::tuple<
 		void*,
@@ -65,6 +68,8 @@ public:
 			Variables...
 		>::get_mpi_datatype();
 	}
+
+	#endif // ifdef MPI_VERSION
 };
 
 

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "boost/function_types/property_tags.hpp"
 #include "boost/tti/has_member_function.hpp"
+#include "mpi.h"
 
 #include "gensimcell.hpp"
 

@@ -43,6 +43,7 @@ namespace second {
 int main(int, char**)
 {
 	gensimcell::Cell<first::variable, second::variable> cell;
+	cell[first::variable()] = 3;
 
 	return 0;
 }

@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "cstdlib"
+#include "mpi.h"
 
 #include "check_true.hpp"
 #include "gensimcell.hpp"

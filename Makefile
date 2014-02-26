@@ -1,54 +1,70 @@
-CPPFLAGS = \
+include makefiles/macosx_macports
+
+CPPFLAGS += \
   -I source \
   -I tests \
   -I examples/game_of_life/parallel \
   -I examples/advection/parallel \
   -I examples/particle_propagation/parallel
 
-CXXFLAGS = -std=c++0x -W -Wall -Wextra -pedantic -O3
-
-include makefiles/macosx_macports
+CXXFLAGS += -std=c++0x -W -Wall -Wextra -pedantic -O3
 
 HEADERS = \
   source/gensimcell.hpp \
   source/gensimcell_impl.hpp \
   source/get_var_datatype.hpp
 
+
 %.exe: %.cpp $(HEADERS) Makefile
-	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	@echo "CXX "$< && $(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 %.tst: %.exe
+	@echo "RUN "$< && $(RUN) ./$< && echo PASS && touch $@
+
+
+# these require boost and MPI (for example open-mpi.org)
+%.mexe: %.cpp $(HEADERS) Makefile
+	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
+
+%.mtst: %.mexe
 	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
+
 
 # these require dccrg (the c++11 version from c++11 branch,
 # https://gitorious.org/dccrg) which also requires Zoltan
 %.dexe: %.cpp $(HEADERS) Makefile
-	@echo "MPICXX "$< && $(MPICXX) $(DCCRG_FLAGS) $(ZOLTAN_FLAGS) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(DCCRG_CPPFLAGS) $(ZOLTAN_CPPFLAGS) $(ZOLTAN_LDFLAGS) $(ZOLTAN_LIBS) $< -o $@
 
 
 EXECUTABLES = \
-  tests/compile/enable_if.dexe \
-  tests/compile/get_var_datatype_included.exe \
-  tests/compile/cell_included.exe \
+  tests/compile/enable_if.mexe \
+  tests/compile/get_var_datatype_included.mexe \
+  tests/compile/cell_included.mexe \
   tests/compile/one_variable.exe \
+  tests/compile/one_variable.mexe \
   tests/compile/two_variables.exe \
+  tests/compile/two_variables.mexe \
   tests/compile/many_variables.exe \
+  tests/compile/many_variables.mexe \
   tests/compile/one_variable_recursive.exe \
+  tests/compile/one_variable_recursive.mexe \
   tests/compile/many_variables_recursive.exe \
+  tests/compile/many_variables_recursive.mexe \
   tests/compile/identical_names.exe \
-  tests/serial/get_var_datatype_std.exe \
+  tests/compile/identical_names.mexe \
+  tests/serial/get_var_datatype_std.mexe \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe \
   tests/serial/one_variable_recursive.exe \
   tests/serial/many_variables_recursive.exe \
-  tests/serial/transfer_one_cell_one_variable.exe \
-  tests/serial/transfer_one_cell_many_variables.exe \
-  tests/serial/transfer_many_cells_one_variable.exe \
-  tests/serial/transfer_many_cells_many_variables.exe \
-  tests/serial/transfer_recursive.exe \
-  tests/parallel/one_variable.exe \
-  tests/parallel/many_variables.exe \
-  tests/parallel/memory_ordering.exe \
+  tests/serial/transfer_one_cell_one_variable.mexe \
+  tests/serial/transfer_one_cell_many_variables.mexe \
+  tests/serial/transfer_many_cells_one_variable.mexe \
+  tests/serial/transfer_many_cells_many_variables.mexe \
+  tests/serial/transfer_recursive.mexe \
+  tests/parallel/one_variable.mexe \
+  tests/parallel/many_variables.mexe \
+  tests/parallel/memory_ordering.mexe \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
   tests/compile/dccrg/instantiated.dexe \
@@ -67,19 +83,19 @@ EXECUTABLES = \
   examples/combined/parallel.dexe
 
 TESTS = \
-  tests/serial/get_var_datatype_std.tst \
+  tests/serial/get_var_datatype_std.mtst \
   tests/serial/one_variable.tst \
   tests/serial/many_variables.tst \
   tests/serial/one_variable_recursive.tst \
   tests/serial/many_variables_recursive.tst \
-  tests/serial/transfer_one_cell_one_variable.tst \
-  tests/serial/transfer_one_cell_many_variables.tst \
-  tests/serial/transfer_many_cells_one_variable.tst \
-  tests/serial/transfer_many_cells_many_variables.tst \
-  tests/serial/transfer_recursive.tst \
-  tests/parallel/one_variable.tst \
-  tests/parallel/many_variables.tst \
-  tests/parallel/memory_ordering.tst
+  tests/serial/transfer_one_cell_one_variable.mtst \
+  tests/serial/transfer_one_cell_many_variables.mtst \
+  tests/serial/transfer_many_cells_one_variable.mtst \
+  tests/serial/transfer_many_cells_many_variables.mtst \
+  tests/serial/transfer_recursive.mtst \
+  tests/parallel/one_variable.mtst \
+  tests/parallel/many_variables.mtst \
+  tests/parallel/memory_ordering.mtst
 
 all: test
 
