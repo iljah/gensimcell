@@ -1,5 +1,5 @@
 /*
-Tests whether a program including get_var_datatype header compiles.
+Tests whether a program including get_var_mpi_datatype header compiles.
 
 Copyright (c) 2013, 2014, Ilja Honkonen
 All rights reserved.
@@ -34,6 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mpi.h"
 #endif
 
-#include "get_var_datatype.hpp"
+#include "get_var_mpi_datatype.hpp"
 
 int main(int, char**) { return 0; }

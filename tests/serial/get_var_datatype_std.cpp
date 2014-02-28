@@ -1,5 +1,5 @@
 /*
-Tests that get_var_datatype returns correct datatypes for standard variables.
+Tests that get_var_mpi_datatype returns correct datatypes for standard variables.
 
 Copyright (c) 2013, 2014, Ilja Honkonen
 All rights reserved.
@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mpi.h"
 
 #include "check_true.hpp"
-#include "get_var_datatype.hpp"
+#include "get_var_mpi_datatype.hpp"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ int main(int, char**) {
 
 	bool b;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(b);
+		= gensimcell::detail::get_var_mpi_datatype(b);
 	CHECK_TRUE(
 		address == &b
 		and count == 1
@@ -60,7 +60,7 @@ int main(int, char**) {
 
 	char c;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(c);
+		= gensimcell::detail::get_var_mpi_datatype(c);
 	CHECK_TRUE(
 		address == &c
 		and count == 1
@@ -70,7 +70,7 @@ int main(int, char**) {
 
 	signed long long int i;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(i);
+		= gensimcell::detail::get_var_mpi_datatype(i);
 	CHECK_TRUE(
 		address == &i
 		and count == 1
@@ -80,7 +80,7 @@ int main(int, char**) {
 
 	std::complex<long double> d;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(d);
+		= gensimcell::detail::get_var_mpi_datatype(d);
 	CHECK_TRUE(
 		address == &d
 		and count == 1
@@ -90,7 +90,7 @@ int main(int, char**) {
 
 	std::array<char, 5> e;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(e);
+		= gensimcell::detail::get_var_mpi_datatype(e);
 	CHECK_TRUE(
 		address == e.data()
 		and count == 5
@@ -100,7 +100,7 @@ int main(int, char**) {
 
 	std::array<std::complex<double>, 3> f;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_datatype(f);
+		= gensimcell::detail::get_var_mpi_datatype(f);
 	CHECK_TRUE(
 		address == f.data()
 		and count == 3

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif // ifdef MPI_VERSION
 
 
-#include "get_var_datatype.hpp"
+#include "get_var_mpi_datatype.hpp"
 
 
 namespace gensimcell {
@@ -151,7 +151,7 @@ protected:
 				address,
 				count,
 				datatype
-			) = get_var_datatype(this->data);
+			) = get_var_mpi_datatype(this->data);
 
 			std::get<0>(transfer_info).push_back(address);
 			std::get<1>(transfer_info).push_back(count);
@@ -455,7 +455,7 @@ protected:
 				address,
 				count,
 				datatype
-			) = get_var_datatype(this->data);
+			) = get_var_mpi_datatype(this->data);
 
 			std::get<0>(transfer_info).push_back(address);
 			std::get<1>(transfer_info).push_back(count);

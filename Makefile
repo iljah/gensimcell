@@ -12,7 +12,7 @@ CXXFLAGS += -std=c++0x -W -Wall -Wextra -pedantic -O3
 HEADERS = \
   source/gensimcell.hpp \
   source/gensimcell_impl.hpp \
-  source/get_var_datatype.hpp
+  source/get_var_mpi_datatype.hpp
 
 
 %.exe: %.cpp $(HEADERS) Makefile
