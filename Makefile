@@ -38,7 +38,7 @@ HEADERS = \
 
 EXECUTABLES = \
   tests/compile/enable_if.mexe \
-  tests/compile/get_var_datatype_included.mexe \
+  tests/compile/get_var_mpi_datatype_included.mexe \
   tests/compile/cell_included.mexe \
   tests/compile/one_variable.exe \
   tests/compile/one_variable.mexe \
