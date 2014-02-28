@@ -53,11 +53,12 @@ namespace particle {
 
 
 /*!
-Stores an arbitrary number of 2d particle coordinates and
+Stores an arbitrary number of 3d particle coordinates and
 provides the corresponding MPI transfer information.
 */
 struct Particle_Storage
 {
+	// make storage type visible outside of this class
 	using storage_type = std::vector<std::array<double, 3>>;
 	storage_type coordinates;
 
