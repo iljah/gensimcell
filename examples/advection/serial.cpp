@@ -92,7 +92,7 @@ grid_t grid;
 Returns the center of cell located at given indices in given grid.
 
 First index is the cell's location in horizontal direction (x),
-second in vertical (y).
+second in vertical (y). Indices increase in positive direction.
 */
 array<double, 2> get_cell_center(
 	const grid_t& grid,
@@ -181,8 +181,10 @@ void initialize(grid_t& grid)
 		/*
 		Initialize velocity
 		*/
-		cell[Velocity()][0] = 2 * center[1];
-		cell[Velocity()][1] = -2 * center[0];
+		cell[Velocity()] = {
+			+2 * center[1],
+			-2 * center[0]
+		};
 	}
 }
 
@@ -304,12 +306,12 @@ string save(
 
 	const string
 		gnuplot_file_name(
-			"serial_"
+			"advection_"
 			+ time_string.str()
 			+ ".dat"
 		),
 		plot_file_name(
-			"serial_"
+			"advection_"
 			+ time_string.str()
 			+ ".png"
 		);
@@ -325,8 +327,9 @@ string save(
 		   "plot '-' matrix with image title ''\n";
 
 	// plotting 'with image' requires row data from bottom to top
-	for (const auto& row: boost::adaptors::reverse(grid)) {
-		for (const auto& cell: row) {
+	for (size_t row_i = 0; row_i < grid.size(); row_i++) {
+		for (size_t cell_i = 0; cell_i < grid[row_i].size(); cell_i++) {
+			const cell_t& cell = grid[row_i][cell_i];
 			gnuplot_file << cell[Density()] << " ";
 		}
 		gnuplot_file << "\n";

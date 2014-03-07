@@ -59,7 +59,7 @@ had been disabled before this function was called.
 */
 template<
 	class Cell_T,
-	class Number_Of_Particles_T,
+	class Number_Of_Internal_Particles_T,
 	class Velocity_T,
 	class Internal_Particles_T
 > void save(
@@ -68,22 +68,10 @@ template<
 ) {
 	Cell_T::set_transfer_all(
 		true,
-		Number_Of_Particles_T(),
+		Number_Of_Internal_Particles_T(),
 		Velocity_T(),
 		Internal_Particles_T()
 	);
-
-	// use Number_Of_Particles_T to mark internal particles
-	for (auto& item: grid) {
-		Cell_T* cell_data = grid[item.first];
-		if (cell_data == NULL) {
-			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-			abort();
-		}
-
-		(*cell_data)[Number_Of_Particles_T()]
-			= (*cell_data)[Internal_Particles_T()].coordinates.size();
-	}
 
 	// get the file name
 	std::ostringstream time_string;
@@ -104,7 +92,7 @@ template<
 
 	Cell_T::set_transfer_all(
 		false,
-		Number_Of_Particles_T(),
+		Number_Of_Internal_Particles_T(),
 		Velocity_T(),
 		Internal_Particles_T()
 	);

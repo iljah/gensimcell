@@ -51,10 +51,11 @@ Inserts 3 particles / cell in the center of the given grid.
 */
 template<
 	class Cell_T,
-	class Number_Of_Particles_T,
-	class Particle_Destinations_T,
+	class Number_Of_Internal_Particles_T,
+	class Number_Of_External_Particles_T,
 	class Velocity_T,
-	class Internal_Particles_T
+	class Internal_Particles_T,
+	class External_Particles_T
 > void initialize(
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
 ) {
@@ -62,11 +63,11 @@ template<
 		grid_start = grid.geometry.get_start(),
 		grid_end = grid.geometry.get_end();
 
-	// don't create particles too close to the edges
 	auto
 		particles_start = grid_start,
 		particles_end = grid_end;
 
+	// don't create particles too close to the edges
 	for (size_t i = 0; i < grid_start.size(); i++) {
 		particles_start[i] += (grid_end[i] - grid_start[i]) / 4;
 		particles_end[i] -= (grid_end[i] - grid_start[i]) / 4;
@@ -80,16 +81,18 @@ template<
 			center = grid.geometry.get_center(cell_id),
 			length = grid.geometry.get_length(cell_id);
 
-		Cell_T* cell_data_temp = grid[cell_id];
-		if (cell_data_temp == NULL) {
+		Cell_T* cell_data = grid[cell_id];
+		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
-		Cell_T& cell_data = *cell_data_temp;
 
-		cell_data[Number_Of_Particles_T()] = 0;
-		cell_data[Particle_Destinations_T()].fill(dccrg::error_cell);
-		cell_data[Velocity_T()] = {2 * center[1], -2 * center[0]};
+		(*cell_data)[Number_Of_Internal_Particles_T()] =
+		(*cell_data)[Number_Of_External_Particles_T()] = 0;
+		(*cell_data)[Velocity_T()] = {
+			-2 * center[1],
+			+2 * center[0]
+		};
 
 		if (
 			center[0] < particles_start[0]
@@ -100,18 +103,18 @@ template<
 			continue;
 		}
 
-		cell_data[Number_Of_Particles_T()] = 3;
-		cell_data[Internal_Particles_T()].coordinates.push_back({
+		(*cell_data)[Number_Of_Internal_Particles_T()] = 3;
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				0
 		});
-		cell_data[Internal_Particles_T()].coordinates.push_back({
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0],
 				center[1] + length[1] / 4,
 				0
 		});
-		cell_data[Internal_Particles_T()].coordinates.push_back({
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				0

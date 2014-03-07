@@ -98,12 +98,12 @@ string save(
 
 	const string
 		gnuplot_file_name(
-			"serial_"
+			"particle_"
 			+ time_string.str()
 			+ ".dat"
 		),
 		plot_file_name(
-			"serial_"
+			"particle_"
 			+ time_string.str()
 			+ ".png"
 		);
@@ -203,8 +203,8 @@ void initialize(grid_t& grid)
 			cell_size = get_cell_size(grid, {cell_i, row_i});
 
 		cell_t& cell = grid[row_i][cell_i];
-		cell[Velocity()][0] = 2 * center[1];
-		cell[Velocity()][1] = -2 * center[0];
+		cell[Velocity()][0] = -2 * center[1];
+		cell[Velocity()][1] = +2 * center[0];
 
 		// don't create particles too close to the edges
 		if (

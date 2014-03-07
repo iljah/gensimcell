@@ -150,14 +150,6 @@ int main(int argc, char* argv[])
 		after which the particles themselves can be read
 		*/
 
-		// read the variables on a cell-by-cell basis
-		Cell::set_transfer_all(
-			boost::logic::indeterminate,
-			Number_Of_Particles(),
-			Velocity(),
-			Internal_Particles()
-		);
-
 		for (const auto& item: cells_offsets) {
 			const uint64_t cell_id = item.first;
 			uint64_t file_address = item.second;
@@ -172,7 +164,7 @@ int main(int argc, char* argv[])
 				file_datatype = MPI_DATATYPE_NULL;
 
 			// read constant sized data
-			cell_data.set_transfer(true, Number_Of_Particles(), Velocity());
+			cell_data.set_transfer_all(true, Number_Of_Internal_Particles(), Velocity());
 
 			tie(
 				memory_address,
@@ -207,11 +199,11 @@ int main(int argc, char* argv[])
 			MPI_Type_free(&memory_datatype);
 			MPI_Type_free(&file_datatype);
 
-			cell_data[Internal_Particles()].resize(cell_data[Number_Of_Particles()]);
+			cell_data[Internal_Particles()].resize(cell_data[Number_Of_Internal_Particles()]);
 
 			// read the particle coordinates and velocity
-			cell_data.set_transfer(false, Number_Of_Particles(), Velocity());
-			cell_data.set_transfer(true, Internal_Particles());
+			cell_data.set_transfer_all(false, Number_Of_Internal_Particles(), Velocity());
+			cell_data.set_transfer_all(true, Internal_Particles());
 
 			tie(
 				memory_address,

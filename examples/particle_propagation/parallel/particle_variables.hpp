@@ -56,11 +56,9 @@ namespace particle {
 Stores an arbitrary number of 3d particle coordinates and
 provides the corresponding MPI transfer information.
 */
-struct Particle_Storage
+struct Internal_Particle_Storage
 {
-	// make storage type visible outside of this class
-	using storage_type = std::vector<std::array<double, 3>>;
-	storage_type coordinates;
+	std::vector<std::array<double, 3>> coordinates;
 
 	std::tuple<
 		void*,
@@ -68,6 +66,10 @@ struct Particle_Storage
 		MPI_Datatype
 	> get_mpi_datatype() const
 	{
+		if (3 * this->coordinates.size() > std::numeric_limits<int>::max()) {
+			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+		}
+
 		return std::make_tuple(
 			(void*) this->coordinates.data(),
 			3 * this->coordinates.size(),
@@ -75,7 +77,7 @@ struct Particle_Storage
 		);
 	}
 
-	// resizes coordinates to fit new_size particles
+	// resizes internal storage to fit new_size particles
 	void resize(const size_t new_size)
 	{
 		this->coordinates.resize(new_size);
@@ -89,7 +91,88 @@ the cell in which they are stored.
 */
 struct Internal_Particles
 {
-	using data_type = Particle_Storage;
+	using data_type = Internal_Particle_Storage;
+};
+
+
+
+/*!
+Stores an arbitrary number of 3d particle coordinates,
+the particles' destination cells and provides the
+corresponding MPI transfer information.
+*/
+struct External_Particle_Storage
+{
+	std::vector<std::array<double, 3>> coordinates;
+	std::vector<uint64_t> destinations;
+
+	/*!
+	Returns the MPI transfer information corresponding to
+	particle coordinates and their destination cells.
+
+	1st value is starting address, 2nd number of items, 3rd the datatype.
+	In case of error returns NULL, N and MPI_DATATYPE_NULL, where N is:
+		- -1 if the number of doubles in coordinates > maximum int
+		- -2 if MPI_Type_create_struct failed to create the final type
+	*/
+	std::tuple<
+		void*,
+		int,
+		MPI_Datatype
+	> get_mpi_datatype() const
+	{
+		/*
+		Transfer particle coordinates and destinations
+		*/
+
+		if (3 * this->coordinates.size() > std::numeric_limits<int>::max()) {
+			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+		}
+
+		std::array<int, 2> counts{
+			int(3 * this->coordinates.size()),
+			int(1 * this->destinations.size())
+		};
+
+		std::array<MPI_Aint, 2> displacements{
+			0,
+			  reinterpret_cast<const char* const>(this->destinations.data())
+			- reinterpret_cast<const char* const>(this->coordinates.data())
+		};
+
+		std::array<MPI_Datatype, 2> datatypes{
+			MPI_DOUBLE,
+			MPI_UINT64_T
+		};
+
+
+		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
+		if (
+			MPI_Type_create_struct(
+				2,
+				counts.data(),
+				displacements.data(),
+				datatypes.data(),
+				&final_datatype
+			) != MPI_SUCCESS
+		) {
+			return std::make_tuple((void*) NULL, -2, MPI_DATATYPE_NULL);
+		}
+
+
+		return std::make_tuple(
+			(void*) this->coordinates.data(),
+			1,
+			final_datatype
+		);
+	}
+
+	// resizes internal storage to fit new_size particles
+	void resize(const size_t new_size)
+	{
+		this->coordinates.resize(new_size);
+		this->destinations.resize(new_size);
+	}
 };
 
 
@@ -100,41 +183,31 @@ assigned to the storage of a different cell.
 */
 struct External_Particles
 {
-	using data_type = Particle_Storage;
+	using data_type = External_Particle_Storage;
 };
 
 
 /*!
-Used for MPI which requires known max size of transferred data.
+The number of internal particles in a cell.
 
-When updating copies of remote neighbor cells represents
-the number of external particles, when saving the simulation
-to a file represents the number of particles in a cell in
-general assuming all particles are located in the internal
-particle list at that time.
+MPI requires that the max size of transferred
+data be known prior to the transfer.
 */
-struct Number_Of_Particles
+struct Number_Of_Internal_Particles
 {
 	using data_type = unsigned long int;
 };
 
 
 /*!
-Records the destination cell of particles not
-located in the cell in which they are stored.
+The number of external particles in a cell.
 
-Assumes a 2d system with a maximum of 8 destination cells.
+MPI requires that the max size of transferred
+data be known prior to the transfer.
 */
-struct Particle_Destinations
+struct Number_Of_External_Particles
 {
-	/*
-	Format: 1st destination, number of particles to
-	assign to 1st destination from the external particle
-	list starting from the first particle, 2nd destination,
-	number of particles to assign to 2nd destination
-	starting from the next unassigned particle, etc.
-	*/
-	using data_type = std::array<unsigned long long int, 16>;
+	using data_type = unsigned long int;
 };
 
 
@@ -147,13 +220,15 @@ struct Velocity
 /*!
 Cell definition for the particle propagation example.
 
-Fixed size variables are ordered first in the
-transfer information for MPI to allow reading
-files saved by dccrg more easily.
+Fixed size variables are ordered first so that they
+are saved at a known position in the file by dccrg.
+The cell class puts the variables in an MPI datatype
+in the same order as they are given here, which
+dccrg will use to save the file.
 */
 using Cell = gensimcell::Cell<
-	Number_Of_Particles,
-	Particle_Destinations,
+	Number_Of_Internal_Particles,
+	Number_Of_External_Particles,
 	Velocity,
 	Internal_Particles,
 	External_Particles

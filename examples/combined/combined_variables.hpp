@@ -48,8 +48,8 @@ using Cell = gensimcell::Cell<
 	advection::Density,
 	advection::Density_Flux,
 	advection::Velocity,
-	particle::Number_Of_Particles,
-	particle::Particle_Destinations,
+	particle::Number_Of_Internal_Particles,
+	particle::Number_Of_External_Particles,
 	particle::Velocity,
 	particle::Internal_Particles,
 	particle::External_Particles

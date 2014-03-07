@@ -53,11 +53,11 @@ namespace particle {
 /*!
 Allocates space in each copy of a remote neighbor
 in given grid to hold as many particles as given by
-the copy's Number_Of_Particles_T variable.
+the copy's Number_Of_External_Particles_T variable.
 */
 template<
 	class Cell_T,
-	class Number_Of_Particles_T,
+	class Number_Of_External_Particles_T,
 	class External_Particles_T
 > void resize_receiving_containers(
 	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid
@@ -71,7 +71,7 @@ template<
 		}
 
 		(*data)[External_Particles_T()]
-			.resize((*data)[Number_Of_Particles_T()]);
+			.resize((*data)[Number_Of_External_Particles_T()]);
 	}
 }
 
@@ -87,8 +87,8 @@ information.
 */
 template<
 	class Cell_T,
-	class Number_Of_Particles_T,
-	class Particle_Destinations_T,
+	class Number_Of_Internal_Particles_T,
+	class Number_Of_External_Particles_T,
 	class Velocity_T,
 	class Internal_Particles_T,
 	class External_Particles_T
@@ -99,12 +99,12 @@ template<
 ) {
 	double max_time_step = std::numeric_limits<double>::max();
 
-	const auto
-		grid_start = grid.geometry.get_start(),
-		grid_end = grid.geometry.get_end();
-
-	// propagate particles and move maybe from internal to external list
+	// propagate particles and maybe move from internal to external list
 	for (auto cell_id: cell_ids) {
+
+		const auto
+			cell_min = grid.geometry.get_min(cell_id),
+			cell_max = grid.geometry.get_max(cell_id);
 
 		Cell_T* cell_data = grid[cell_id];
 		if (cell_data == NULL) {
@@ -114,15 +114,10 @@ template<
 
 		// shorthand notation
 		const auto& v = (*cell_data)[Velocity_T()];
-		auto& destinations = (*cell_data)[Particle_Destinations_T()];
 		auto
 			&int_coords = (*cell_data)[Internal_Particles_T()].coordinates,
 			&ext_coords = (*cell_data)[External_Particles_T()].coordinates;
-
-		// propagate particles
-		const auto
-			cell_min = grid.geometry.get_min(cell_id),
-			cell_max = grid.geometry.get_max(cell_id);
+		auto& ext_destinations = (*cell_data)[External_Particles_T()].destinations;
 
 		for (size_t i = 0; i < int_coords.size(); i++) {
 			auto& coordinate = int_coords[i];
@@ -133,6 +128,7 @@ template<
 			// handle periodic grid
 			coordinate = grid.geometry.get_real_coordinate(coordinate);
 
+			// check if particle outside of current cell
 			if (
 				coordinate[0] < cell_min[0]
 				or coordinate[0] > cell_max[0]
@@ -141,87 +137,48 @@ template<
 				or coordinate[2] < cell_min[2]
 				or coordinate[2] > cell_max[2]
 			) {
-				ext_coords.push_back(coordinate);
-				int_coords.erase(int_coords.begin() + i);
-				i--;
-			}
-		}
-
-		/*
-		Designate particles to a neighbor cell. Particles must
-		be listed contiguously for each destination so sort
-		them first by destination cell.
-		*/
-		std::unordered_map<
-			uint64_t,
-			typename External_Particles_T::data_type::storage_type
-		> sorted_destinations;
-
-		const auto* const neighbors = grid.get_neighbors_of(cell_id);
-		if (neighbors == NULL) {
-			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-			abort();
-		}
-
-		for (const auto& ext_coord: ext_coords) {
-			bool destination_found = false;
-
-			for (auto neighbor_id: *neighbors) {
-				if (neighbor_id == dccrg::error_cell) {
-					continue;
+				const auto* const neighbors = grid.get_neighbors_of(cell_id);
+				if (neighbors == NULL) {
+					std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+					abort();
 				}
 
-				const auto
-					neighbor_min = grid.geometry.get_min(neighbor_id),
-					neighbor_max = grid.geometry.get_max(neighbor_id);
+				uint64_t destination = dccrg::error_cell;
 
-				if (
-					ext_coord[0] >= neighbor_min[0]
-					and ext_coord[0] <= neighbor_max[0]
-					and ext_coord[1] >= neighbor_min[1]
-					and ext_coord[1] <= neighbor_max[1]
-					and ext_coord[2] >= neighbor_min[2]
-					and ext_coord[2] <= neighbor_max[2]
-				) {
-					destination_found = true;
-					sorted_destinations[neighbor_id].push_back(ext_coord);
-					break;
+				for (const auto neighbor_id: *neighbors) {
+					if (neighbor_id == dccrg::error_cell) {
+						continue;
+					}
+
+					const auto
+						neighbor_min = grid.geometry.get_min(neighbor_id),
+						neighbor_max = grid.geometry.get_max(neighbor_id);
+
+					if (
+						coordinate[0] >= neighbor_min[0]
+						and coordinate[0] <= neighbor_max[0]
+						and coordinate[1] >= neighbor_min[1]
+						and coordinate[1] <= neighbor_max[1]
+						and coordinate[2] >= neighbor_min[2]
+						and coordinate[2] <= neighbor_max[2]
+					) {
+						destination = neighbor_id;
+						break;
+					}
 				}
-			}
 
-			if (not destination_found) {
-				// don't lose any particles
-				if (
-					ext_coord[0] >= grid_start[0]
-					and ext_coord[0] <= grid_end[0]
-					and ext_coord[1] >= grid_start[1]
-					and ext_coord[1] <= grid_end[1]
-					and ext_coord[2] >= grid_start[2]
-					and ext_coord[2] <= grid_end[2]
-				) {
-					int_coords.push_back(ext_coord);
+				if (destination != dccrg::error_cell) {
+					ext_coords.push_back(coordinate);
+					ext_destinations.push_back(destination);
+
+					int_coords.erase(int_coords.begin() + i);
+					i--;
 				}
 			}
 		}
 
-
-		// create the final external particle list and destination info
-		ext_coords.clear();
-
-		size_t destination_i = 0;
-		for (const auto& item: sorted_destinations) {
-
-			destinations[destination_i] = item.first;
-			destinations[destination_i + 1] = item.second.size();
-			destination_i += 2;
-
-			ext_coords.insert(
-				ext_coords.end(),
-				item.second.cbegin(),
-				item.second.cend()
-			);
-		}
-		(*cell_data)[Number_Of_Particles_T()] = ext_coords.size();
+		(*cell_data)[Number_Of_Internal_Particles_T()] = int_coords.size();
+		(*cell_data)[Number_Of_External_Particles_T()] = ext_coords.size();
 
 		// check time step
 		const auto length = grid.geometry.get_length(cell_id);
@@ -243,7 +200,7 @@ of given cells into internal particle lists of given cells.
 */
 template<
 	class Cell_T,
-	class Particle_Destinations_T,
+	class Number_Of_Internal_Particles_T,
 	class Internal_Particles_T,
 	class External_Particles_T
 > void incorporate_external_particles(
@@ -261,13 +218,13 @@ template<
 		auto& int_coords = (*cell_data)[Internal_Particles_T()].coordinates;
 
 		// assign some particles from neighbors' external list to this cell
-		const std::vector<uint64_t>* const neighbors = grid.get_neighbors_of(cell_id);
+		const auto* const neighbors = grid.get_neighbors_of(cell_id);
 		if (neighbors == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
 
-		for (auto neighbor_id: *neighbors) {
+		for (const auto neighbor_id: *neighbors) {
 			if (neighbor_id == dccrg::error_cell) {
 				continue;
 			}
@@ -278,31 +235,19 @@ template<
 				abort();
 			}
 
-			const auto& destinations = (*neighbor_data)[Particle_Destinations_T()];
-			const auto& ext_coords = (*neighbor_data)[External_Particles_T()].coordinates;
+			const auto& neigh_ext_coords
+				= (*neighbor_data)[External_Particles_T()].coordinates;
+			const auto& neigh_destinations
+				= (*neighbor_data)[External_Particles_T()].destinations;
 
-			for (size_t
-				dest_i = 0, coord_i = 0;
-				dest_i < destinations.size();
-				dest_i += 2
-			) {
-
-				const uint64_t
-					destination_cell = destinations[dest_i],
-					nr_of_particles = destinations[dest_i + 1];
-
-				if (destination_cell == cell_id) {
-					int_coords.insert(
-						int_coords.end(),
-						ext_coords.begin() + coord_i,
-						ext_coords.begin() + coord_i + nr_of_particles
-					);
+			for (size_t i = 0; i < neigh_destinations.size(); i++) {
+				if (neigh_destinations[i] == cell_id) {
+					int_coords.push_back(neigh_ext_coords[i]);
 				}
-
-				coord_i += nr_of_particles;
 			}
-
 		}
+
+		(*cell_data)[Number_Of_Internal_Particles_T()] = int_coords.size();
 	}
 }
 
@@ -314,8 +259,7 @@ Also clears particle destinations of given cells and updates number_of_particles
 */
 template<
 	class Cell_T,
-	class Number_Of_Particles_T,
-	class Particle_Destinations_T,
+	class Number_Of_External_Particles_T,
 	class External_Particles_T
 > void remove_external_particles(
 	const std::vector<uint64_t>& cell_ids,
@@ -329,9 +273,9 @@ template<
 			abort();
 		}
 
-		(*cell_data)[Number_Of_Particles_T()] = 0;
-		(*cell_data)[Particle_Destinations_T()].fill(dccrg::error_cell);
+		(*cell_data)[Number_Of_External_Particles_T()] = 0;
 		(*cell_data)[External_Particles_T()].coordinates.clear();
+		(*cell_data)[External_Particles_T()].destinations.clear();
 	}
 }
 

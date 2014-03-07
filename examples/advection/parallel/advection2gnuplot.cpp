@@ -212,10 +212,10 @@ int main(int argc, char* argv[])
 			   "set size square\n"
 			   "plot '-' matrix with image title ''\n";
 
-		// plot assumes data is ordered from top to bottom left to right
-		const uint64_t grid_width = mapping.length.get()[1]; 
-		for (size_t y_i = grid_width - 1; /* handle this below */ true; y_i--) {
-			for (size_t x_i = 0; x_i < grid_width; x_i++) {
+		// plot assumes data is in the order bottom to top left to right
+		const auto grid_length = mapping.length.get();
+		for (size_t y_i = 0; y_i < grid_length[1]; y_i++) {
+			for (size_t x_i = 0; x_i < grid_length[0]; x_i++) {
 
 				const auto cell_id
 					= mapping.get_cell_from_indices({x_i, y_i, 0}, 0);
@@ -224,10 +224,6 @@ int main(int argc, char* argv[])
 			}
 
 			gnuplot_file << "\n";
-
-			if (y_i == 0) {
-				break;
-			}
 		}
 		gnuplot_file << "end\n";
 		gnuplot_file.close();

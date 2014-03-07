@@ -113,10 +113,11 @@ int main(int argc, char* argv[])
 
 	particle::initialize<
 		Cell,
-		particle::Number_Of_Particles,
-		particle::Particle_Destinations,
+		particle::Number_Of_Internal_Particles,
+		particle::Number_Of_External_Particles,
 		particle::Velocity,
-		particle::Internal_Particles
+		particle::Internal_Particles,
+		particle::External_Particles
 	>(grid);
 
 	const std::vector<uint64_t>
@@ -139,8 +140,8 @@ int main(int argc, char* argv[])
 		*/
 		Cell::set_transfer_all(
 			false,
-			particle::Number_Of_Particles(),
-			particle::Particle_Destinations(),
+			particle::Number_Of_Internal_Particles(),
+			particle::Number_Of_External_Particles(),
 			particle::Velocity(),
 			particle::Internal_Particles(),
 			particle::External_Particles()
@@ -151,7 +152,7 @@ int main(int argc, char* argv[])
 
 			particle::save<
 				Cell,
-				particle::Number_Of_Particles,
+				particle::Number_Of_Internal_Particles,
 				particle::Velocity,
 				particle::Internal_Particles
 			>(grid, simulation_time);
@@ -172,8 +173,8 @@ int main(int argc, char* argv[])
 				next_time_step,
 				particle::solve<
 					Cell,
-					particle::Number_Of_Particles,
-					particle::Particle_Destinations,
+					particle::Number_Of_Internal_Particles,
+					particle::Number_Of_External_Particles,
 					particle::Velocity,
 					particle::Internal_Particles,
 					particle::External_Particles
@@ -184,7 +185,7 @@ int main(int argc, char* argv[])
 		Update number of particles in external lists of outer cells
 		so that receiving processes can allocate memory for coordinates.
 		*/
-		Cell::set_transfer_all(true, particle::Number_Of_Particles());
+		Cell::set_transfer_all(true, particle::Number_Of_External_Particles());
 		grid.start_remote_neighbor_copy_updates();
 
 		/*
@@ -196,8 +197,8 @@ int main(int argc, char* argv[])
 				next_time_step,
 				particle::solve<
 					Cell,
-					particle::Number_Of_Particles,
-					particle::Particle_Destinations,
+					particle::Number_Of_Internal_Particles,
+					particle::Number_Of_External_Particles,
 					particle::Velocity,
 					particle::Internal_Particles,
 					particle::External_Particles
@@ -212,7 +213,7 @@ int main(int argc, char* argv[])
 		grid.wait_remote_neighbor_copy_update_receives();
 		particle::resize_receiving_containers<
 			Cell,
-			particle::Number_Of_Particles,
+			particle::Number_Of_External_Particles,
 			particle::External_Particles
 		>(grid);
 
@@ -222,10 +223,9 @@ int main(int argc, char* argv[])
 		Start transferring coordinates of particles in external lists
 		of outer cells between processes.
 		*/
-		Cell::set_transfer_all(false, particle::Number_Of_Particles());
+		Cell::set_transfer_all(false, particle::Number_Of_External_Particles());
 		Cell::set_transfer_all(
 			true,
-			particle::Particle_Destinations(),
 			particle::Velocity(),
 			particle::External_Particles()
 		);
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 		*/
 		particle::incorporate_external_particles<
 			Cell,
-			particle::Particle_Destinations,
+			particle::Number_Of_Internal_Particles,
 			particle::Internal_Particles,
 			particle::External_Particles
 		>(inner_cells, grid);
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
 		*/
 		particle::incorporate_external_particles<
 			Cell,
-			particle::Particle_Destinations,
+			particle::Number_Of_Internal_Particles,
 			particle::Internal_Particles,
 			particle::External_Particles
 		>(outer_cells, grid);
@@ -266,8 +266,7 @@ int main(int argc, char* argv[])
 		*/
 		particle::remove_external_particles<
 			Cell,
-			particle::Number_Of_Particles,
-			particle::Particle_Destinations,
+			particle::Number_Of_External_Particles,
 			particle::External_Particles
 		>(inner_cells, grid);
 
@@ -283,8 +282,7 @@ int main(int argc, char* argv[])
 		*/
 		particle::remove_external_particles<
 			Cell,
-			particle::Number_Of_Particles,
-			particle::Particle_Destinations,
+			particle::Number_Of_External_Particles,
 			particle::External_Particles
 		>(outer_cells, grid);
 
