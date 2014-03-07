@@ -105,7 +105,17 @@ test: $(EXECUTABLES) $(TESTS)
 
 d: data
 data:
-	rm -f examples/advection/serial*dat examples/advection/serial*png examples/particle_propagation/serial*dat examples/particle_propagation/serial*png examples/*/parallel/*.dc examples/*/parallel/*.png examples/*/parallel/*.dat examples/combined/*.dc examples/combined/*.dat examples/combined/*.png
+	@echo "CLEAN DATA" && rm -f \
+	examples/advection/advection*dat \
+	examples/advection/advection*png \
+	examples/particle_propagation/particle*dat \
+	examples/particle_propagation/particle*png \
+	examples/*/parallel/*.dc \
+	examples/*/parallel/*.png \
+	examples/*/parallel/*.dat \
+	examples/combined/*.dc \
+	examples/combined/*.dat \
+	examples/combined/*.png
 
 c: clean
 clean: data
