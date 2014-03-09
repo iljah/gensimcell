@@ -62,6 +62,9 @@ EXECUTABLES = \
   tests/serial/transfer_many_cells_one_variable.mexe \
   tests/serial/transfer_many_cells_many_variables.mexe \
   tests/serial/transfer_recursive.mexe \
+  tests/serial/game_of_life/speed.exe \
+  tests/serial/game_of_life/speed_reference.exe \
+  tests/serial/game_of_life/main.exe \
   tests/parallel/one_variable.mexe \
   tests/parallel/many_variables.mexe \
   tests/parallel/memory_ordering.mexe \
@@ -93,6 +96,7 @@ TESTS = \
   tests/serial/transfer_many_cells_one_variable.mtst \
   tests/serial/transfer_many_cells_many_variables.mtst \
   tests/serial/transfer_recursive.mtst \
+  tests/serial/game_of_life/main.tst \
   tests/parallel/one_variable.mtst \
   tests/parallel/many_variables.mtst \
   tests/parallel/memory_ordering.mtst
