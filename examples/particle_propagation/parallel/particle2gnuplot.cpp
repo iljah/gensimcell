@@ -260,6 +260,13 @@ int main(int argc, char* argv[])
 		for (const auto& item: simulation_data) {
 			const auto& cell_id = item.first;
 			const auto& cell_data = item.second;
+
+			// plot particles in cells at z index 0
+			const auto index = mapping.get_indices(cell_id);
+			if (index[2] != 0) {
+				continue;
+			}
+
 			for (const auto& coordinate: cell_data[Internal_Particles()].coordinates) {
 				total_particles++;
 				gnuplot_file

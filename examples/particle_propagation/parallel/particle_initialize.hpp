@@ -107,17 +107,17 @@ template<
 		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
-				0
+				center[2]
 		});
 		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0],
 				center[1] + length[1] / 4,
-				0
+				center[2]
 		});
 		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
-				0
+				center[2]
 		});
 	}
 }
