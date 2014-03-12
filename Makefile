@@ -15,14 +15,15 @@ HEADERS = \
   source/get_var_mpi_datatype.hpp
 
 
+# these require (some parts of) boost
 %.exe: %.cpp $(HEADERS) Makefile
-	@echo "CXX "$< && $(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	@echo "CXX "$< && $(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
 
 %.tst: %.exe
 	@echo "RUN "$< && $(RUN) ./$< && echo PASS && touch $@
 
 
-# these require boost and MPI (for example open-mpi.org)
+# these require MPI (for example open-mpi.org)
 %.mexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
 
@@ -37,46 +38,51 @@ HEADERS = \
 
 
 EXECUTABLES = \
-  tests/compile/enable_if.mexe \
-  tests/compile/get_var_mpi_datatype_included.mexe \
-  tests/compile/cell_included.mexe \
   tests/compile/one_variable.exe \
-  tests/compile/one_variable.mexe \
   tests/compile/two_variables.exe \
-  tests/compile/two_variables.mexe \
   tests/compile/many_variables.exe \
-  tests/compile/many_variables.mexe \
   tests/compile/one_variable_recursive.exe \
-  tests/compile/one_variable_recursive.mexe \
   tests/compile/many_variables_recursive.exe \
-  tests/compile/many_variables_recursive.mexe \
   tests/compile/identical_names.exe \
-  tests/compile/identical_names.mexe \
-  tests/serial/get_var_datatype_std.mexe \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe \
   tests/serial/one_variable_recursive.exe \
   tests/serial/many_variables_recursive.exe \
+  tests/serial/game_of_life/speed.exe \
+  tests/serial/game_of_life/speed_reference.exe \
+  tests/serial/game_of_life/main.exe \
+  examples/game_of_life/serial.exe \
+  examples/advection/serial.exe \
+  examples/particle_propagation/serial.exe \
+
+MPI_EXECS = \
+  tests/compile/enable_if.mexe \
+  tests/compile/get_var_mpi_datatype_included.mexe \
+  tests/compile/cell_included.mexe \
+  tests/compile/one_variable.mexe \
+  tests/compile/two_variables.mexe \
+  tests/compile/many_variables.mexe \
+  tests/compile/one_variable_recursive.mexe \
+  tests/compile/many_variables_recursive.mexe \
+  tests/compile/identical_names.mexe \
+  tests/serial/get_var_datatype_std.mexe \
   tests/serial/transfer_one_cell_one_variable.mexe \
   tests/serial/transfer_one_cell_many_variables.mexe \
   tests/serial/transfer_many_cells_one_variable.mexe \
   tests/serial/transfer_many_cells_many_variables.mexe \
   tests/serial/transfer_recursive.mexe \
-  tests/serial/game_of_life/speed.exe \
-  tests/serial/game_of_life/speed_reference.exe \
-  tests/serial/game_of_life/main.exe \
   tests/parallel/one_variable.mexe \
   tests/parallel/many_variables.mexe \
-  tests/parallel/memory_ordering.mexe \
+  tests/parallel/memory_ordering.mexe
+
+DCCRG_EXECS = \
+  tests/parallel/particle_propagation/main.dexe \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
   tests/compile/dccrg/instantiated.dexe \
   tests/compile/dccrg/initialized.dexe \
   tests/compile/dccrg/updated.dexe \
   tests/compile/dccrg/saved.dexe \
-  examples/game_of_life/serial.exe \
-  examples/advection/serial.exe \
-  examples/particle_propagation/serial.exe \
   examples/game_of_life/parallel/main.dexe \
   examples/game_of_life/parallel/gol2gnuplot.dexe \
   examples/advection/parallel/main.dexe \
@@ -104,8 +110,14 @@ TESTS = \
 all: test
 
 t: test
-test: $(EXECUTABLES) $(TESTS)
+test: serial mpi dccrg $(TESTS)
 	@echo && echo "All tests passed."
+
+serial: $(EXECUTABLES)
+
+mpi: $(MPI_EXECS)
+
+dccrg: $(DCCRG_EXECS)
 
 d: data
 data:
@@ -123,4 +135,4 @@ data:
 
 c: clean
 clean: data
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(TESTS)
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(MPI_EXECS) $(DCCRG_EXECS) $(TESTS)
