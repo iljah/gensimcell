@@ -81,12 +81,12 @@ struct test_variable6 {
 
 int main(int, char**)
 {
-	const test_variable1 v1;
-	const test_variable2 v2;
-	const test_variable3 v3;
-	const test_variable4 v4;
-	const test_variable5 v5;
-	const test_variable6 v6;
+	const test_variable1 v1{};
+	const test_variable2 v2{};
+	const test_variable3 v3{};
+	const test_variable4 v4{};
+	const test_variable5 v5{};
+	const test_variable6 v6{};
 
 	gensimcell::Cell<test_variable4> cell4;
 	cell4[v4][v1] = 3;
