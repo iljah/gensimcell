@@ -76,8 +76,9 @@ EXECUTABLES = \
   tests/serial/game_of_life/main.exe \
   tests/parallel/particle_propagation/main.exe \
   examples/game_of_life/serial.exe \
+  examples/game_of_life/non_cellular.exe \
   examples/advection/serial.exe \
-  examples/particle_propagation/serial.exe \
+  examples/particle_propagation/serial.exe
 
 MPI_EXECS = \
   tests/compile/enable_if.mexe \
