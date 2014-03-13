@@ -130,44 +130,40 @@ protected:
 	}
 
 
-	std::tuple<
-		std::vector<void*>,
-		std::vector<int>,
-		std::vector<MPI_Datatype>
-	> get_mpi_datatype_impl(
-		std::tuple<
-			std::vector<void*>,
-			std::vector<int>,
-			std::vector<MPI_Datatype>
-		> transfer_info
+	size_t get_mpi_datatype_impl(
+		size_t index,
+		std::array<void*, number_of_variables>& addresses,
+		std::array<int, number_of_variables>& counts,
+		std::array<MPI_Datatype, number_of_variables>& datatypes
 	) const {
 
+		size_t nr_transferred = 0;
 		if (this->is_transferred(Current_Variable())) {
-			void* address = NULL;
-			int count = -1;
-			MPI_Datatype datatype = MPI_DATATYPE_NULL;
-
 			std::tie(
-				address,
-				count,
-				datatype
+				addresses[index],
+				counts[index],
+				datatypes[index]
 			) = get_var_mpi_datatype(this->data);
-
-			std::get<0>(transfer_info).push_back(address);
-			std::get<1>(transfer_info).push_back(count);
-			std::get<2>(transfer_info).push_back(datatype);
+			index++;
+			nr_transferred++;
 		}
 
 		/*
 		Make the order of variables in the final data type
 		the same as in the template arguments list to the cell
 		*/
-		transfer_info = Cell_impl<
-			number_of_variables,
-			Rest_Of_Variables...
-		>::get_mpi_datatype_impl(transfer_info);
+		nr_transferred
+			+= Cell_impl<
+				number_of_variables,
+				Rest_Of_Variables...
+			>::get_mpi_datatype_impl(
+				index,
+				addresses,
+				counts,
+				datatypes
+			);
 
-		return transfer_info;
+		return nr_transferred;
 	}
 
 	#endif // ifdef MPI_VERSION
@@ -288,23 +284,17 @@ public:
 		MPI_Datatype
 	> get_mpi_datatype() const
 	{
-		std::vector<void*> addresses;
-		std::vector<int> counts;
-		std::vector<MPI_Datatype> datatypes;
+		std::array<void*, number_of_variables> addresses;
+		std::array<int, number_of_variables> counts;
+		std::array<MPI_Datatype, number_of_variables> datatypes;
 
-		std::tie(
-			addresses,
-			counts,
-			datatypes
-		) = this->get_mpi_datatype_impl(
-			std::tuple<
-				std::vector<void*>,
-				std::vector<int>,
-				std::vector<MPI_Datatype>
-			>()
-		);
-
-		const size_t nr_vars_to_transfer = addresses.size();
+		const size_t nr_vars_to_transfer
+			= this->get_mpi_datatype_impl(
+				0,
+				addresses,
+				counts,
+				datatypes
+			);
 
 		if (nr_vars_to_transfer == 0) {
 
@@ -313,13 +303,8 @@ public:
 
 		} else if (nr_vars_to_transfer == 1) {
 
-			if (counts.size() != 1 or datatypes.size() != 1) {
-				// this shouldn't happen
-				abort();
-			}
-
 			return std::make_tuple(
-				(void*) addresses[0],
+				addresses[0],
 				counts[0],
 				datatypes[0]
 			);
@@ -327,8 +312,8 @@ public:
 		} else if (nr_vars_to_transfer <= std::numeric_limits<int>::max()) {
 
 			// get displacements of variables to transfer
-			std::vector<MPI_Aint> displacements(nr_vars_to_transfer, 0);
-			for (size_t i = 1; i < nr_vars_to_transfer; i++) {
+			std::array<MPI_Aint, number_of_variables> displacements;
+			for (size_t i = 0; i < nr_vars_to_transfer; i++) {
 				displacements[i]
 					= static_cast<char*>(addresses[i])
 					- static_cast<char*>(addresses[0]);
@@ -347,7 +332,7 @@ public:
 				return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 			}
 
-			return std::make_tuple((void*) addresses[0], 1, final_datatype);
+			return std::make_tuple(addresses[0], 1, final_datatype);
 
 		} else {
 
@@ -434,35 +419,24 @@ protected:
 	}
 
 
-	std::tuple<
-		std::vector<void*>,
-		std::vector<int>,
-		std::vector<MPI_Datatype>
-	> get_mpi_datatype_impl(
-		std::tuple<
-			std::vector<void*>,
-			std::vector<int>,
-			std::vector<MPI_Datatype>
-		> transfer_info
+	size_t get_mpi_datatype_impl(
+		const size_t index,
+		std::array<void*, number_of_variables>& addresses,
+		std::array<int, number_of_variables>& counts,
+		std::array<MPI_Datatype, number_of_variables>& datatypes
 	) const {
 
 		if (this->is_transferred(Variable())) {
-			void* address = NULL;
-			int count = -1;
-			MPI_Datatype datatype = MPI_DATATYPE_NULL;
-
 			std::tie(
-				address,
-				count,
-				datatype
+				addresses[index],
+				counts[index],
+				datatypes[index]
 			) = get_var_mpi_datatype(this->data);
 
-			std::get<0>(transfer_info).push_back(address);
-			std::get<1>(transfer_info).push_back(count);
-			std::get<2>(transfer_info).push_back(datatype);
+			return 1;
 		}
 
-		return transfer_info;
+		return 0;
 	}
 
 	#endif // ifdef MPI_VERSION
@@ -572,42 +546,29 @@ public:
 		MPI_Datatype
 	> get_mpi_datatype() const
 	{
-		if (not this->is_transferred(Variable())) {
+		std::array<void*, number_of_variables> addresses;
+		std::array<int, number_of_variables> counts;
+		std::array<MPI_Datatype, number_of_variables> datatypes;
 
-			return std::make_tuple((void*) NULL, 0, MPI_BYTE);
-
-		} else {
-
-			std::vector<void*> addresses;
-			std::vector<int> counts;
-			std::vector<MPI_Datatype> datatypes;
-
-			std::tie(
+		const size_t nr_vars_to_transfer
+			= this->get_mpi_datatype_impl(
+				0,
 				addresses,
 				counts,
 				datatypes
-			) = this->get_mpi_datatype_impl(
-				std::tuple<
-					std::vector<void*>,
-					std::vector<int>,
-					std::vector<MPI_Datatype>
-				>()
 			);
 
-			if (
-				addresses.size() != 1
-				or counts.size() != 1
-				or datatypes.size() != 1
-			) {
-				abort();
-			}
-
-			return std::make_tuple(
-				(void*) addresses[0],
-				counts[0],
-				datatypes[0]
-			);
+		if (nr_vars_to_transfer == 0) {
+			addresses[0] = NULL;
+			counts[0] = 0;
+			datatypes[0] = MPI_BYTE;
 		}
+
+		return std::make_tuple(
+			addresses[0],
+			counts[0],
+			datatypes[0]
+		);
 	}
 
 	#endif // ifdef MPI_VERSION
