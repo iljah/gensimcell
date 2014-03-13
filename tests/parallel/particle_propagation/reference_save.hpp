@@ -1,5 +1,5 @@
 /*
-Saves results of parallel particle propagator.
+Saves results of parallel reference particle propagator.
 
 Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
@@ -30,8 +30,8 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PARTICLE_SAVE_HPP
-#define PARTICLE_SAVE_HPP
+#ifndef REFERENCE_SAVE_HPP
+#define REFERENCE_SAVE_HPP
 
 #include "cstdlib"
 #include "iomanip"
@@ -43,36 +43,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "dccrg.hpp"
 #include "dccrg_cartesian_geometry.hpp"
 
-#include "gensimcell.hpp"
-
-//! see ../serial.cpp for the basics
+#include "reference_cell.hpp"
 
 namespace particle {
 
-/*!
-Saves the simulation in given grid into a file with name derived from given time. 
-
-The variables *_T given as template parameters are used
-to refer to the particular data to be saved.
-Assumes that the transfer of all variables
-had been disabled before this function was called. 
-*/
-template<
-	class Cell_T,
-	class Number_Of_Internal_Particles_T,
-	class Velocity_T,
-	class Internal_Particles_T
-> void save(
-	dccrg::Dccrg<Cell_T, dccrg::Cartesian_Geometry>& grid,
+void reference_save(
+	dccrg::Dccrg<Reference_Cell, dccrg::Cartesian_Geometry>& grid,
 	const double simulation_time,
 	const std::string& prefix = std::string()
 ) {
-	Cell_T::set_transfer_all(
-		true,
-		Number_Of_Internal_Particles_T(),
-		Velocity_T(),
-		Internal_Particles_T()
-	);
+	Reference_Cell::transfers
+		|= Reference_Cell::transfer_types::nr_of_int_particles
+		| Reference_Cell::transfer_types::vel
+		| Reference_Cell::transfer_types::int_particles;
 
 	// get the file name
 	std::ostringstream time_string;
@@ -86,19 +69,17 @@ template<
 	std::tuple<void*, int, MPI_Datatype> header{(void*) &dummy, 0, MPI_BYTE};
 
 	grid.save_grid_data(
-		prefix + "particle_" + time_string.str() + ".dc",
+		prefix + "reference_" + time_string.str() + ".dc",
 		0,
 		header
 	);
 
-	Cell_T::set_transfer_all(
-		false,
-		Number_Of_Internal_Particles_T(),
-		Velocity_T(),
-		Internal_Particles_T()
-	);
+	Reference_Cell::transfers
+		&= ~Reference_Cell::transfer_types::nr_of_int_particles
+		& ~Reference_Cell::transfer_types::vel
+		& ~Reference_Cell::transfer_types::int_particles;
 }
 
 } // namespace
 
-#endif // ifndef PARTICLE_SAVE_HPP
+#endif // ifndef REFERENCE_SAVE_HPP

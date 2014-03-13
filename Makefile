@@ -10,31 +10,54 @@ CPPFLAGS += \
 CXXFLAGS += -std=c++0x -W -Wall -Wextra -pedantic -O3
 
 HEADERS = \
+  examples/advection/parallel/advection_initialize.hpp \
+  examples/advection/parallel/advection_save.hpp \
+  examples/advection/parallel/advection_solve.hpp \
+  examples/advection/parallel/advection_variables.hpp \
+  examples/combined/combined_variables.hpp \
+  examples/game_of_life/parallel/gol_initialize.hpp \
+  examples/game_of_life/parallel/gol_save.hpp \
+  examples/game_of_life/parallel/gol_solve.hpp \
+  examples/game_of_life/parallel/gol_variables.hpp \
+  examples/particle_propagation/parallel/particle_initialize.hpp \
+  examples/particle_propagation/parallel/particle_save.hpp \
+  examples/particle_propagation/parallel/particle_solve.hpp \
+  examples/particle_propagation/parallel/particle_variables.hpp \
   source/gensimcell.hpp \
   source/gensimcell_impl.hpp \
-  source/get_var_mpi_datatype.hpp
+  source/get_var_mpi_datatype.hpp \
+  tests/check_true.hpp \
+  tests/parallel/particle_propagation/reference_cell.hpp \
+  tests/parallel/particle_propagation/reference_initialize.hpp \
+  tests/parallel/particle_propagation/reference_save.hpp \
+  tests/parallel/particle_propagation/reference_solve.hpp
 
 
+## Compilation rules ##
 # these require (some parts of) boost
 %.exe: %.cpp $(HEADERS) Makefile
 	@echo "CXX "$< && $(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
-
-%.tst: %.exe
-	@echo "RUN "$< && $(RUN) ./$< && echo PASS && touch $@
-
 
 # these require MPI (for example open-mpi.org)
 %.mexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
 
-%.mtst: %.mexe
-	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
-
-
 # these require dccrg (the c++11 version from c++11 branch,
 # https://gitorious.org/dccrg) which also requires Zoltan
 %.dexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(DCCRG_CPPFLAGS) $(ZOLTAN_CPPFLAGS) $(ZOLTAN_LDFLAGS) $(ZOLTAN_LIBS) $< -o $@
+
+
+## Execution rules ##
+%.tst: %.exe
+	@echo "RUN "$< && $(RUN) ./$< && echo PASS && touch $@
+
+%.mtst: %.mexe
+	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
+
+# these are launched serially but execute MPI themselves
+%.mmtst: %.exe
+	@echo "RUN "$< && $(RUN) ./$< "$(MPIRUN)" && echo PASS && touch $@
 
 
 EXECUTABLES = \
@@ -51,6 +74,7 @@ EXECUTABLES = \
   tests/serial/game_of_life/speed.exe \
   tests/serial/game_of_life/speed_reference.exe \
   tests/serial/game_of_life/main.exe \
+  tests/parallel/particle_propagation/main.exe \
   examples/game_of_life/serial.exe \
   examples/advection/serial.exe \
   examples/particle_propagation/serial.exe \
@@ -76,13 +100,14 @@ MPI_EXECS = \
   tests/parallel/memory_ordering.mexe
 
 DCCRG_EXECS = \
-  tests/parallel/particle_propagation/main.dexe \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
   tests/compile/dccrg/instantiated.dexe \
   tests/compile/dccrg/initialized.dexe \
   tests/compile/dccrg/updated.dexe \
   tests/compile/dccrg/saved.dexe \
+  tests/parallel/particle_propagation/mpi_speed.dexe \
+  tests/parallel/particle_propagation/mpi_speed_reference.dexe \
   examples/game_of_life/parallel/main.dexe \
   examples/game_of_life/parallel/gol2gnuplot.dexe \
   examples/advection/parallel/main.dexe \
@@ -105,7 +130,8 @@ TESTS = \
   tests/serial/game_of_life/main.tst \
   tests/parallel/one_variable.mtst \
   tests/parallel/many_variables.mtst \
-  tests/parallel/memory_ordering.mtst
+  tests/parallel/memory_ordering.mtst \
+  tests/parallel/particle_propagation/main.mmtst
 
 all: test
 
@@ -131,7 +157,10 @@ data:
 	examples/*/parallel/*.dat \
 	examples/combined/*.dc \
 	examples/combined/*.dat \
-	examples/combined/*.png
+	examples/combined/*.png \
+	tests/parallel/particle_propagation/*.dc \
+	tests/parallel/particle_propagation/*.dat \
+	tests/parallel/particle_propagation/*.png
 
 c: clean
 clean: data
