@@ -2,7 +2,7 @@
 CXX = /opt/local/bin/g++-mp-4.8
 
 # ICC
-#CXX = icc -O3 -gcc-version=480 \
+#CXX = icc -gcc-version=480 \
 #  -I /opt/local/include/gcc48/c++/x86_64-apple-darwin13 \
 #  -I /opt/local/include/gcc48/c++ \
 #  -L /opt/local/lib/gcc48
