@@ -24,3 +24,5 @@ DCCRG_CPPFLAGS = -I $(HOME)/include
 ZOLTAN_CPPFLAGS = -I $(HOME)/include
 ZOLTAN_LDFLAGS = -L $(HOME)/lib
 ZOLTAN_LIBS = -lzoltan
+
+EIGEN_CPPFLAGS = -I /opt/local/include/eigen3

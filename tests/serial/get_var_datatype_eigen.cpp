@@ -1,7 +1,7 @@
 /*
-Tests whether a program including get_var_mpi_datatype header compiles.
+Tests that get_var_mpi_datatype returns correct datatypes for Eigen variables.
 
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright (c) 2014, Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -30,14 +30,64 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef HAVE_MPI
-#include "mpi.h"
-#endif
-
-#ifdef HAVE_EIGEN
+#include "array"
+#include "complex"
+#include "cstdlib"
 #include "Eigen/Core"
-#endif
+#include "iostream"
+#include "mpi.h"
 
+#include "check_true.hpp"
 #include "get_var_mpi_datatype.hpp"
 
-int main(int, char**) { return 0; }
+using namespace std;
+
+int main(int, char**) {
+
+	void* address = NULL;
+	int count = -1;
+	MPI_Datatype datatype = MPI_DATATYPE_NULL;
+
+
+	Eigen::Vector2f a;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(a);
+	CHECK_TRUE(
+		address == a.data()
+		and count == 2
+		and datatype == MPI_FLOAT
+	)
+
+
+	Eigen::Vector3d b;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(b);
+	CHECK_TRUE(
+		address == b.data()
+		and count == 3
+		and datatype == MPI_DOUBLE
+	)
+
+
+	Eigen::Matrix3i c;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(c);
+	CHECK_TRUE(
+		address == c.data()
+		and count == 9
+		and datatype == MPI_INT
+	)
+
+
+	Eigen::Matrix<std::complex<long double>, 2, 4> d;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(d);
+	CHECK_TRUE(
+		address == d.data()
+		and count == 8
+		and datatype == MPI_CXX_LONG_DOUBLE_COMPLEX
+	)
+
+
+	return EXIT_SUCCESS;
+}

@@ -191,6 +191,76 @@ GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DO
 #endif
 
 
+#ifdef EIGEN_WORLD_VERSION
+/*!
+Specializations of get_var_mpi_datatype for standard
+C++ types with an MPI equivalent inside an Eigen matrix.
+*/
+#define GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(GIVEN_CPP_TYPE, GIVEN_MPI_TYPE) \
+template < \
+	int Rows, \
+	int Columns \
+> std::tuple< \
+	void*, \
+	int, \
+	MPI_Datatype \
+> get_var_mpi_datatype( \
+	const Eigen::Matrix< \
+		GIVEN_CPP_TYPE, \
+		Rows, \
+		Columns \
+	>& variable \
+) { \
+	static_assert( \
+		Rows != Eigen::Dynamic, \
+		"Only compile time sized Eigen matrices are supported" \
+	); \
+	static_assert( \
+		Columns != Eigen::Dynamic, \
+		"Only compile time sized Eigen matrices are supported" \
+	); \
+	return std::make_tuple( \
+		(void*) variable.data(), \
+		Rows * Columns, \
+		GIVEN_MPI_TYPE \
+	); \
+}
+
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(char, MPI_CHAR)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(double, MPI_DOUBLE)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(float, MPI_FLOAT)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(long double, MPI_LONG_DOUBLE)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(signed char, MPI_SIGNED_CHAR)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(signed int, MPI_INT)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(signed long int, MPI_LONG)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(signed long long int, MPI_LONG_LONG_INT)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(signed short int, MPI_SHORT)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(unsigned char, MPI_UNSIGNED_CHAR)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(unsigned int, MPI_UNSIGNED)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(unsigned long int, MPI_UNSIGNED_LONG)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(unsigned long long int, MPI_UNSIGNED_LONG_LONG)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(unsigned short int, MPI_UNSIGNED_SHORT)
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(wchar_t, MPI_WCHAR)
+
+#ifdef MPI_CXX_BOOL
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(bool, MPI_CXX_BOOL)
+#endif
+
+#ifdef MPI_CXX_FLOAT_COMPLEX
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(std::complex<float>, MPI_CXX_FLOAT_COMPLEX)
+#endif
+
+#ifdef MPI_CXX_DOUBLE_COMPLEX
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(std::complex<double>, MPI_CXX_DOUBLE_COMPLEX)
+#endif
+
+#ifdef MPI_CXX_LONG_DOUBLE_COMPLEX
+GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DOUBLE_COMPLEX)
+#endif
+
+#endif // ifdef EIGEN_WORLD_VERSION
+
+
 } // namespace detail
 } // namespace gensimcell
 

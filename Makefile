@@ -42,10 +42,14 @@ HEADERS = \
 %.mexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $< -o $@
 
+# these require Eigen and MPI
+%.eexe: %.cpp $(HEADERS) Makefile
+	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI -DHAVE_EIGEN $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $(EIGEN_CPPFLAGS) $< -o $@
+
 # these require dccrg (the c++11 version from c++11 branch,
 # https://gitorious.org/dccrg) which also requires Zoltan
 %.dexe: %.cpp $(HEADERS) Makefile
-	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(DCCRG_CPPFLAGS) $(ZOLTAN_CPPFLAGS) $(ZOLTAN_LDFLAGS) $(ZOLTAN_LIBS) $< -o $@
+	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $(DCCRG_CPPFLAGS) $(ZOLTAN_CPPFLAGS) $(ZOLTAN_LDFLAGS) $(ZOLTAN_LIBS) $< -o $@
 
 
 ## Execution rules ##
@@ -55,12 +59,16 @@ HEADERS = \
 %.mtst: %.mexe
 	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
 
+%.etst: %.eexe
+	@echo "MPIRUN "$< && $(MPIRUN) ./$< && echo PASS && touch $@
+
 # these are launched serially but execute MPI themselves
 %.mmtst: %.exe
 	@echo "RUN "$< && $(RUN) ./$< "$(MPIRUN)" && echo PASS && touch $@
 
 
 EXECUTABLES = \
+  tests/compile/get_var_mpi_datatype_included.exe \
   tests/compile/one_variable.exe \
   tests/compile/two_variables.exe \
   tests/compile/many_variables.exe \
@@ -100,6 +108,11 @@ MPI_EXECS = \
   tests/parallel/many_variables.mexe \
   tests/parallel/memory_ordering.mexe
 
+EIGEN_EXECS = \
+  tests/compile/get_var_mpi_datatype_included.eexe \
+  tests/serial/get_var_datatype_eigen.eexe \
+  tests/parallel/eigen.eexe
+
 DCCRG_EXECS = \
   tests/compile/dccrg/get_cell_mpi_datatype.dexe \
   tests/compile/dccrg/included.dexe \
@@ -119,6 +132,7 @@ DCCRG_EXECS = \
 
 TESTS = \
   tests/serial/get_var_datatype_std.mtst \
+  tests/serial/get_var_datatype_eigen.etst \
   tests/serial/one_variable.tst \
   tests/serial/many_variables.tst \
   tests/serial/one_variable_recursive.tst \
@@ -132,17 +146,20 @@ TESTS = \
   tests/parallel/one_variable.mtst \
   tests/parallel/many_variables.mtst \
   tests/parallel/memory_ordering.mtst \
+  tests/parallel/eigen.etst \
   tests/parallel/particle_propagation/main.mmtst
 
 all: test
 
 t: test
-test: serial mpi dccrg $(TESTS)
+test: serial mpi eigen dccrg $(TESTS)
 	@echo && echo "All tests passed."
 
 serial: $(EXECUTABLES)
 
 mpi: $(MPI_EXECS)
+
+eigen: $(EIGEN_EXECS)
 
 dccrg: $(DCCRG_EXECS)
 
@@ -165,4 +182,4 @@ data:
 
 c: clean
 clean: data
-	@echo "CLEAN" && rm -f $(EXECUTABLES) $(MPI_EXECS) $(DCCRG_EXECS) $(TESTS)
+	@echo "CLEAN" && rm -f $(EXECUTABLES) $(MPI_EXECS) $(EIGEN_EXECS) $(DCCRG_EXECS) $(TESTS)
