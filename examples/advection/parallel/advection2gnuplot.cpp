@@ -1,7 +1,7 @@
 /*
 Program for plotting output of advection program with gnuplot.
 
-Copyright (c) 2014, Ilja Honkonen
+Copyright 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

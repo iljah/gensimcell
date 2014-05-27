@@ -1,7 +1,7 @@
 /*
 Serial example program solving the advection equation.
 
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright 2013, 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

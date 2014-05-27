@@ -1,7 +1,7 @@
 /*
 Tests that transfer logic of a cell with multiple variables works.
 
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright 2013, 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

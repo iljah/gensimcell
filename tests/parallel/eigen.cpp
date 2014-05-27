@@ -1,7 +1,7 @@
 /*
 Tests that transfer of a cell with one Eigen variable between processes works.
 
-Copyright 2014, Ilja Honkonen
+Copyright 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

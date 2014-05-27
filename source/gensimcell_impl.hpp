@@ -1,5 +1,7 @@
 /*
-Copyright (c) 2013, 2014, Ilja Honkonen
+Implementation of the generic simulation cell class.
+
+Copyright 2013, 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,11 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace gensimcell {
-
-/*!
-Everything in this namespace should be considered as an
-implementation detail that is subject to change without notice.
-*/
 namespace detail {
 
 
