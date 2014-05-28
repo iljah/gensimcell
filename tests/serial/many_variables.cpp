@@ -51,6 +51,11 @@ struct test_variable3 {
 	using data_type = char;
 };
 
+struct test_variable4 {
+	using data_type = char;
+};
+
+using test_variable5 = test_variable4;
 
 int main(int, char**)
 {
@@ -97,6 +102,16 @@ int main(int, char**)
 	CHECK_TRUE(get<2>(cell_tuple)[test_variable2()] == 4.5)
 	CHECK_TRUE(get<2>(cell_tuple)[test_variable3()] == '5')
 
+	gensimcell::Cell<
+		test_variable3,
+		test_variable4
+	> cell2;
+	cell2[test_variable5()] = 'a';
+	cell2[test_variable4()] = 'b';
+	cell2[test_variable3()] = 'c';
+	CHECK_TRUE(cell2[test_variable3()] == 'c');
+	CHECK_TRUE(cell2[test_variable4()] == 'b');
+	CHECK_TRUE(cell2[test_variable5()] == 'b');
 
 	return EXIT_SUCCESS;
 }
