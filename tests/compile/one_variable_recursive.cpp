@@ -36,19 +36,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gensimcell.hpp"
 
-struct test_variable {
+struct test_variable1 {
 	using data_type = int;
 };
+using cell1_t = gensimcell::Cell<test_variable1>;
 
+struct test_variable2 {
+	using data_type = cell1_t;
+};
+using cell2_t = gensimcell::Cell<test_variable2>;
+
+template<class Variable_T> bool test_recursive_ret_type(const cell2_t& cell)
+{
+	const typename Variable_T::data_type& data = cell[Variable_T()];
+	return data[test_variable1()] == cell[Variable_T()][test_variable1()];
+}
 
 int main(int, char**)
 {
-	gensimcell::Cell<
-		gensimcell::Cell<
-			test_variable
-		>
-	> cell1, cell2;
-	cell1 = cell2;
+	cell2_t c1, c2;
+	c1 = c2;
+
+	test_recursive_ret_type<test_variable2>(c1);
 
 	return 0;
 }
