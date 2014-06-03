@@ -66,7 +66,7 @@ struct Velocity
 	using data_type = std::array<double, 2>;
 };
 
-using cell_t = gensimcell::Cell<
+using Cell_T = gensimcell::Cell<
 	Density,
 	Density_Flux,
 	Velocity
@@ -84,8 +84,8 @@ the cell at horizontal (x) index = 2 and
 vertical (y) index = 4 use grid[4][2]
 (indices start from 0)
 */
-using grid_t = array<array<cell_t, width>, height>;
-grid_t grid;
+using Grid_T = array<array<Cell_T, width>, height>;
+Grid_T grid;
 
 
 /*!
@@ -95,7 +95,7 @@ First index is the cell's location in horizontal direction (x),
 second in vertical (y). Indices increase in positive direction.
 */
 array<double, 2> get_cell_center(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const array<size_t, 2>& index
 ) {
 	if (
@@ -120,7 +120,7 @@ Returns the size of given cell in x and y directions
 at given x and y indices in the grid.
 */
 array<double, 2> get_cell_size(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const array<size_t, 2>& index
 ) {
 	if (
@@ -148,7 +148,7 @@ R.J. LeVeque,
 Finite Volume Methods for Hyperbolic Problems,
 ISBN 978-0-521-00924-9.
 */
-void initialize(grid_t& grid)
+void initialize(Grid_T& grid)
 {
 	for (size_t row_i = 0; row_i < grid.size(); row_i++)
 	for (size_t cell_i = 0; cell_i < grid[row_i].size(); cell_i++) {
@@ -156,7 +156,7 @@ void initialize(grid_t& grid)
 		const array<double, 2> center = get_cell_center(grid, {cell_i, row_i});
 		const double r = sqrt(pow(center[0] + 0.45, 2) + pow(center[1], 2));
 
-		cell_t& cell = grid[row_i][cell_i];
+		auto& cell = grid[row_i][cell_i];
 
 		/*
 		Initialize density
@@ -192,7 +192,7 @@ void initialize(grid_t& grid)
 /*!
 Returns the maximum allowed time step in given grid.
 */
-double get_max_time_step(const grid_t& grid)
+double get_max_time_step(const Grid_T& grid)
 {
 	double ret_val = std::numeric_limits<double>::max();
 
@@ -223,17 +223,21 @@ Velocity does not change during the simulation.
 The solver is probably simplest possible
 so it has e.g. very large diffusion.
 */
-void solve(grid_t& grid, const double dt)
+void solve(Grid_T& grid, const double dt)
 {
-	if (grid.size() == 0) {
-		cerr << __FILE__ << ":" << __LINE__ << endl;
-		abort();
-	}
+	static_assert(
+		std::tuple_size<Grid_T>::value > 0,
+		"Given grid must have at least one cell in first dimension"
+	);
+	static_assert(
+		std::tuple_size<Grid_T::value_type>::value > 0,
+		"Given grid must have at least one cell in second dimension"
+	);
 
 	for (size_t y_i = 0; y_i < height; y_i++)
 	for (size_t x_i = 0; x_i < width; x_i++) {
 
-		cell_t& cell = grid[y_i][x_i];
+		auto& cell = grid[y_i][x_i];
 
 		const double density = cell[Density()];
 		const array<double, 2>
@@ -252,21 +256,21 @@ void solve(grid_t& grid, const double dt)
 		// figure out where the density from current cell goes
 		if (flux_x < 0) {
 			// stuff flows into neighbor on the negative x side
-			cell_t& neighbor = grid[y_i][(x_i + (width - 1)) % width];
+			Cell_T& neighbor = grid[y_i][(x_i + (width - 1)) % width];
 			neighbor[Density_Flux()] += fabs(flux_x);
 		} else {
 			// stuff flows into neighbor on the positive x side
-			cell_t& neighbor = grid[y_i][(x_i + 1) % width];
+			Cell_T& neighbor = grid[y_i][(x_i + 1) % width];
 			neighbor[Density_Flux()] += flux_x;
 		}
 
 		if (flux_y < 0) {
 			// stuff flows into neighbor on the negative y side
-			cell_t& neighbor = grid[(y_i + (height - 1)) % height][x_i];
+			Cell_T& neighbor = grid[(y_i + (height - 1)) % height][x_i];
 			neighbor[Density_Flux()] += fabs(flux_y);
 		} else {
 			// stuff flows into neighbor on the positive y side
-			cell_t& neighbor = grid[(y_i + 1) % height][x_i];
+			Cell_T& neighbor = grid[(y_i + 1) % height][x_i];
 			neighbor[Density_Flux()] += flux_y;
 		}
 	}
@@ -278,7 +282,7 @@ Sets the new density in each cell of given grid based on density flux.
 
 Density flux is zeroed after applying it.
 */
-void apply_solution(grid_t& grid)
+void apply_solution(Grid_T& grid)
 {
 	for (auto& row: grid)
 	for (auto& cell: row) {
@@ -295,7 +299,7 @@ Returns the name of the file written which
 is derived from given simulation time.
 */
 string save(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const double simulation_time
 ) {
 	ostringstream time_string;
@@ -329,7 +333,7 @@ string save(
 	// plotting 'with image' requires row data from bottom to top
 	for (size_t row_i = 0; row_i < grid.size(); row_i++) {
 		for (size_t cell_i = 0; cell_i < grid[row_i].size(); cell_i++) {
-			const cell_t& cell = grid[row_i][cell_i];
+			const auto& cell = grid[row_i][cell_i];
 			gnuplot_file << cell[Density()] << " ";
 		}
 		gnuplot_file << "\n";
