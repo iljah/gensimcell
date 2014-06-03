@@ -66,7 +66,7 @@ struct Particles
 };
 
 
-using cell_t = gensimcell::Cell<
+using Cell_T = gensimcell::Cell<
 	Velocity,
 	Particles
 >;
@@ -76,8 +76,8 @@ constexpr size_t
 	width = 20,
 	height = 20;
 
-using grid_t = array<array<cell_t, width>, height>;
-grid_t grid;
+using Grid_T = array<array<Cell_T, width>, height>;
+Grid_T grid;
 
 
 /*!
@@ -87,7 +87,7 @@ Returns the name of the file written which
 is derived from given simulation time.
 */
 string save(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const double simulation_time
 ) {
 	ostringstream time_string;
@@ -145,7 +145,7 @@ First index is the cell's location in horizontal direction (x),
 second in vertical (y).
 */
 array<double, 2> get_cell_center(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const array<size_t, 2>& index
 ) {
 	if (
@@ -170,7 +170,7 @@ Returns the size of given cell in x and y directions
 at given x and y indices in the grid.
 */
 array<double, 2> get_cell_size(
-	const grid_t& grid,
+	const Grid_T& grid,
 	const array<size_t, 2>& index
 ) {
 	if (
@@ -193,18 +193,18 @@ array<double, 2> get_cell_size(
 /*!
 Initializes cells in given grid with 3 particles
 */
-void initialize(grid_t& grid)
+void initialize(Grid_T& grid)
 {
 	for (size_t row_i = 0; row_i < height; row_i++)
 	for (size_t cell_i = 0; cell_i < width; cell_i++) {
 
-		const array<double, 2>
-			center = get_cell_center(grid, {cell_i, row_i}),
+		const auto
+			cell_center = get_cell_center(grid, {cell_i, row_i}),
 			cell_size = get_cell_size(grid, {cell_i, row_i});
 
-		cell_t& cell = grid[row_i][cell_i];
-		cell[Velocity()][0] = -2 * center[1];
-		cell[Velocity()][1] = +2 * center[0];
+		auto& cell = grid[row_i][cell_i];
+		cell[Velocity()][0] = -2 * cell_center[1];
+		cell[Velocity()][1] = +2 * cell_center[0];
 
 		// don't create particles too close to the edges
 		if (
@@ -217,16 +217,16 @@ void initialize(grid_t& grid)
 		}
 
 		cell[Particles()].push_back({
-				center[0] - cell_size[0] / 4,
-				center[1] - cell_size[1] / 4
+				cell_center[0] - cell_size[0] / 4,
+				cell_center[1] - cell_size[1] / 4
 		});
 		cell[Particles()].push_back({
-				center[0],
-				center[1] + cell_size[1] / 4
+				cell_center[0],
+				cell_center[1] + cell_size[1] / 4
 		});
 		cell[Particles()].push_back({
-				center[0] + cell_size[0] / 4,
-				center[1] - cell_size[1] / 4
+				cell_center[0] + cell_size[0] / 4,
+				cell_center[1] - cell_size[1] / 4
 		});
 	}
 }
@@ -235,14 +235,14 @@ void initialize(grid_t& grid)
 /*!
 Returns the maximum allowed time step in given grid.
 */
-double get_max_time_step(const grid_t& grid)
+double get_max_time_step(const Grid_T& grid)
 {
 	double ret_val = std::numeric_limits<double>::max();
 
 	for (size_t y_i = 0; y_i < grid.size(); y_i++)
 	for (size_t x_i = 0; x_i < grid[y_i].size(); x_i++) {
 
-		const array<double, 2>
+		const auto
 			cell_size = get_cell_size(grid, {x_i, y_i}),
 			vel = grid[x_i][y_i][Velocity()];
 
@@ -261,12 +261,12 @@ Propagates particles in each cell of given grid over given time.
 
 Does not change the cell in which a particle is stored.
 */
-void solve(grid_t& grid, const double dt)
+void solve(Grid_T& grid, const double dt)
 {
 	for (size_t y_i = 0; y_i < height; y_i++)
 	for (size_t x_i = 0; x_i < width; x_i++) {
 
-		cell_t& cell = grid[y_i][x_i];
+		auto& cell = grid[y_i][x_i];
 
 		for (auto& particle: cell[Particles()]) {
 
@@ -298,17 +298,17 @@ they are currently located at.
 Assumes particles have propagated no further from their
 previous cell than one of the cell's nearest neighbors.
 */
-void apply_solution(grid_t& grid)
+void apply_solution(Grid_T& grid)
 {
 	for (size_t y_i = 0; y_i < height; y_i++)
 	for (size_t x_i = 0; x_i < width; x_i++) {
 
-		cell_t& cell = grid[y_i][x_i];
+		auto& cell = grid[y_i][x_i];
 		const auto
 			cell_center = get_cell_center(grid, {x_i, y_i}),
 			cell_size = get_cell_size(grid, {x_i, y_i});
 
-		// shorten the notation for current coordinate list
+		// shorter notation for current coordinate list
 		vector<array<double, 2>>& coords = cell[Particles()];
 
 		for (size_t particle_i = 0; particle_i < coords.size(); particle_i++) {
@@ -363,7 +363,7 @@ void apply_solution(grid_t& grid)
 				}
 			}
 
-			cell_t& neighbor = grid[closest_y][closest_x];
+			auto& neighbor = grid[closest_y][closest_x];
 			neighbor[Particles()].push_back(coordinate);
 		}
 	}
