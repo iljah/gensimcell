@@ -121,10 +121,6 @@ struct External_Particle_Storage
 		MPI_Datatype
 	> get_mpi_datatype() const
 	{
-		/*
-		Transfer particle coordinates and destinations
-		*/
-
 		if (3 * this->coordinates.size() > std::numeric_limits<int>::max()) {
 			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 		}
