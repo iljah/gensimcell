@@ -53,7 +53,6 @@ namespace gensimcell {
 namespace detail {
 
 
-
 /*!
 Generic version of the implementation that doesn't do anything.
 
@@ -64,7 +63,6 @@ template <
 	size_t number_of_variables,
 	class... Variables
 > class Cell_impl {};
-
 
 
 /*!
@@ -111,6 +109,7 @@ protected:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
+	//! Sets global transfer info of given variable
 	static void set_transfer_all_impl(
 		const boost::logic::tribool given_transfer,
 		const Current_Variable&
@@ -119,6 +118,7 @@ protected:
 	}
 
 
+	//! Sets this cell instance's transfer info of given variable
 	void set_transfer_impl(
 		const bool given_transfer,
 		const Current_Variable&
@@ -127,6 +127,10 @@ protected:
 	}
 
 
+	/*!
+	Fill given arrays at given index with current
+	variable's MPI transfer info.
+	*/
 	size_t get_mpi_datatype_impl(
 		size_t index,
 		std::array<void*, number_of_variables>& addresses,
@@ -170,18 +174,20 @@ protected:
 public:
 
 
-	/*
+	/*!
 	Make all public functions of the inherited implementation(s)
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
 
 
+	//! Returns a reference to the data of given variable.
 	typename Current_Variable::data_type& operator[](const Current_Variable&)
 	{
 		return this->data;
 	};
 
+	//! Returns a const reference to the data of given variable.
 	const typename Current_Variable::data_type& operator[](const Current_Variable&) const
 	{
 		return this->data;
@@ -197,11 +203,23 @@ public:
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
 
 
+	/*!
+	Sets the MPI transfer info of given variables.
+
+	If given a determined tribool (true or false) the given
+	variables will or will not be included in the MPI_Datatype
+	returned by get_mpi_datatype() of all instances of this
+	cell type. Setting an underemined value here will make
+	the decision of whether to include a variable or not in
+	the MPI transfer info to be decided on a cell by cell
+	basis controlled by set_transfer().
+	*/
 	template<class... Given_Vars> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
 		const Given_Vars&...
 	);
 
+	//! See the general version for documentation
 	template<
 		class First_Given_Var,
 		class... Rest_Given_Vars
@@ -214,6 +232,7 @@ public:
 		set_transfer_all(given_transfer, rest...);
 	}
 
+	//! See the general version for documentation
 	template<class Given_Var> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
 		const Given_Var& var
@@ -222,17 +241,20 @@ public:
 	}
 
 
+	//! Returns the value set by set_transfer_all() for given variable
 	static boost::logic::tribool get_transfer_all(const Current_Variable&)
 	{
 		return transfer_all;
 	}
 
 
+	//! same as set_transfer_all but for this cell instance
 	template<class... Given_Vars> void set_transfer(
 		const bool given_transfer,
 		const Given_Vars&...
 	);
 
+	//! same as set_transfer_all but for this cell instance
 	template<
 		class First_Given_Var,
 		class... Rest_Given_Vars
@@ -245,6 +267,7 @@ public:
 		this->set_transfer(given_transfer, rest...);
 	}
 
+	//! same as set_transfer_all but for this cell instance
 	template<class Given_Var> void set_transfer(
 		const bool given_transfer,
 		const Given_Var& var
@@ -253,12 +276,17 @@ public:
 	}
 
 
+	//! Returns the value set by set_transfer() for given variable
 	bool get_transfer(const Current_Variable&) const
 	{
 		return this->transfer;
 	}
 
 
+	/*!
+	Returns true if given variable will be added to the transfer
+	info returned by get_mpi_datatype() and false otherwise.
+	*/
 	bool is_transferred(const Current_Variable&) const
 	{
 		if (transfer_all) {
@@ -275,6 +303,14 @@ public:
 	}
 
 
+	/*!
+	Returns the MPI transfer info of this cell instance.
+
+	By default no variables are included in the transfer info.
+	This can be changed with set_transfer() and
+	set_transfer_all() and queried with get_transfer(),
+	get_transfer_all() and is_transferred().
+	*/
 	std::tuple<
 		void*,
 		int,
@@ -382,15 +418,9 @@ private:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-	/*!
-	Whether each instance tranfers
-	this variable or not using MPI
-	*/
+	//! See the variadic version of Cell_impl for documentation
 	static boost::logic::tribool transfer_all;
-	/*!
-	Whether this instance sends this variable
-	if transfer_all is indeterminite
-	*/
+	//! See the variadic version of Cell_impl for documentation
 	bool transfer = false;
 
 	#endif // ifdef MPI_VERSION
@@ -402,6 +432,7 @@ protected:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
+	//! See the variadic version of Cell_impl for documentation
 	static void set_transfer_all_impl(
 		const boost::logic::tribool given_transfer,
 		const Variable&
@@ -410,12 +441,14 @@ protected:
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	void set_transfer_impl(const bool given_transfer, const Variable&)
 	{
 		this->transfer = given_transfer;
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	size_t get_mpi_datatype_impl(
 		const size_t index,
 		std::array<void*, number_of_variables>& addresses,
@@ -442,11 +475,13 @@ protected:
 public:
 
 
+	//! See the variadic version of Cell_impl for documentation
 	typename Variable::data_type& operator[](const Variable&)
 	{
 		return this->data;
 	}
 
+	//! See the variadic version of Cell_impl for documentation
 	const typename Variable::data_type& operator[](const Variable&) const
 	{
 		return this->data;
@@ -455,11 +490,13 @@ public:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
+	//! See the variadic version of Cell_impl for documentation
 	template<class... Given_Vars> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
 		const Given_Vars&...
 	);
 
+	//! See the variadic version of Cell_impl for documentation
 	template<
 		class First_Given_Var,
 		class... Rest_Given_Vars
@@ -472,6 +509,7 @@ public:
 		set_transfer_all(given_transfer, rest...);
 	}
 
+	//! See the variadic version of Cell_impl for documentation
 	template<class Given_Var> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
 		const Given_Var& var
@@ -480,21 +518,20 @@ public:
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	static boost::logic::tribool get_transfer_all(const Variable&)
 	{
 		return transfer_all;
 	}
 
 
-	/*!
-	Note that this information is not transferred over MPI
-	if the datatype is obtained from get_mpi_datatype().
-	*/
+	//! See the variadic version of Cell_impl for documentation
 	template<class... Given_Vars> void set_transfer(
 		const bool given_transfer,
 		const Given_Vars&...
 	);
 
+	//! See the variadic version of Cell_impl for documentation
 	template<
 		class First_Given_Var,
 		class... Rest_Given_Vars
@@ -507,6 +544,7 @@ public:
 		this->set_transfer_impl(given_transfer, first);
 	}
 
+	//! See the variadic version of Cell_impl for documentation
 	template<class Given_Var> void set_transfer(
 		const bool given_transfer,
 		const Given_Var& var
@@ -515,12 +553,14 @@ public:
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	bool get_transfer(const Variable&) const
 	{
 		return this->transfer;
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	bool is_transferred(const Variable&) const
 	{
 		if (transfer_all) {
@@ -537,6 +577,7 @@ public:
 	}
 
 
+	//! See the variadic version of Cell_impl for documentation
 	std::tuple<
 		void*,
 		int,

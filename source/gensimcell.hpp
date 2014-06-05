@@ -38,13 +38,83 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*!
-Namespace where everything related to gensimcell is defined.
+\mainpage Generic simulation cell class.
+
+See gensimcell::Cell to get started with the API.
+*/
+
+
+/*!
+Namespace where everything related to
+generic simulation cell class is defined.
 */
 namespace gensimcell {
 
 
 /*!
-\todo Write documentation.
+Generic simulation cell that stores arbitrary simulation variables.
+
+Simulation variables are classes given as template arguments.
+Each variables must define its type as data_type which will
+be the type stored in each instance of the cell class.
+For example in Conway's Game of Life (GoL) the following variables
+could be used:
+@code
+struct Is_Alive { using data_type = bool;};
+struct Live_Neighbors { using data_type = int;};
+@endcode
+An instance of a GoL cell is created by:
+@code
+gensimcell::Cell<Is_Alive, Live_Neighbors> cell;
+@endcode
+And a grid of such cells can be created by:
+@code
+using Cell_T = gensimcell::Cell<Is_Alive, Live_Neighbors>;
+std::array<std::array<Cell_T, 10>, 10> grid;
+@endcode
+Access to the data of each variable is provided by the []
+operator overloaded for the class type:
+@code
+cell[Is_Alive()] = false;
+cell[Live_Neighbors()] = 3;
+@endcode
+The life state of all cells in the previous grid can be printed by:
+@code
+for (const auto& row: grid) {
+	for (const auto& cell: row) {
+		cout << cell[Is_Alive()] << " ";
+	}
+	cout << endl;
+}
+@endcode
+For complete examples see the following files in the git repository:
+examples/game_of_life/serial.cpp
+examples/advection/serial.cpp
+examples/particle_propagation/serial.cpp
+
+Distributed memory concurrency support is provided using the
+Message Passing Interface (MPI) application programming interface
+via the get_mpi_datatype() member function. Each variable stored
+in the cell can be included in the transfer information returned
+by get_mpi_datatype(). Whether a variable is included or not can
+be switched with the set_transfer() and set_transfer_all()
+methods. The latter switches the transfer of variables given to
+the method on or off in all instances of that cell, the former
+affects only the current cell. When the value set by
+set_transfer_all() is determined, either true of false, all cells
+will behave identically regardless of the value set by
+set_transfer(). To get individual cell behavior for a variable
+set the transfer info using set_transfer_all() to an
+undeterminate value for the specific variables.
+For complete examples check the files in the following directories
+in the git repository:
+examples/game_of_life/parallel/
+examples/advection/parallel/
+examples/particle_propagation/parallel/
+examples/combined/
+
+For the full API check the comments in the
+source/gensimcell_impl.hpp file.
 */
 template <
 	class... Variables
@@ -52,13 +122,38 @@ template <
 	public detail::Cell_impl<sizeof...(Variables), Variables...>
 {
 public:
-	// allow the cell to be used as a variable
+	/*!
+	Allows the cell class to be stored as a variable in another cell class.
+
+	For example:
+	@code
+	struct GoL_Variables1 {
+		using data_type = gensimcell:Cell<Is_Alive, Live_Neighbors>;
+	};
+	struct GoL_Variables2 {
+		using data_type = gensimcell:Cell<Is_Alive, Live_Neighbors>;
+	};
+	gensimcell::Cell<GoL_Variables1, GoL_Variables2> cell1, cell2;
+
+	cell1[GoL_Variables1()][Is_Alive()] =
+	cell1[GoL_Variables2()][Is_Alive()] =
+	cell2[GoL_Variables1()][Is_Alive()] =
+	cell2[GoL_Variables2()][Is_Alive()] = true;
+	@endcode
+	*/
 	using data_type = detail::Cell_impl<sizeof...(Variables), Variables...>;
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-	// boost::tti has_member_function doesn't see the inherited one
+	/*!
+	Returns the MPI transfer info of this cell's variables.
+
+	Each variable that has been set to be transferred with
+	set_transfer_all() or set_transfer() will be added to the
+	final datatype returned by this function. See the MPI API
+	for details on the returned address, count and MPI_Datatype.
+	*/
 	std::tuple<
 		void*,
 		int,

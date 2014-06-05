@@ -1,4 +1,8 @@
 gensimcell
 ==========
 
-Generic cell class for development of computational models
+Generic simulation cell class for developing computational models.
+
+For installation instructions see the INSTALL file.
+
+See the LICENSE file for licensing information.

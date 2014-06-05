@@ -1,0 +1,8 @@
+The generic simulation cell class is a header only library
+so installation consists of placing the files in the source
+directory somewhere where your compiler can find them.
+Alternatively you can include that directory in the compiler
+search path with -I .../gensimcell/source.
+
+A compiler with support for C++11 or at least variadic
+template parameters is required.
