@@ -27,6 +27,10 @@ HEADERS = \
   source/gensimcell_impl.hpp \
   source/get_var_mpi_datatype.hpp \
   tests/check_true.hpp \
+  tests/parallel/recursive_cell_gol/gol_initialize.hpp \
+  tests/parallel/recursive_cell_gol/gol_save.hpp \
+  tests/parallel/recursive_cell_gol/gol_solve.hpp \
+  tests/parallel/recursive_cell_gol/gol_variables.hpp \
   tests/parallel/particle_propagation/reference_cell.hpp \
   tests/parallel/particle_propagation/reference_initialize.hpp \
   tests/parallel/particle_propagation/reference_save.hpp \
@@ -120,6 +124,7 @@ DCCRG_EXECS = \
   tests/compile/dccrg/initialized.dexe \
   tests/compile/dccrg/updated.dexe \
   tests/compile/dccrg/saved.dexe \
+  tests/parallel/recursive_cell_gol/main.dexe \
   tests/parallel/particle_propagation/mpi_speed.dexe \
   tests/parallel/particle_propagation/mpi_speed_reference.dexe \
   examples/game_of_life/parallel/main.dexe \
