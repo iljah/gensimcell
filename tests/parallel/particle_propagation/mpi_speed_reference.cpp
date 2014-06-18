@@ -62,8 +62,17 @@ int main(int argc, char* argv[])
 
 	MPI_Comm comm = MPI_COMM_WORLD;
 
+
+	// intialize Zoltan
+	float zoltan_version;
+	if (Zoltan_Initialize(argc, argv, &zoltan_version) != ZOLTAN_OK) {
+		std::cerr << "Zoltan_Initialize failed." << std::endl;
+		abort();
+	}
+
+
 	/*
-	Set up the grid in which the game will run
+	Set up the grid in which the simulation will run
 	*/
 	dccrg::Dccrg<Cell, dccrg::Cartesian_Geometry> grid;
 
