@@ -37,24 +37,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gensimcell {
 
 
-template <class Cell> Cell operator+(Cell lhs, const Cell& rhs)
-{
-	lhs += rhs;
-	return lhs;
+#define GENSIMCELL_COMMA ,
+#define GENSIMCELL_MAKE_FREE_OPERATOR(FREE_OPERATOR, MEMBER_OPERATOR) \
+template <class Cell> Cell operator FREE_OPERATOR ( \
+	Cell lhs GENSIMCELL_COMMA \
+	const Cell& rhs \
+) { \
+	lhs MEMBER_OPERATOR rhs; \
+	return lhs; \
+} \
+\
+template < \
+	class Cell GENSIMCELL_COMMA \
+	class Scalar \
+> Cell operator FREE_OPERATOR ( \
+	Cell lhs GENSIMCELL_COMMA \
+	const Scalar& rhs \
+) { \
+	lhs MEMBER_OPERATOR rhs; \
+	return lhs; \
+} \
+\
+template < \
+	class Scalar GENSIMCELL_COMMA \
+	class Cell \
+> Cell operator FREE_OPERATOR ( \
+	const Scalar& lhs GENSIMCELL_COMMA \
+	Cell rhs \
+) { \
+	rhs MEMBER_OPERATOR lhs; \
+	return rhs; \
 }
 
-template <class Cell, class Scalar> Cell operator+(Cell lhs, const Scalar& rhs)
-{
-	lhs += rhs;
-	return lhs;
-}
+GENSIMCELL_MAKE_FREE_OPERATOR(+, +=)
+GENSIMCELL_MAKE_FREE_OPERATOR(-, -=)
+GENSIMCELL_MAKE_FREE_OPERATOR(*, *=)
+GENSIMCELL_MAKE_FREE_OPERATOR(/, /=)
 
-template <class Scalar, class Cell> Cell operator+(const Scalar& lhs, Cell rhs)
-{
-	rhs += lhs;
-	return rhs;
-}
-
+#undef GENSIMCELL_MAKE_FREE_OPERATOR
+#undef GENSIMCELL_COMMA
 
 } // namespace
 
