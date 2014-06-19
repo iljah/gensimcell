@@ -170,17 +170,23 @@ protected:
 	#endif // ifdef MPI_VERSION
 
 
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::plus_equal_impl;
-
-	/*!
-	Adds given data to the data of current variable of identical type.
-	*/
-	void plus_equal_impl(
-		const Current_Variable&,
-		const typename Current_Variable::data_type& rhs
-	) {
-		this->data += rhs;
+	#define GENSIMCELL_COMMA ,
+	#define GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(NAME, OPERATOR) \
+	using Cell_impl< \
+		number_of_variables GENSIMCELL_COMMA \
+		Rest_Of_Variables... \
+	>::plus_equal_impl; \
+	\
+	void NAME( \
+		const Current_Variable&, \
+		const typename Current_Variable::data_type& rhs \
+	) { \
+		this->data OPERATOR rhs; \
 	}
+
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(plus_equal_impl, +=)
+	#undef GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION
+	#undef GENSIMCELL_COMMA
 
 
 public:

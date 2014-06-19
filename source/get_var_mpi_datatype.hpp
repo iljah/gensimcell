@@ -1,7 +1,7 @@
 /*
 Functions that return the MPI transfer information of some C++ types.
 
-Copyright (c) 2013, 2014, Ilja Honkonen
+Copyright 2013, 2014 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -133,6 +133,8 @@ GENSIMCELL_GET_VAR_MPI_DATATYPE(std::complex<double>, MPI_CXX_DOUBLE_COMPLEX)
 GENSIMCELL_GET_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DOUBLE_COMPLEX)
 #endif
 
+#undef GENSIMCELL_GET_VAR_MPI_DATATYPE
+
 
 /*!
 Specializations of get_var_mpi_datatype for standard
@@ -189,6 +191,8 @@ GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE(std::complex<double>, MPI_CXX_DOUBLE_COMPL
 #ifdef MPI_CXX_LONG_DOUBLE_COMPLEX
 GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DOUBLE_COMPLEX)
 #endif
+
+#undef GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE
 
 
 #ifdef EIGEN_WORLD_VERSION
@@ -257,6 +261,8 @@ GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(std::complex<double>, MPI_CXX_DOUBLE_COMPL
 #ifdef MPI_CXX_LONG_DOUBLE_COMPLEX
 GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DOUBLE_COMPLEX)
 #endif
+
+#undef GENSIMCELL_GET_EIGEN_VAR_MPI_DATATYPE
 
 #endif // ifdef EIGEN_WORLD_VERSION
 
