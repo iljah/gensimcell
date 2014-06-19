@@ -170,6 +170,18 @@ protected:
 	#endif // ifdef MPI_VERSION
 
 
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::plus_equal_impl;
+
+	/*!
+	Adds given data to the data of current variable of identical type.
+	*/
+	void plus_equal_impl(
+		const Current_Variable&,
+		const typename Current_Variable::data_type& rhs
+	) {
+		this->data += rhs;
+	}
+
 
 public:
 
@@ -179,6 +191,7 @@ public:
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
+	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator+=;
 
 
 	//! Returns a reference to the data of given variable.
@@ -192,6 +205,82 @@ public:
 	{
 		return this->data;
 	};
+
+
+	/*
+	Operators
+	*/
+
+	/*!
+	Adds the data of given variables to this cell.
+
+	Adds data of variables given as template arguments
+	from given cell to this cell's data.
+	*/
+	template<
+		class... Operator_Variables
+	> void plus_equal(
+		const Cell_impl<
+			number_of_variables,
+			Current_Variable,
+			Rest_Of_Variables...
+		>&,
+		const Operator_Variables&...
+	) {}
+
+	/*!
+	Starts/continues recursion over variables.
+	*/
+	template<
+		class First_Op_Var,
+		class... Rest_Op_Vars
+	> void plus_equal(
+		const Cell_impl<
+			number_of_variables,
+			Current_Variable,
+			Rest_Of_Variables...
+		>& rhs,
+		const First_Op_Var& first_op_var,
+		const Rest_Op_Vars&... rest_op_vars
+	) {
+		this->plus_equal_impl(first_op_var, rhs[first_op_var]);
+		this->plus_equal(rhs, rest_op_vars...);
+	}
+
+	/*!
+	Stops recursion over variables.
+	*/
+	template<
+		class Last_Op_Var
+	> void plus_equal(
+		const Cell_impl<
+			number_of_variables,
+			Current_Variable,
+			Rest_Of_Variables...
+		>& rhs,
+		const Last_Op_Var& last_op_var
+	) {
+		this->plus_equal_impl(last_op_var, rhs[last_op_var]);
+	}
+
+	/*!
+	Applies += to all variables this cell and given cell of identical type.
+	*/
+	Cell_impl<
+		number_of_variables,
+		Current_Variable,
+		Rest_Of_Variables...
+	>& operator+=(
+		const Cell_impl<
+			number_of_variables,
+			Current_Variable,
+			Rest_Of_Variables...
+		>& rhs
+	) {
+		this->plus_equal(rhs, Current_Variable(), Rest_Of_Variables()...);
+		return *this;
+	}
+
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
@@ -471,8 +560,28 @@ protected:
 
 	#endif // ifdef MPI_VERSION
 
+	void plus_equal_impl(
+		const Variable&,
+		const typename Variable::data_type& rhs
+	) {
+		this->data += rhs;
+	}
+
 
 public:
+
+	Cell_impl<
+		number_of_variables,
+		Variable
+	>& operator+=(
+		const Cell_impl<
+			number_of_variables,
+			Variable
+		>& rhs
+	) {
+		this->plus_equal_impl(Variable(), rhs[Variable()]);
+		return *this;
+	}
 
 
 	//! See the variadic version of Cell_impl for documentation

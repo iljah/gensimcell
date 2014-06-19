@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENSIMCELL_HPP
 
 
+#include "operators.hpp"
 #include "gensimcell_impl.hpp"
 
 
