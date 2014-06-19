@@ -286,11 +286,11 @@ public:
 	#undef GENSIMCELL_MAKE_OPERATOR
 
 
-	#define GENSIMCELL_MAKE_OPERATOR_OTHER(NAME, IMPL_NAME, OPERATOR, Other_T) \
+	#define GENSIMCELL_MAKE_OPERATOR_OTHER(NAME, IMPL_NAME, OPERATOR, OTHER_TYPE) \
 	template< \
 		class... Operator_Variables \
 	> void NAME( \
-		const Other_T& GENSIMCELL_COMMA \
+		const OTHER_TYPE& GENSIMCELL_COMMA \
 		const Operator_Variables&... \
 	) {} \
 	\
@@ -298,7 +298,7 @@ public:
 		class First_Op_Var GENSIMCELL_COMMA \
 		class... Rest_Op_Vars \
 	> void NAME( \
-		const Other_T& rhs GENSIMCELL_COMMA \
+		const OTHER_TYPE& rhs GENSIMCELL_COMMA \
 		const First_Op_Var& first_op_var GENSIMCELL_COMMA \
 		const Rest_Op_Vars&... rest_op_vars \
 	) { \
@@ -309,7 +309,7 @@ public:
 	template< \
 		class Last_Op_Var \
 	> void NAME( \
-		const Other_T& rhs GENSIMCELL_COMMA \
+		const OTHER_TYPE& rhs GENSIMCELL_COMMA \
 		const Last_Op_Var& last_op_var \
 	) { \
 		this->IMPL_NAME(last_op_var GENSIMCELL_COMMA rhs); \
@@ -320,7 +320,7 @@ public:
 		Current_Variable GENSIMCELL_COMMA \
 		Rest_Of_Variables... \
 	>& operator OPERATOR ( \
-		const Other_T& rhs \
+		const OTHER_TYPE& rhs \
 	) { \
 		this->NAME( \
 			rhs GENSIMCELL_COMMA \
@@ -643,9 +643,9 @@ protected:
 
 
 	#define GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(NAME, OPERATOR) \
-	void NAME( \
+	template<class Other_T> void NAME( \
 		const Variable& GENSIMCELL_COMMA \
-		const typename Variable::data_type& rhs \
+		const Other_T& rhs \
 	) { \
 		this->data OPERATOR rhs; \
 	}
