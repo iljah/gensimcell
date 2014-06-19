@@ -175,18 +175,20 @@ protected:
 	using Cell_impl< \
 		number_of_variables GENSIMCELL_COMMA \
 		Rest_Of_Variables... \
-	>::plus_equal_impl; \
+	>::NAME; \
 	\
 	void NAME( \
-		const Current_Variable&, \
+		const Current_Variable& GENSIMCELL_COMMA \
 		const typename Current_Variable::data_type& rhs \
 	) { \
 		this->data OPERATOR rhs; \
 	}
 
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(plus_equal_impl, +=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(minus_equal_impl, -=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(mul_equal_impl, *=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(div_equal_impl, /=)
 	#undef GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION
-	#undef GENSIMCELL_COMMA
 
 
 public:
@@ -197,7 +199,6 @@ public:
 	available also through the current iteration over user's variables.
 	*/
 	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator+=;
 
 
 	//! Returns a reference to the data of given variable.
@@ -217,76 +218,72 @@ public:
 	Operators
 	*/
 
-	/*!
-	Adds the data of given variables to this cell.
-
-	Adds data of variables given as template arguments
-	from given cell to this cell's data.
-	*/
-	template<
-		class... Operator_Variables
-	> void plus_equal(
-		const Cell_impl<
-			number_of_variables,
-			Current_Variable,
-			Rest_Of_Variables...
-		>&,
-		const Operator_Variables&...
-	) {}
-
-	/*!
-	Starts/continues recursion over variables.
-	*/
-	template<
-		class First_Op_Var,
-		class... Rest_Op_Vars
-	> void plus_equal(
-		const Cell_impl<
-			number_of_variables,
-			Current_Variable,
-			Rest_Of_Variables...
-		>& rhs,
-		const First_Op_Var& first_op_var,
-		const Rest_Op_Vars&... rest_op_vars
-	) {
-		this->plus_equal_impl(first_op_var, rhs[first_op_var]);
-		this->plus_equal(rhs, rest_op_vars...);
+	#define GENSIMCELL_MAKE_OPERATOR(NAME, IMPLEMENTATION_NAME, OPERATOR) \
+	template< \
+		class... Operator_Variables \
+	> void NAME( \
+		const Cell_impl< \
+			number_of_variables GENSIMCELL_COMMA \
+			Current_Variable GENSIMCELL_COMMA \
+			Rest_Of_Variables... \
+		>& GENSIMCELL_COMMA \
+		const Operator_Variables&... \
+	) {} \
+	\
+	template< \
+		class First_Op_Var GENSIMCELL_COMMA \
+		class... Rest_Op_Vars \
+	> void NAME( \
+		const Cell_impl< \
+			number_of_variables GENSIMCELL_COMMA \
+			Current_Variable GENSIMCELL_COMMA \
+			Rest_Of_Variables... \
+		>& rhs GENSIMCELL_COMMA \
+		const First_Op_Var& first_op_var GENSIMCELL_COMMA \
+		const Rest_Op_Vars&... rest_op_vars \
+	) { \
+		this->IMPLEMENTATION_NAME(first_op_var GENSIMCELL_COMMA rhs[first_op_var]); \
+		this->NAME(rhs GENSIMCELL_COMMA rest_op_vars...); \
+	} \
+	\
+	template< \
+		class Last_Op_Var \
+	> void NAME( \
+		const Cell_impl< \
+			number_of_variables GENSIMCELL_COMMA \
+			Current_Variable GENSIMCELL_COMMA \
+			Rest_Of_Variables... \
+		>& rhs GENSIMCELL_COMMA \
+		const Last_Op_Var& last_op_var \
+	) { \
+		this->IMPLEMENTATION_NAME(last_op_var GENSIMCELL_COMMA rhs[last_op_var]); \
+	} \
+	\
+	Cell_impl< \
+		number_of_variables GENSIMCELL_COMMA \
+		Current_Variable GENSIMCELL_COMMA \
+		Rest_Of_Variables... \
+	>& operator OPERATOR ( \
+		const Cell_impl< \
+			number_of_variables GENSIMCELL_COMMA \
+			Current_Variable GENSIMCELL_COMMA \
+			Rest_Of_Variables... \
+		>& rhs \
+	) { \
+		this->NAME( \
+			rhs GENSIMCELL_COMMA \
+			Current_Variable() GENSIMCELL_COMMA \
+			Rest_Of_Variables()... \
+		); \
+		return *this; \
 	}
 
-	/*!
-	Stops recursion over variables.
-	*/
-	template<
-		class Last_Op_Var
-	> void plus_equal(
-		const Cell_impl<
-			number_of_variables,
-			Current_Variable,
-			Rest_Of_Variables...
-		>& rhs,
-		const Last_Op_Var& last_op_var
-	) {
-		this->plus_equal_impl(last_op_var, rhs[last_op_var]);
-	}
+	GENSIMCELL_MAKE_OPERATOR(plus_equal, plus_equal_impl, +=)
+	GENSIMCELL_MAKE_OPERATOR(minus_equal, minus_equal_impl, -=)
+	GENSIMCELL_MAKE_OPERATOR(mul_equal, mul_equal_impl, *=)
+	GENSIMCELL_MAKE_OPERATOR(div_equal, div_equal_impl, /=)
 
-	/*!
-	Applies += to all variables this cell and given cell of identical type.
-	*/
-	Cell_impl<
-		number_of_variables,
-		Current_Variable,
-		Rest_Of_Variables...
-	>& operator+=(
-		const Cell_impl<
-			number_of_variables,
-			Current_Variable,
-			Rest_Of_Variables...
-		>& rhs
-	) {
-		this->plus_equal(rhs, Current_Variable(), Rest_Of_Variables()...);
-		return *this;
-	}
-
+	#undef GENSIMCELL_MAKE_OPERATOR
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
@@ -525,6 +522,21 @@ private:
 protected:
 
 
+	#define GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(NAME, OPERATOR) \
+	void NAME( \
+		const Variable& GENSIMCELL_COMMA \
+		const typename Variable::data_type& rhs \
+	) { \
+		this->data OPERATOR rhs; \
+	}
+
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(plus_equal_impl, +=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(minus_equal_impl, -=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(mul_equal_impl, *=)
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(div_equal_impl, /=)
+	#undef GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST
+
+
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 	//! See the variadic version of Cell_impl for documentation
@@ -566,29 +578,9 @@ protected:
 
 	#endif // ifdef MPI_VERSION
 
-	void plus_equal_impl(
-		const Variable&,
-		const typename Variable::data_type& rhs
-	) {
-		this->data += rhs;
-	}
 
 
 public:
-
-	Cell_impl<
-		number_of_variables,
-		Variable
-	>& operator+=(
-		const Cell_impl<
-			number_of_variables,
-			Variable
-		>& rhs
-	) {
-		this->plus_equal_impl(Variable(), rhs[Variable()]);
-		return *this;
-	}
-
 
 	//! See the variadic version of Cell_impl for documentation
 	typename Variable::data_type& operator[](const Variable&)
@@ -601,6 +593,29 @@ public:
 	{
 		return this->data;
 	}
+
+
+	#define GENSIMCELL_MAKE_OPERATOR_LAST(NAME, OPERATOR) \
+	Cell_impl< \
+		number_of_variables GENSIMCELL_COMMA \
+		Variable \
+	>& operator OPERATOR( \
+		const Cell_impl< \
+			number_of_variables GENSIMCELL_COMMA \
+			Variable \
+		>& rhs \
+	) { \
+		this->NAME(Variable() GENSIMCELL_COMMA rhs[Variable()]); \
+		return *this; \
+	}
+
+	GENSIMCELL_MAKE_OPERATOR_LAST(plus_equal_impl, +=)
+	GENSIMCELL_MAKE_OPERATOR_LAST(minus_equal_impl, -=)
+	GENSIMCELL_MAKE_OPERATOR_LAST(mul_equal_impl, *=)
+	GENSIMCELL_MAKE_OPERATOR_LAST(div_equal_impl, /=)
+
+	#undef GENSIMCELL_MAKE_OPERATOR_LAST
+	#undef GENSIMCELL_COMMA
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)

@@ -85,6 +85,9 @@ EXECUTABLES = \
   tests/serial/one_variable_recursive.exe \
   tests/serial/many_variables_recursive.exe \
   tests/serial/operators/plus.exe \
+  tests/serial/operators/minus.exe \
+  tests/serial/operators/mul.exe \
+  tests/serial/operators/div.exe \
   tests/serial/game_of_life/speed.exe \
   tests/serial/game_of_life/speed_reference.exe \
   tests/serial/game_of_life/main.exe \
@@ -150,6 +153,9 @@ TESTS = \
   tests/serial/transfer_many_cells_many_variables.mtst \
   tests/serial/transfer_recursive.mtst \
   tests/serial/operators/plus.tst \
+  tests/serial/operators/minus.tst \
+  tests/serial/operators/mul.tst \
+  tests/serial/operators/div.tst \
   tests/serial/game_of_life/main.tst \
   tests/parallel/one_variable.mtst \
   tests/parallel/many_variables.mtst \
