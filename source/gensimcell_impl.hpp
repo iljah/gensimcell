@@ -177,9 +177,9 @@ protected:
 		Rest_Of_Variables... \
 	>::NAME; \
 	\
-	void NAME( \
+	template<class Other_T> void NAME( \
 		const Current_Variable& GENSIMCELL_COMMA \
-		const typename Current_Variable::data_type& rhs \
+		const Other_T& rhs \
 	) { \
 		this->data OPERATOR rhs; \
 	}
@@ -284,6 +284,126 @@ public:
 	GENSIMCELL_MAKE_OPERATOR(div_equal, div_equal_impl, /=)
 
 	#undef GENSIMCELL_MAKE_OPERATOR
+
+
+	#define GENSIMCELL_MAKE_OPERATOR_OTHER(NAME, IMPL_NAME, OPERATOR, Other_T) \
+	template< \
+		class... Operator_Variables \
+	> void NAME( \
+		const Other_T& GENSIMCELL_COMMA \
+		const Operator_Variables&... \
+	) {} \
+	\
+	template< \
+		class First_Op_Var GENSIMCELL_COMMA \
+		class... Rest_Op_Vars \
+	> void NAME( \
+		const Other_T& rhs GENSIMCELL_COMMA \
+		const First_Op_Var& first_op_var GENSIMCELL_COMMA \
+		const Rest_Op_Vars&... rest_op_vars \
+	) { \
+		this->IMPL_NAME(first_op_var GENSIMCELL_COMMA rhs); \
+		this->NAME(rhs GENSIMCELL_COMMA rest_op_vars...); \
+	} \
+	\
+	template< \
+		class Last_Op_Var \
+	> void NAME( \
+		const Other_T& rhs GENSIMCELL_COMMA \
+		const Last_Op_Var& last_op_var \
+	) { \
+		this->IMPL_NAME(last_op_var GENSIMCELL_COMMA rhs); \
+	} \
+	\
+	Cell_impl< \
+		number_of_variables GENSIMCELL_COMMA \
+		Current_Variable GENSIMCELL_COMMA \
+		Rest_Of_Variables... \
+	>& operator OPERATOR ( \
+		const Other_T& rhs \
+	) { \
+		this->NAME( \
+			rhs GENSIMCELL_COMMA \
+			Current_Variable() GENSIMCELL_COMMA \
+			Rest_Of_Variables()... \
+		); \
+		return *this; \
+	}
+
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, bool)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, float)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, long double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, bool)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, float)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(minus_equal, minus_equal_impl, -=, long double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, bool)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, float)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(mul_equal, mul_equal_impl, *=, long double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, bool)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, float)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(div_equal, div_equal_impl, /=, long double)
+
+	#undef GENSIMCELL_MAKE_OPERATOR_OTHER
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
@@ -615,6 +735,93 @@ public:
 	GENSIMCELL_MAKE_OPERATOR_LAST(div_equal_impl, /=)
 
 	#undef GENSIMCELL_MAKE_OPERATOR_LAST
+
+
+	#define GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(NAME, OPERATOR, OTHER_TYPE) \
+	Cell_impl< \
+		number_of_variables GENSIMCELL_COMMA \
+		Variable \
+	>& operator OPERATOR( \
+		const OTHER_TYPE& rhs \
+	) { \
+		this->NAME(Variable() GENSIMCELL_COMMA rhs); \
+		return *this; \
+	}
+
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, bool)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, float)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, long double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, bool)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, float)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(minus_equal_impl, -=, long double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, bool)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, float)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(mul_equal_impl, *=, long double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, bool)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, signed char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, float)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(div_equal_impl, /=, long double)
+
+	#undef GENSIMCELL_MAKE_OPERATOR_LAST_OTHER
 	#undef GENSIMCELL_COMMA
 
 

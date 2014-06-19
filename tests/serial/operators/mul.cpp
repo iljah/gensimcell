@@ -90,6 +90,10 @@ int main(int, char**)
 	c1_1 = c1_1 * c1_2;
 	CHECK_TRUE(c1_1[v1] == 12)
 	CHECK_TRUE(c1_2[v1] == 4)
+	c1_1 *= 3;
+	c1_2 = c1_2 * 4;
+	CHECK_TRUE(c1_1[v1] == 36)
+	CHECK_TRUE(c1_2[v1] == 16)
 
 	cell2_t c2_1, c2_2;
 	c2_1[v2][v1] = -3;
@@ -150,6 +154,14 @@ int main(int, char**)
 	CHECK_TRUE(c4_1[v1] == 82944)
 	CHECK_TRUE(c4_1[v3] == -21233664)
 	CHECK_TRUE(c4_1[v4] == 8294400)
+	c4_1[v1] = 3;
+	c4_1[v3] = -3;
+	c4_1[v4] = 300;
+	c4_1 *= 2;
+	c4_1 = c4_1 * 2;
+	CHECK_TRUE(c4_1[v1] == 12)
+	CHECK_TRUE(c4_1[v3] == -12)
+	CHECK_TRUE(c4_1[v4] == 1200)
 
 	return EXIT_SUCCESS;
 }
