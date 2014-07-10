@@ -68,7 +68,7 @@ protected:
 
 	//! Sets this cell instance's transfer info of given variable
 	void set_transfer_impl(
-		const bool given_transfer,
+		const bool,
 		const Variable&
 	) {}
 
@@ -96,7 +96,7 @@ protected:
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
 	template<class... Variables> static void set_transfer_all_impl(
-		const boost::logic::tribool given_transfer,
+		const boost::logic::tribool,
 		const Variables&...
 	) {}
 
@@ -106,7 +106,7 @@ protected:
 	}
 
 	template<class... Variables> void set_transfer_impl(
-		const bool given_transfer,
+		const bool,
 		const Variables&...
 	) {}
 
