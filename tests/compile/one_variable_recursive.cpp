@@ -39,12 +39,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct test_variable1 {
 	using data_type = int;
 };
-using cell1_t = gensimcell::Cell<test_variable1>;
+
+#ifdef HAVE_MPI
+using cell1_t = gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>;
+#else
+using cell1_t = gensimcell::Cell<gensimcell::Never_Transfer, test_variable1>;
+#endif
 
 struct test_variable2 {
 	using data_type = cell1_t;
 };
-using cell2_t = gensimcell::Cell<test_variable2>;
+
+#ifdef HAVE_MPI
+using cell2_t = gensimcell::Cell<gensimcell::Always_Transfer, test_variable2>;
+#else
+using cell2_t = gensimcell::Cell<gensimcell::Never_Transfer, test_variable2>;
+#endif
 
 template<class Variable_T> bool test_recursive_ret_type(const cell2_t& cell)
 {

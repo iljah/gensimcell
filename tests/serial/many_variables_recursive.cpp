@@ -58,6 +58,7 @@ struct test_variable3 {
 
 struct test_variable4 {
 	using data_type = gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable1,
 		test_variable2,
 		test_variable3
@@ -66,6 +67,7 @@ struct test_variable4 {
 
 struct test_variable5 {
 	using data_type = gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable1,
 		test_variable4
 	>;
@@ -73,6 +75,7 @@ struct test_variable5 {
 
 struct test_variable6 {
 	using data_type = gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable4,
 		test_variable5
 	>;
@@ -88,7 +91,7 @@ int main(int, char**)
 	const test_variable5 v5{};
 	const test_variable6 v6{};
 
-	gensimcell::Cell<test_variable4> cell4;
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable4> cell4;
 	cell4[v4][v1] = 3;
 	cell4[v4][v2] = 1.5;
 	cell4[v4][v3] = {'a', 'b'};
@@ -98,7 +101,7 @@ int main(int, char**)
 	CHECK_TRUE(cell4[v4][v3][1] == 'b')
 
 
-	gensimcell::Cell<test_variable5> cell5;
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable5> cell5;
 	cell5[v5][v1] = 4;
 	cell5[v5][v4][v1] = 5;
 	cell5[v5][v4][v2] = 2.5;
@@ -110,7 +113,7 @@ int main(int, char**)
 	CHECK_TRUE(cell5[v5][v4][v3][1] == 'd')
 
 
-	gensimcell::Cell<test_variable6> cell6;
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable6> cell6;
 	cell6[v6][v4][v1] = 6;
 	cell6[v6][v4][v2] = 4.5;
 	cell6[v6][v4][v3] = {'e', 'f'};

@@ -45,15 +45,16 @@ struct test_variable1 {
 	using data_type = int;
 };
 
-using cell1_t = gensimcell::Cell<test_variable1>;
+using cell1_t = gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>;
 
 struct test_variable2 {
 	using data_type = cell1_t;
 };
 
-using cell2_t = gensimcell::Cell<test_variable2>;
+using cell2_t = gensimcell::Cell<gensimcell::Optional_Transfer, test_variable2>;
 
 using cell3_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable1,
 	test_variable2
 >;
@@ -67,6 +68,7 @@ struct test_variable4 {
 };
 
 using cell4_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable1,
 	test_variable3,
 	test_variable4

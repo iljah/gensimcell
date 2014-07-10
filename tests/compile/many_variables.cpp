@@ -69,6 +69,7 @@ struct test_variable7 {
 int main(int, char**)
 {
 	gensimcell::Cell<
+		gensimcell::Never_Transfer,
 		test_variable1,
 		test_variable2,
 		test_variable3,
@@ -76,7 +77,34 @@ int main(int, char**)
 		test_variable5,
 		test_variable6,
 		test_variable7
-	> cell;
+	> cell1;
+
+
+	#ifdef HAVE_MPI
+
+	gensimcell::Cell<
+		gensimcell::Always_Transfer,
+		test_variable1,
+		test_variable2,
+		test_variable3,
+		test_variable4,
+		test_variable5,
+		test_variable6,
+		test_variable7
+	> cell2;
+
+	gensimcell::Cell<
+		gensimcell::Optional_Transfer,
+		test_variable1,
+		test_variable2,
+		test_variable3,
+		test_variable4,
+		test_variable5,
+		test_variable6,
+		test_variable7
+	> cell3;
+
+	#endif // ifdef HAVE_MPI
 
 	return 0;
 }

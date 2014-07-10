@@ -42,7 +42,7 @@ struct variable_t {
 	using data_type = int;
 };
 
-typedef gensimcell::Cell<variable_t> cell_t;
+typedef gensimcell::Cell<gensimcell::Optional_Transfer, variable_t> cell_t;
 
 static_assert(
 	has_member_function_get_mpi_datatype<

@@ -56,12 +56,12 @@ struct test_variable3 {
 
 int main(int, char**)
 {
-	gensimcell::Cell<test_variable1> cell;
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1> cell;
 	cell[test_variable1()] = 3;
 	CHECK_TRUE(cell[test_variable1()] == 3)
 
 
-	array<gensimcell::Cell<test_variable1>, 3> cell_array;
+	array<gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>, 3> cell_array;
 	cell_array[0][test_variable1()] = -1;
 	cell_array[1][test_variable1()] = -2;
 	cell_array[2][test_variable1()] = -3;
@@ -71,9 +71,9 @@ int main(int, char**)
 
 
 	tuple<
-		gensimcell::Cell<test_variable1>,
-		gensimcell::Cell<test_variable2>,
-		gensimcell::Cell<test_variable3>
+		gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>,
+		gensimcell::Cell<gensimcell::Optional_Transfer, test_variable2>,
+		gensimcell::Cell<gensimcell::Optional_Transfer, test_variable3>
 	> cell_tuple;
 	get<0>(cell_tuple)[test_variable1()] = -10;
 	get<1>(cell_tuple)[test_variable2()] = -0.5;
@@ -83,7 +83,7 @@ int main(int, char**)
 	CHECK_TRUE(get<2>(cell_tuple)[test_variable3()] == '3')
 
 
-	vector<gensimcell::Cell<test_variable1>> cell_vector(3);
+	vector<gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>> cell_vector(3);
 	cell_vector[0][test_variable1()] = 100.1;
 	cell_vector[1][test_variable1()] = 200.3;
 	cell_vector[2][test_variable1()] = 300.6;

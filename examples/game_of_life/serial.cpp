@@ -61,6 +61,7 @@ The cell type stored in the game grid
 defined by the variables it holds 
 */
 using Cell_T = gensimcell::Cell<
+	gensimcell::Never_Transfer,
 	is_alive,
 	live_neighbors
 >;

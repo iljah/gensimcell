@@ -115,7 +115,8 @@ MPI_EXECS = \
   tests/serial/transfer_recursive.mexe \
   tests/parallel/one_variable.mexe \
   tests/parallel/many_variables.mexe \
-  tests/parallel/memory_ordering.mexe
+  tests/parallel/memory_ordering.mexe \
+  tests/parallel/memory_layout.mexe
 
 EIGEN_EXECS = \
   tests/compile/get_var_mpi_datatype_included.eexe \
@@ -160,6 +161,7 @@ TESTS = \
   tests/parallel/one_variable.mtst \
   tests/parallel/many_variables.mtst \
   tests/parallel/memory_ordering.mtst \
+  tests/parallel/memory_layout.mtst \
   tests/parallel/eigen.etst \
   tests/parallel/particle_propagation/main.mmtst
 

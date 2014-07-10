@@ -52,6 +52,7 @@ struct test_variable3 {
 };
 
 using cell1_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable1,
 	test_variable2,
 	test_variable3

@@ -67,6 +67,7 @@ struct Velocity
 };
 
 using Cell_T = gensimcell::Cell<
+	gensimcell::Never_Transfer,
 	Density,
 	Density_Flux,
 	Velocity

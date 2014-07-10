@@ -223,6 +223,7 @@ in the same order as they are given here, which
 dccrg will use to save the file.
 */
 using Cell = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	Number_Of_Internal_Particles,
 	Number_Of_External_Particles,
 	Velocity,

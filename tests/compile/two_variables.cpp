@@ -36,19 +36,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "gensimcell.hpp"
 
-struct test_variable1 {
+struct test_var1 {
 	using data_type = int;
 };
 
-struct test_variable2 {
+struct test_var2 {
 	using data_type = double;
 };
 
 
 int main(int, char**)
 {
-	gensimcell::Cell<test_variable1, test_variable2> cell;
-	cell[test_variable1()] = 3;
+	gensimcell::Cell<gensimcell::Never_Transfer, test_var1, test_var2> cell1;
+	cell1[test_var1()] = 3;
+
+
+	#ifdef HAVE_MPI
+
+	gensimcell::Cell<gensimcell::Always_Transfer, test_var1, test_var2> cell2;
+	cell2[test_var1()] = 3;
+
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_var1, test_var2> cell3;
+	cell3[test_var1()] = 3;
+
+	#endif // ifdef HAVE_MPI
 
 	return 0;
 }

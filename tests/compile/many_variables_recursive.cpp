@@ -50,6 +50,7 @@ struct test_variable4 {
 
 struct test_variable5 {
 	using data_type = gensimcell::Cell<
+		gensimcell::Never_Transfer,
 		test_variable4,
 		test_variable3,
 		test_variable2,
@@ -58,21 +59,27 @@ struct test_variable5 {
 };
 
 struct test_variable6 {
-	using data_type = gensimcell::Cell<test_variable5, test_variable4>;
+	using data_type = gensimcell::Cell<
+		gensimcell::Never_Transfer,
+		test_variable5,
+		test_variable4
+	>;
 };
 
 
 int main(int, char**)
 {
-	gensimcell::Cell<test_variable5> cell1, cell2;
+	gensimcell::Cell<gensimcell::Never_Transfer, test_variable5> cell1, cell2;
 	cell1 = cell2;
 
-	gensimcell::Cell<test_variable6> cell3, cell4;
+	gensimcell::Cell<gensimcell::Never_Transfer, test_variable6> cell3, cell4;
 	cell3 = cell4;
 
 	gensimcell::Cell<
+		gensimcell::Never_Transfer,
 		test_variable2,
 		gensimcell::Cell<
+			gensimcell::Never_Transfer,
 			test_variable1,
 			test_variable5
 		>,

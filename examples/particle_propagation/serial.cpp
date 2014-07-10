@@ -67,6 +67,7 @@ struct Particles
 
 
 using Cell_T = gensimcell::Cell<
+	gensimcell::Never_Transfer,
 	Velocity,
 	Particles
 >;

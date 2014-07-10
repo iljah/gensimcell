@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "operators.hpp"
 #include "gensimcell_impl.hpp"
+#include "gensimcell_transfer_policy.hpp"
 
 
 /*!
@@ -54,6 +55,17 @@ namespace gensimcell {
 
 /*!
 Generic simulation cell that stores arbitrary simulation variables.
+
+Transfer policy decides how generic cells of that type will transfer
+variable data between processes. gensimcell::Optional_Transfer allows
+to switch on and off transfer of variable data in individual cells.
+gensimcell::Always_Transfer makes cells of that type always transfer
+all of their variables' data. gensimcell::Never_Transfer never
+transfers any variables' data between processes. The latter two
+policies can be used to create cells with smaller memory footprint,
+cells using gensimcell::Optional_Transfer as a transfer policy
+store in memory one boolean before or after each variables' data.
+See below for details on switching transfers on and off.
 
 Simulation variables are classes given as template arguments.
 Each variables must define its type as data_type which will
@@ -102,25 +114,26 @@ be switched with the set_transfer() and set_transfer_all()
 methods. The latter switches the transfer of variables given to
 the method on or off in all instances of that cell, the former
 affects only the current cell. When the value set by
-set_transfer_all() is determined, either true of false, all cells
+set_transfer_all() is equal to true of false, all cells
 will behave identically regardless of the value set by
 set_transfer(). To get individual cell behavior for a variable
 set the transfer info using set_transfer_all() to an
 undeterminate value for the specific variables.
-For complete examples check the files in the following directories
+For complete examples see the files in the following directories
 in the git repository:
 examples/game_of_life/parallel/
 examples/advection/parallel/
 examples/particle_propagation/parallel/
 examples/combined/
 
-For the full API check the comments in the
+For the full API see the comments in the
 source/gensimcell_impl.hpp file.
 */
 template <
+	template<class> class Transfer_Policy,
 	class... Variables
 > class Cell :
-	public detail::Cell_impl<sizeof...(Variables), Variables...>
+	public detail::Cell_impl<Transfer_Policy, sizeof...(Variables), Variables...>
 {
 public:
 	/*!
@@ -142,7 +155,11 @@ public:
 	cell2[GoL_Variables2()][Is_Alive()] = true;
 	@endcode
 	*/
-	using data_type = detail::Cell_impl<sizeof...(Variables), Variables...>;
+	using data_type = detail::Cell_impl<
+		Transfer_Policy,
+		sizeof...(Variables),
+		Variables...
+	>;
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
@@ -162,6 +179,7 @@ public:
 	> get_mpi_datatype() const
 	{
 		return detail::Cell_impl<
+			Transfer_Policy,
 			sizeof...(Variables),
 			Variables...
 		>::get_mpi_datatype();

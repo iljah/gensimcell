@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace combined {
 
 using Cell = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	gol::Is_Alive,
 	gol::Live_Neighbors,
 	advection::Density,

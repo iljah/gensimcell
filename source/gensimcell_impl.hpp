@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace gensimcell {
 namespace detail {
 
-
 /*!
 Generic version of the implementation that doesn't do anything.
 
@@ -60,6 +59,7 @@ See the version that stops the iteration
 over Variables for documentation.
 */
 template <
+	template<class> class Transfer_Policy,
 	size_t number_of_variables,
 	class... Variables
 > class Cell_impl {};
@@ -71,37 +71,23 @@ Starts or continues the iteration over variables.
 See the version that stops the iteration for documentation.
 */
 template <
+	template<class> class Transfer_Policy,
 	size_t number_of_variables,
 	class Current_Variable,
 	class... Rest_Of_Variables
 > class Cell_impl<
+	Transfer_Policy,
 	number_of_variables,
 	Current_Variable,
 	Rest_Of_Variables...
 > :
-	public Cell_impl<number_of_variables, Rest_Of_Variables...>
+	public Cell_impl<Transfer_Policy, number_of_variables, Rest_Of_Variables...>,
+	public Transfer_Policy<Current_Variable>
 {
 
 private:
 
-
 	typename Current_Variable::data_type data;
-
-
-	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
-
-	/*!
-	Whether each instance tranfers
-	this variable or not using MPI
-	*/
-	static boost::logic::tribool transfer_all;
-	/*!
-	Whether this instance sends this variable
-	if transfer_all is indeterminite
-	*/
-	bool transfer = false;
-
-	#endif // ifdef MPI_VERSION
 
 
 protected:
@@ -109,22 +95,26 @@ protected:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-	//! Sets global transfer info of given variable
-	static void set_transfer_all_impl(
-		const boost::logic::tribool given_transfer,
-		const Current_Variable&
-	) {
-		transfer_all = given_transfer;
-	}
+	using Transfer_Policy<Current_Variable>::set_transfer_all_impl;
+	using Transfer_Policy<Current_Variable>::set_transfer_impl;
 
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::set_transfer_all_impl;
 
-	//! Sets this cell instance's transfer info of given variable
-	void set_transfer_impl(
-		const bool given_transfer,
-		const Current_Variable&
-	) {
-		this->transfer = given_transfer;
-	}
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::set_transfer_impl;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::get_mpi_datatype_impl;
 
 
 	/*!
@@ -155,6 +145,7 @@ protected:
 		*/
 		nr_transferred
 			+= Cell_impl<
+				Transfer_Policy,
 				number_of_variables,
 				Rest_Of_Variables...
 			>::get_mpi_datatype_impl(
@@ -167,12 +158,13 @@ protected:
 		return nr_transferred;
 	}
 
-	#endif // ifdef MPI_VERSION
+	#endif // if defined MPI...
 
 
 	#define GENSIMCELL_COMMA ,
 	#define GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(NAME, OPERATOR) \
 	using Cell_impl< \
+		Transfer_Policy GENSIMCELL_COMMA \
 		number_of_variables GENSIMCELL_COMMA \
 		Rest_Of_Variables... \
 	>::NAME; \
@@ -198,7 +190,11 @@ public:
 	Make all public functions of the inherited implementation(s)
 	available also through the current iteration over user's variables.
 	*/
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::operator[];
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::operator[];
 
 
 	//! Returns a reference to the data of given variable.
@@ -223,6 +219,7 @@ public:
 		class... Operator_Variables \
 	> void NAME( \
 		const Cell_impl< \
+			Transfer_Policy GENSIMCELL_COMMA \
 			number_of_variables GENSIMCELL_COMMA \
 			Current_Variable GENSIMCELL_COMMA \
 			Rest_Of_Variables... \
@@ -235,6 +232,7 @@ public:
 		class... Rest_Op_Vars \
 	> void NAME( \
 		const Cell_impl< \
+			Transfer_Policy GENSIMCELL_COMMA \
 			number_of_variables GENSIMCELL_COMMA \
 			Current_Variable GENSIMCELL_COMMA \
 			Rest_Of_Variables... \
@@ -250,6 +248,7 @@ public:
 		class Last_Op_Var \
 	> void NAME( \
 		const Cell_impl< \
+			Transfer_Policy GENSIMCELL_COMMA \
 			number_of_variables GENSIMCELL_COMMA \
 			Current_Variable GENSIMCELL_COMMA \
 			Rest_Of_Variables... \
@@ -260,11 +259,13 @@ public:
 	} \
 	\
 	Cell_impl< \
+		Transfer_Policy GENSIMCELL_COMMA \
 		number_of_variables GENSIMCELL_COMMA \
 		Current_Variable GENSIMCELL_COMMA \
 		Rest_Of_Variables... \
 	>& operator OPERATOR ( \
 		const Cell_impl< \
+			Transfer_Policy GENSIMCELL_COMMA \
 			number_of_variables GENSIMCELL_COMMA \
 			Current_Variable GENSIMCELL_COMMA \
 			Rest_Of_Variables... \
@@ -316,6 +317,7 @@ public:
 	} \
 	\
 	Cell_impl< \
+		Transfer_Policy GENSIMCELL_COMMA \
 		number_of_variables GENSIMCELL_COMMA \
 		Current_Variable GENSIMCELL_COMMA \
 		Rest_Of_Variables... \
@@ -408,11 +410,39 @@ public:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_all_impl;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer_all;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::set_transfer_impl;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::get_transfer;
-	using Cell_impl<number_of_variables, Rest_Of_Variables...>::is_transferred;
+	using Transfer_Policy<Current_Variable>::get_transfer_all;
+	using Transfer_Policy<Current_Variable>::get_transfer;
+	using Transfer_Policy<Current_Variable>::is_transferred;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::set_transfer_all;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::get_transfer_all;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::set_transfer;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::get_transfer;
+
+	using Cell_impl<
+		Transfer_Policy,
+		number_of_variables,
+		Rest_Of_Variables...
+	>::is_transferred;
 
 
 	/*!
@@ -453,13 +483,6 @@ public:
 	}
 
 
-	//! Returns the value set by set_transfer_all() for given variable
-	static boost::logic::tribool get_transfer_all(const Current_Variable&)
-	{
-		return transfer_all;
-	}
-
-
 	//! same as set_transfer_all but for this cell instance
 	template<class... Given_Vars> void set_transfer(
 		const bool given_transfer,
@@ -485,33 +508,6 @@ public:
 		const Given_Var& var
 	) {
 		this->set_transfer_impl(given_transfer, var);
-	}
-
-
-	//! Returns the value set by set_transfer() for given variable
-	bool get_transfer(const Current_Variable&) const
-	{
-		return this->transfer;
-	}
-
-
-	/*!
-	Returns true if given variable will be added to the transfer
-	info returned by get_mpi_datatype() and false otherwise.
-	*/
-	bool is_transferred(const Current_Variable&) const
-	{
-		if (transfer_all) {
-			return true;
-		} else if (not transfer_all) {
-			return false;
-		} else {
-			if (this->transfer) {
-				return true;
-			} else {
-				return false;
-			}
-		}
 	}
 
 
@@ -593,20 +589,6 @@ public:
 	#endif // ifdef MPI_VERSION
 };
 
-#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
-
-template <
-	size_t number_of_variables,
-	class Current_Variable,
-	class... Rest_Of_Variables
-> boost::logic::tribool Cell_impl<
-	number_of_variables,
-	Current_Variable,
-	Rest_Of_Variables...
->::transfer_all = false;
-
-#endif // ifdef MPI_VERSION
-
 
 /*!
 Stops the iteration over variables given by the user.
@@ -614,28 +596,22 @@ Stops the iteration over variables given by the user.
 Operator () provides access to the user's data.
 */
 template <
+	template<class> class Transfer_Policy,
 	size_t number_of_variables,
 	class Variable
 > class Cell_impl<
+	Transfer_Policy,
 	number_of_variables,
 	Variable
-> {
+> :
+	public Transfer_Policy<Variable>
+{
 
 
 private:
 
 
 	typename Variable::data_type data;
-
-
-	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
-
-	//! See the variadic version of Cell_impl for documentation
-	static boost::logic::tribool transfer_all;
-	//! See the variadic version of Cell_impl for documentation
-	bool transfer = false;
-
-	#endif // ifdef MPI_VERSION
 
 
 
@@ -659,21 +635,8 @@ protected:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-	//! See the variadic version of Cell_impl for documentation
-	static void set_transfer_all_impl(
-		const boost::logic::tribool given_transfer,
-		const Variable&
-	) {
-		transfer_all = given_transfer;
-	}
-
-
-	//! See the variadic version of Cell_impl for documentation
-	void set_transfer_impl(const bool given_transfer, const Variable&)
-	{
-		this->transfer = given_transfer;
-	}
-
+	using Transfer_Policy<Variable>::set_transfer_all_impl;
+	using Transfer_Policy<Variable>::set_transfer_impl;
 
 	//! See the variadic version of Cell_impl for documentation
 	size_t get_mpi_datatype_impl(
@@ -717,10 +680,12 @@ public:
 
 	#define GENSIMCELL_MAKE_OPERATOR_LAST(NAME, OPERATOR) \
 	Cell_impl< \
+		Transfer_Policy GENSIMCELL_COMMA \
 		number_of_variables GENSIMCELL_COMMA \
 		Variable \
 	>& operator OPERATOR( \
 		const Cell_impl< \
+			Transfer_Policy GENSIMCELL_COMMA \
 			number_of_variables GENSIMCELL_COMMA \
 			Variable \
 		>& rhs \
@@ -739,6 +704,7 @@ public:
 
 	#define GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(NAME, OPERATOR, OTHER_TYPE) \
 	Cell_impl< \
+		Transfer_Policy GENSIMCELL_COMMA \
 		number_of_variables GENSIMCELL_COMMA \
 		Variable \
 	>& operator OPERATOR( \
@@ -827,6 +793,11 @@ public:
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
+	using Transfer_Policy<Variable>::get_transfer_all;
+	using Transfer_Policy<Variable>::get_transfer;
+	using Transfer_Policy<Variable>::is_transferred;
+
+
 	//! See the variadic version of Cell_impl for documentation
 	template<class... Given_Vars> static void set_transfer_all(
 		const boost::logic::tribool given_transfer,
@@ -856,13 +827,6 @@ public:
 
 
 	//! See the variadic version of Cell_impl for documentation
-	static boost::logic::tribool get_transfer_all(const Variable&)
-	{
-		return transfer_all;
-	}
-
-
-	//! See the variadic version of Cell_impl for documentation
 	template<class... Given_Vars> void set_transfer(
 		const bool given_transfer,
 		const Given_Vars&...
@@ -887,30 +851,6 @@ public:
 		const Given_Var& var
 	) {
 		this->set_transfer_impl(given_transfer, var);
-	}
-
-
-	//! See the variadic version of Cell_impl for documentation
-	bool get_transfer(const Variable&) const
-	{
-		return this->transfer;
-	}
-
-
-	//! See the variadic version of Cell_impl for documentation
-	bool is_transferred(const Variable&) const
-	{
-		if (transfer_all) {
-			return true;
-		} else if (not transfer_all) {
-			return false;
-		} else {
-			if (this->transfer) {
-				return true;
-			} else {
-				return false;
-			}
-		}
 	}
 
 
@@ -948,19 +888,6 @@ public:
 
 	#endif // ifdef MPI_VERSION
 };
-
-
-#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
-
-template <
-	size_t number_of_variables,
-	class Variable
-> boost::logic::tribool Cell_impl<
-	number_of_variables,
-	Variable
->::transfer_all = false;
-
-#endif // ifdef MPI_VERSION
 
 
 

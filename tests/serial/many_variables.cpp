@@ -60,6 +60,7 @@ using test_variable5 = test_variable4;
 int main(int, char**)
 {
 	gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable1,
 		test_variable2,
 		test_variable3
@@ -74,14 +75,17 @@ int main(int, char**)
 
 	tuple<
 		gensimcell::Cell<
+			gensimcell::Optional_Transfer,
 			test_variable1,
 			test_variable2
 		>,
 		gensimcell::Cell<
+			gensimcell::Optional_Transfer,
 			test_variable2,
 			test_variable3
 		>,
 		gensimcell::Cell<
+			gensimcell::Optional_Transfer,
 			test_variable1,
 			test_variable2,
 			test_variable3
@@ -103,6 +107,7 @@ int main(int, char**)
 	CHECK_TRUE(get<2>(cell_tuple)[test_variable3()] == '5')
 
 	gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable3,
 		test_variable4
 	> cell2;

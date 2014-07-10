@@ -55,6 +55,7 @@ struct Live_Neighbors
 };
 
 using Cell = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	Is_Alive,
 	Live_Neighbors
 >;

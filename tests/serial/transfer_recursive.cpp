@@ -43,24 +43,37 @@ struct test_variable1 {
 	using data_type = int;
 };
 
-using cell1_t = gensimcell::Cell<test_variable1>;
+using cell1_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
+	test_variable1
+>;
 
 
 struct test_variable2 {
-	using data_type = gensimcell::Cell<test_variable1>;
+	using data_type = gensimcell::Cell<
+		gensimcell::Optional_Transfer,
+		test_variable1
+	>;
 };
 
-using cell2_t = gensimcell::Cell<test_variable2>;
+using cell2_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
+	test_variable2
+>;
 
 
 struct test_variable3 {
 	using data_type = cell1_t;
 };
 
-using cell3_t = gensimcell::Cell<test_variable3>;
+using cell3_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
+	test_variable3
+>;
 
 
 using cell4_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable1,
 	test_variable2,
 	test_variable3

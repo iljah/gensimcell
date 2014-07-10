@@ -56,10 +56,17 @@ struct Live_Neighbors
 
 struct GoL_Variables
 {
-	using data_type = gensimcell::Cell<Is_Alive, Live_Neighbors>;
+	using data_type = gensimcell::Cell<
+		gensimcell::Optional_Transfer,
+		Is_Alive,
+		Live_Neighbors
+	>;
 };
 
-using Cell = gensimcell::Cell<GoL_Variables>;
+using Cell = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
+	GoL_Variables
+>;
 
 } // namespace
 

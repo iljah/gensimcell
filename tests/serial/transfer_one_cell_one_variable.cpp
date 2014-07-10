@@ -41,7 +41,7 @@ struct test_variable1 {
 	using data_type = int;
 };
 
-using cell1_t = gensimcell::Cell<test_variable1>;
+using cell1_t = gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>;
 
 
 int main(int, char**)

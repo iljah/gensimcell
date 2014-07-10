@@ -71,6 +71,7 @@ void transfer_c1(MPI_Comm comm, const int rank)
 	const test_variable2 v2;
 	const test_variable3 v3;
 	gensimcell::Cell<
+		gensimcell::Optional_Transfer,
 		test_variable1,
 		test_variable2,
 		test_variable3
@@ -290,6 +291,7 @@ void transfer_cN(MPI_Comm comm, const int rank)
 	const test_variable4 v4;
 	vector<
 		gensimcell::Cell<
+			gensimcell::Optional_Transfer,
 			test_variable1,
 			test_variable2,
 			test_variable3,

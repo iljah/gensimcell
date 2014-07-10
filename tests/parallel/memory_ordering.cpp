@@ -56,12 +56,14 @@ struct test_variable3 {
 };
 
 using cell123_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable1,
 	test_variable2,
 	test_variable3
 >;
 
 using cell321_t = gensimcell::Cell<
+	gensimcell::Optional_Transfer,
 	test_variable3,
 	test_variable2,
 	test_variable1

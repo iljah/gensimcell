@@ -43,8 +43,19 @@ struct test_variable {
 
 int main(int, char**)
 {
-	gensimcell::Cell<test_variable> cell;
-	cell[test_variable()] = 3;
+	gensimcell::Cell<gensimcell::Never_Transfer, test_variable> cell1;
+	cell1[test_variable()] = 3;
+
+
+	#ifdef HAVE_MPI
+
+	gensimcell::Cell<gensimcell::Always_Transfer, test_variable> cell2;
+	cell2[test_variable()] = 3;
+
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable> cell3;
+	cell3[test_variable()] = 3;
+
+	#endif // ifdef HAVE_MPI
 
 	return 0;
 }

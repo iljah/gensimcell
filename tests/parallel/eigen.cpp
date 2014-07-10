@@ -58,7 +58,7 @@ std::cerr \
 void transfer_c1_v1(MPI_Comm comm, const int rank)
 {
 	const test_variable1 v1;
-	gensimcell::Cell<test_variable1> c1_1;
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1> c1_1;
 
 	void* address = NULL;
 	int count = -1;
