@@ -79,6 +79,7 @@ int main(int, char**) {
 	)
 
 
+	#ifdef MPI_CXX_LONG_DOUBLE_COMPLEX
 	Eigen::Matrix<std::complex<long double>, 2, 4> d;
 	std::tie(address, count, datatype)
 		= gensimcell::detail::get_var_mpi_datatype(d);
@@ -87,6 +88,7 @@ int main(int, char**) {
 		and count == 8
 		and datatype == MPI_CXX_LONG_DOUBLE_COMPLEX
 	)
+	#endif
 
 
 	return EXIT_SUCCESS;
