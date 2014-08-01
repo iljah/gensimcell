@@ -48,6 +48,7 @@ int main(int, char**) {
 	MPI_Datatype datatype = MPI_DATATYPE_NULL;
 
 
+	#ifdef MPI_CXX_BOOL
 	bool b;
 	std::tie(address, count, datatype)
 		= gensimcell::detail::get_var_mpi_datatype(b);
@@ -56,6 +57,7 @@ int main(int, char**) {
 		and count == 1
 		and datatype == MPI_CXX_BOOL
 	)
+	#endif
 
 
 	char c;
@@ -78,6 +80,7 @@ int main(int, char**) {
 	)
 
 
+	#ifdef MPI_CXX_LONG_DOUBLE_COMPLEX
 	std::complex<long double> d;
 	std::tie(address, count, datatype)
 		= gensimcell::detail::get_var_mpi_datatype(d);
@@ -86,6 +89,7 @@ int main(int, char**) {
 		and count == 1
 		and datatype == MPI_CXX_LONG_DOUBLE_COMPLEX
 	)
+	#endif
 
 
 	std::array<char, 5> e;
@@ -98,6 +102,7 @@ int main(int, char**) {
 	)
 
 
+	#ifdef MPI_CXX_DOUBLE_COMPLEX
 	std::array<std::complex<double>, 3> f;
 	std::tie(address, count, datatype)
 		= gensimcell::detail::get_var_mpi_datatype(f);
@@ -106,6 +111,7 @@ int main(int, char**) {
 		and count == 3
 		and datatype == MPI_CXX_DOUBLE_COMPLEX
 	)
+	#endif
 
 
 	return EXIT_SUCCESS;
