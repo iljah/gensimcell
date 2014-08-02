@@ -550,7 +550,7 @@ public:
 				datatypes[0]
 			);
 
-		} else if (nr_vars_to_transfer <= std::numeric_limits<int>::max()) {
+		} else if (nr_vars_to_transfer <= size_t(std::numeric_limits<int>::max())) {
 
 			// get displacements of variables to transfer
 			std::array<MPI_Aint, number_of_variables> displacements;
