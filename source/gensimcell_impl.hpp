@@ -573,6 +573,18 @@ public:
 				return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 			}
 
+			// free user-defined component datatypes
+			for (size_t i = 0; i < nr_vars_to_transfer; i++) {
+				if (datatypes[i] == MPI_DATATYPE_NULL) {
+					continue;
+				}
+				int combiner = -1, tmp1 = -1, tmp2 = -1, tmp3 = -1;
+				MPI_Type_get_envelope(datatypes[i], &tmp1, &tmp2, &tmp3, &combiner);
+				if (combiner != MPI_COMBINER_NAMED) {
+					MPI_Type_free(&datatypes[i]);
+				}
+			}
+
 			return std::make_tuple(addresses[0], 1, final_datatype);
 
 		} else {
