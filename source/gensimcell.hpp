@@ -189,7 +189,111 @@ public:
 };
 
 
-} // namespace
+namespace detail {
+
+//! get_last::type is equal to last given template parameter
+template<class... T> struct get_last;
+
+template<class T, class... U> struct get_last<T, U...> {
+	using type = typename get_last<U...>::type;
+};
+
+template<class T> struct get_last<T> {
+	using type = T;
+};
+
+} // namespace detail
+
+
+/*!
+Class for passing variables to functions which call gensimcell::get().
+
+Does nothing.
+*/
+template<class... T> struct Variables {};
+
+
+/*!
+Returns a (const) reference to data stored recursively in Variables.
+
+Helper function for accessing variables nested in several layers
+of generic simulation cells.
+
+Calls [] operator of given cell with first variable, calls []
+of type returned by first [] with second variable, etc. The call
+get(c, v1, v2, v3) is equal to c[v1][v2][v3].
+
+Example:
+@code
+struct var1 {using data_type = int};
+struct var2 {using data_type = gensimcell::Cell<..., var1>};
+gensimcell::Cell<..., var2> cell;
+gensimcell::get(cell, var2(), var1()) = 3;
+@endcode
+*/
+template<class Cell, class... Variables> void get(
+	const Cell&,
+	const Variables&...
+) {}
+
+
+//! Starts/continues recursion over variables
+template<
+	class Cell_T,
+	class First_Variable,
+	class... Rest_Of_Variables
+> const typename detail::get_last<
+	First_Variable,
+	Rest_Of_Variables...
+>::type::data_type& get(
+	const Cell_T& cell,
+	const First_Variable& first_variable,
+	const Rest_Of_Variables&... rest_of_variables
+) {
+	return get(cell[first_variable], rest_of_variables...);
+}
+
+//! Non-const version of recursion over variables
+template<
+	class Cell_T,
+	class First_Variable,
+	class... Rest_Of_Variables
+> typename detail::get_last<
+	First_Variable,
+	Rest_Of_Variables...
+>::type::data_type& get(
+	Cell_T& cell,
+	const First_Variable& first_variable,
+	const Rest_Of_Variables&... rest_of_variables
+) {
+	return get(cell[first_variable], rest_of_variables...);
+}
+
+
+//! Stops recursion over variables
+template<
+	class Cell_T,
+	class Last_Variable
+> const typename Last_Variable::data_type& get(
+	const Cell_T& cell,
+	const Last_Variable& variable
+) {
+	return cell[variable];
+}
+
+//! Non-const version of stopping recursion
+template<
+	class Cell_T,
+	class Last_Variable
+> typename Last_Variable::data_type& get(
+	Cell_T& cell,
+	const Last_Variable& variable
+) {
+	return cell[variable];
+}
+
+
+} // namespace gensimcell
 
 
 #endif // ifndef GENSIMCELL_HPP
