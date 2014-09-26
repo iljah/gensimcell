@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
 	int count = -1;
 	MPI_Datatype datatype = MPI_DATATYPE_NULL;
 
-	const test_variable1 v1;
-	const test_variable2 v2;
-	const test_variable3 v3;
+	const test_variable1 v1{};
+	const test_variable2 v2{};
+	const test_variable3 v3{};
 
 	vector<char> recv_buffer;
 	int sizeof_datatype;

@@ -80,9 +80,9 @@ using cell_optional_t = gensimcell::Cell<
 
 int main(int, char**)
 {
-	const test_variable1 v1;
-	const test_variable2 v2;
-	const test_variable3 v3;
+	const test_variable1 v1{};
+	const test_variable2 v2{};
+	const test_variable3 v3{};
 
 	cell_never_t never;
 	char

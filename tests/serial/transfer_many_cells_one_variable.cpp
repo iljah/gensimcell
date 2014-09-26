@@ -47,7 +47,7 @@ using cell1_t = gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>;
 
 int main(int, char**)
 {
-	const test_variable1 v1;
+	const test_variable1 v1{};
 	cell1_t c1_1, c1_2, c1_3;
 
 	// check default properties
