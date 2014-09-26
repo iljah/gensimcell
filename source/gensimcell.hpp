@@ -206,14 +206,6 @@ template<class T> struct get_last<T> {
 
 
 /*!
-Class for passing variables to functions which call gensimcell::get().
-
-Does nothing.
-*/
-template<class... T> struct Variables {};
-
-
-/*!
 Returns a (const) reference to data stored recursively in Variables.
 
 Helper function for accessing variables nested in several layers
