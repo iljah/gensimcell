@@ -1,4 +1,4 @@
-include makefiles/macosx_macports
+include makefiles/homedir
 
 CPPFLAGS += \
   -I source \

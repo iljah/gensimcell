@@ -1,0 +1,28 @@
+# GCC
+CXX = c++
+
+# ICC
+#CXX = icc \
+#  -gxx-name=/opt/local/bin/g++-mp-4.8 \
+#  -no-use-clang-env \
+#  -I /opt/local/include/gcc48/c++/x86_64-apple-darwin13 \
+#  -I /opt/local/include/gcc48/c++ \
+#  -L /opt/local/lib/gcc48
+
+# Clang
+#CXX = /opt/local/bin/clang++-mp-3.4
+
+RUN =
+
+MPICXX = mpic++
+MPIRUN = mpirun -n 2
+
+BOOST_CPPFLAGS = -I $(HOME)/include
+
+DCCRG_CPPFLAGS = -I $(HOME)/libraries/dccrg
+
+ZOLTAN_CPPFLAGS = -I $(HOME)/include
+ZOLTAN_LDFLAGS = -L $(HOME)/lib
+ZOLTAN_LIBS = -lzoltan
+
+EIGEN_CPPFLAGS = -I $(HOME)/libraries/eigen
