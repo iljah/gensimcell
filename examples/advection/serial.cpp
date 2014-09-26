@@ -103,16 +103,16 @@ array<double, 2> get_cell_center(
 		index[1] >= grid.size()
 		or index[0] >= grid[index[1]].size()
 	) {
-		return {
+		return {{
 			std::numeric_limits<double>::quiet_NaN(),
 			std::numeric_limits<double>::quiet_NaN()
-		};
+		}};
 	}
 
-	return {
+	return {{
 		-1.0 + (0.5 + index[0]) * 2.0 / grid[index[1]].size(),
 		-1.0 + (0.5 + index[1]) * 2.0 / grid.size()
-	};
+	}};
 }
 
 
@@ -128,16 +128,16 @@ array<double, 2> get_cell_size(
 		index[1] >= grid.size()
 		or index[0] >= grid[index[1]].size()
 	) {
-		return {
+		return {{
 			std::numeric_limits<double>::quiet_NaN(),
 			std::numeric_limits<double>::quiet_NaN()
-		};
+		}};
 	}
 
-	return {
+	return {{
 		2.0 / grid.size(),
 		2.0 / grid[index[1]].size()
-	};
+	}};
 }
 
 
@@ -154,7 +154,7 @@ void initialize(Grid_T& grid)
 	for (size_t row_i = 0; row_i < grid.size(); row_i++)
 	for (size_t cell_i = 0; cell_i < grid[row_i].size(); cell_i++) {
 
-		const array<double, 2> center = get_cell_center(grid, {cell_i, row_i});
+		const array<double, 2> center = get_cell_center(grid, {{cell_i, row_i}});
 		const double r = sqrt(pow(center[0] + 0.45, 2) + pow(center[1], 2));
 
 		auto& cell = grid[row_i][cell_i];
@@ -182,10 +182,10 @@ void initialize(Grid_T& grid)
 		/*
 		Initialize velocity
 		*/
-		cell[Velocity()] = {
+		cell[Velocity()] = {{
 			+2 * center[1],
 			-2 * center[0]
-		};
+		}};
 	}
 }
 
@@ -201,7 +201,7 @@ double get_max_time_step(const Grid_T& grid)
 	for (size_t x_i = 0; x_i < grid[y_i].size(); x_i++) {
 
 		const array<double, 2>
-			cell_size = get_cell_size(grid, {x_i, y_i}),
+			cell_size = get_cell_size(grid, {{x_i, y_i}}),
 			vel = grid[x_i][y_i][Velocity()];
 
 		ret_val =
@@ -242,7 +242,7 @@ void solve(Grid_T& grid, const double dt)
 
 		const double density = cell[Density()];
 		const array<double, 2>
-			cell_size = get_cell_size(grid, {x_i, y_i}),
+			cell_size = get_cell_size(grid, {{x_i, y_i}}),
 			velocity = cell[Velocity()];
 
 		const double

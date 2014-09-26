@@ -153,16 +153,16 @@ array<double, 2> get_cell_center(
 		index[1] >= grid.size()
 		or index[0] >= grid[index[1]].size()
 	) {
-		return {
+		return {{
 			std::numeric_limits<double>::quiet_NaN(),
 			std::numeric_limits<double>::quiet_NaN()
-		};
+		}};
 	}
 
-	return {
+	return {{
 		-1.0 + (0.5 + index[0]) * 2.0 / grid[index[1]].size(),
 		-1.0 + (0.5 + index[1]) * 2.0 / grid.size()
-	};
+	}};
 }
 
 
@@ -178,16 +178,16 @@ array<double, 2> get_cell_size(
 		index[1] >= grid.size()
 		or index[0] >= grid[index[1]].size()
 	) {
-		return {
+		return {{
 			std::numeric_limits<double>::quiet_NaN(),
 			std::numeric_limits<double>::quiet_NaN()
-		};
+		}};
 	}
 
-	return {
+	return {{
 		2.0 / grid.size(),
 		2.0 / grid[index[1]].size()
-	};
+	}};
 }
 
 
@@ -200,8 +200,8 @@ void initialize(Grid_T& grid)
 	for (size_t cell_i = 0; cell_i < width; cell_i++) {
 
 		const auto
-			cell_center = get_cell_center(grid, {cell_i, row_i}),
-			cell_size = get_cell_size(grid, {cell_i, row_i});
+			cell_center = get_cell_center(grid, {{cell_i, row_i}}),
+			cell_size = get_cell_size(grid, {{cell_i, row_i}});
 
 		auto& cell = grid[row_i][cell_i];
 		cell[Velocity()][0] = -2 * cell_center[1];
@@ -217,18 +217,18 @@ void initialize(Grid_T& grid)
 			continue;
 		}
 
-		cell[Particles()].push_back({
+		cell[Particles()].push_back({{
 				cell_center[0] - cell_size[0] / 4,
 				cell_center[1] - cell_size[1] / 4
-		});
-		cell[Particles()].push_back({
+		}});
+		cell[Particles()].push_back({{
 				cell_center[0],
 				cell_center[1] + cell_size[1] / 4
-		});
-		cell[Particles()].push_back({
+		}});
+		cell[Particles()].push_back({{
 				cell_center[0] + cell_size[0] / 4,
 				cell_center[1] - cell_size[1] / 4
-		});
+		}});
 	}
 }
 
@@ -244,7 +244,7 @@ double get_max_time_step(const Grid_T& grid)
 	for (size_t x_i = 0; x_i < grid[y_i].size(); x_i++) {
 
 		const auto
-			cell_size = get_cell_size(grid, {x_i, y_i}),
+			cell_size = get_cell_size(grid, {{x_i, y_i}}),
 			vel = grid[x_i][y_i][Velocity()];
 
 		ret_val =
@@ -306,8 +306,8 @@ void apply_solution(Grid_T& grid)
 
 		auto& cell = grid[y_i][x_i];
 		const auto
-			cell_center = get_cell_center(grid, {x_i, y_i}),
-			cell_size = get_cell_size(grid, {x_i, y_i});
+			cell_center = get_cell_center(grid, {{x_i, y_i}}),
+			cell_size = get_cell_size(grid, {{x_i, y_i}});
 
 		// shorter notation for current coordinate list
 		vector<array<double, 2>>& coords = cell[Particles()];
@@ -348,7 +348,7 @@ void apply_solution(Grid_T& grid)
 
 				const auto neighbor_center = get_cell_center(
 					grid,
-					{neighbor_x, neighbor_y}
+					{{neighbor_x, neighbor_y}}
 				);
 
 				const double distance

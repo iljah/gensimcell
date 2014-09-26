@@ -125,21 +125,21 @@ struct External_Particle_Storage
 			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 		}
 
-		std::array<int, 2> counts{
+		std::array<int, 2> counts{{
 			int(3 * this->coordinates.size()),
 			int(1 * this->destinations.size())
-		};
+		}};
 
-		std::array<MPI_Aint, 2> displacements{
+		std::array<MPI_Aint, 2> displacements{{
 			0,
 			  reinterpret_cast<const char* const>(this->destinations.data())
 			- reinterpret_cast<const char* const>(this->coordinates.data())
-		};
+		}};
 
-		std::array<MPI_Datatype, 2> datatypes{
+		std::array<MPI_Datatype, 2> datatypes{{
 			MPI_DOUBLE,
 			MPI_UINT64_T
-		};
+		}};
 
 
 		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;

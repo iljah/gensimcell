@@ -84,9 +84,9 @@ int main(int, char**)
 
 
 	vector<gensimcell::Cell<gensimcell::Optional_Transfer, test_variable1>> cell_vector(3);
-	cell_vector[0][test_variable1()] = 100.1;
-	cell_vector[1][test_variable1()] = 200.3;
-	cell_vector[2][test_variable1()] = 300.6;
+	cell_vector[0][test_variable1()] = int(100.1);
+	cell_vector[1][test_variable1()] = int(200.3);
+	cell_vector[2][test_variable1()] = int(300.6);
 	CHECK_TRUE(cell_vector[0][test_variable1()] == 100)
 	CHECK_TRUE(cell_vector[1][test_variable1()] == 200)
 	CHECK_TRUE(cell_vector[2][test_variable1()] == 300)

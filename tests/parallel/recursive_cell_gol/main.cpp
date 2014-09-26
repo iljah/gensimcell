@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	dccrg::Dccrg<Cell, dccrg::Cartesian_Geometry> grid;
 
 	// initialize the grid
-	std::array<uint64_t, 3> grid_length = {20, 20, 1};
+	std::array<uint64_t, 3> grid_length = {{20, 20, 1}};
 	const unsigned int neighborhood_size = 1;
 	if (not grid.initialize(
 		grid_length,

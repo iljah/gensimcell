@@ -102,10 +102,10 @@ template<
 		/*
 		Initialize velocity
 		*/
-		cell_data[Velocity_T()] = {
+		cell_data[Velocity_T()] = {{
 			+2 * cell_center[1],
 			-2 * cell_center[0]
-		};
+		}};
 	}
 }
 

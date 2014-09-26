@@ -77,10 +77,10 @@ void reference_initialize(
 
 		cell_data->number_of_internal_particles =
 		cell_data->number_of_external_particles = 0;
-		cell_data->velocity = {
+		cell_data->velocity = {{
 			-2 * center[1],
 			+2 * center[0]
-		};
+		}};
 
 		if (
 			center[0] < particles_start[0]
@@ -92,21 +92,21 @@ void reference_initialize(
 		}
 
 		cell_data->number_of_internal_particles = 3;
-		cell_data->internal_coordinates.push_back({
+		cell_data->internal_coordinates.push_back({{
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
-		});
-		cell_data->internal_coordinates.push_back({
+		}});
+		cell_data->internal_coordinates.push_back({{
 				center[0],
 				center[1] + length[1] / 4,
 				center[2]
-		});
-		cell_data->internal_coordinates.push_back({
+		}});
+		cell_data->internal_coordinates.push_back({{
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
-		});
+		}});
 	}
 }
 

@@ -89,10 +89,10 @@ template<
 
 		(*cell_data)[Number_Of_Internal_Particles_T()] =
 		(*cell_data)[Number_Of_External_Particles_T()] = 0;
-		(*cell_data)[Velocity_T()] = {
+		(*cell_data)[Velocity_T()] = {{
 			-2 * center[1],
 			+2 * center[0]
-		};
+		}};
 
 		if (
 			center[0] < particles_start[0]
@@ -104,21 +104,21 @@ template<
 		}
 
 		(*cell_data)[Number_Of_Internal_Particles_T()] = 3;
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
-		});
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
+		}});
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
 				center[0],
 				center[1] + length[1] / 4,
 				center[2]
-		});
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({
+		}});
+		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
-		});
+		}});
 	}
 }
 

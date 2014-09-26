@@ -1,17 +1,8 @@
-# GCC
+# Makefile for the case when header-only dependencies
+# have been installed under $HOME/libraries/ and
+# compiled dependencies under $HOME/
+
 CXX = c++
-
-# ICC
-#CXX = icc \
-#  -gxx-name=/opt/local/bin/g++-mp-4.8 \
-#  -no-use-clang-env \
-#  -I /opt/local/include/gcc48/c++/x86_64-apple-darwin13 \
-#  -I /opt/local/include/gcc48/c++ \
-#  -L /opt/local/lib/gcc48
-
-# Clang
-#CXX = /opt/local/bin/clang++-mp-3.4
-
 RUN =
 
 MPICXX = mpic++

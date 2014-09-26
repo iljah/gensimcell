@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
 			for (size_t x_i = 0; x_i < grid_width; x_i++) {
 
 				const auto cell_id
-					= mapping.get_cell_from_indices({x_i, y_i, 0}, 0);
+					= mapping.get_cell_from_indices({{x_i, y_i, 0}}, 0);
 
 				if (simulation_data.at(cell_id)) {
 					gnuplot_file << "1 ";

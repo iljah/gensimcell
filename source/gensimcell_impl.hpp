@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENSIMCELL_IMPL_HPP
 
 
+#include "array"
 #include "cstdlib"
 #include "limits"
 #include "vector"

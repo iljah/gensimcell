@@ -68,16 +68,16 @@ public:
 	{
 		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
 
-		std::array<int, 6> counts{0, 0, 0, 0, 0, 0};
-		std::array<MPI_Aint, 6> displacements{0, 0, 0, 0, 0, 0};
-		std::array<MPI_Datatype, 6> datatypes{
+		std::array<int, 6> counts{{0, 0, 0, 0, 0, 0}};
+		std::array<MPI_Aint, 6> displacements{{0, 0, 0, 0, 0, 0}};
+		std::array<MPI_Datatype, 6> datatypes{{
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL
-		};
+		}};
 
 		void* starting_address = 0;
 		size_t nr_vars_to_transfer = 0;
