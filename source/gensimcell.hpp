@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "operators.hpp"
+#include "type_support.hpp"
 #include "gensimcell_impl.hpp"
 #include "gensimcell_transfer_policy.hpp"
 

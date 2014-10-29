@@ -34,12 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENSIMCELL_OPERATORS_HPP
 
 
+#include "type_support.hpp"
+
+
 namespace gensimcell {
 
 
 #define GENSIMCELL_COMMA ,
 #define GENSIMCELL_MAKE_FREE_OPERATOR(FREE_OPERATOR, MEMBER_OPERATOR) \
-template <class Cell> Cell operator FREE_OPERATOR ( \
+template < \
+	class Cell \
+> typename std::enable_if< \
+	is_gensimcell<Cell>::value GENSIMCELL_COMMA \
+	Cell \
+>::type operator FREE_OPERATOR ( \
 	Cell lhs GENSIMCELL_COMMA \
 	const Cell& rhs \
 ) { \
@@ -58,7 +66,10 @@ GENSIMCELL_MAKE_FREE_OPERATOR(/, /=)
 #define GENSIMCELL_MAKE_FREE_OPERATOR_OTHER(FREE, MEMBER, OTHER_TYPE) \
 template < \
 	class Cell \
-> Cell operator FREE ( \
+> typename std::enable_if< \
+	is_gensimcell<Cell>::value GENSIMCELL_COMMA \
+	Cell \
+>::type operator FREE ( \
 	Cell lhs GENSIMCELL_COMMA \
 	const OTHER_TYPE& rhs \
 ) { \
