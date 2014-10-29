@@ -51,7 +51,10 @@ template <class... T> struct is_gensimcell : std::false_type {};
 
 //! std::true_type version of is_gensimcell.
 template <
-	template<template<class> class Transfer_Policy, class... Variables> class Cell,
+	template<
+		template<class> class Transfer_Policy,
+		class... Variables
+	> class Cell,
 	template<class> class Transfer_Policy,
 	class... Variables
 > struct is_gensimcell<Cell<Transfer_Policy, Variables...>> : std::true_type {};
