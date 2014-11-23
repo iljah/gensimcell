@@ -69,22 +69,22 @@ int main(int, char**)
 	run_time = run_test(prefix + "speed.exe"),
 	ref_run_time = run_test(prefix + "speed_reference.exe");
 	if (
-		fabs(run_time - ref_run_time)
+		run_time - ref_run_time
 		<= allowed_relative_difference * max(run_time, ref_run_time)
 	) {
 		return EXIT_SUCCESS;
 	}
 
-	cout << "Too large difference in speeds, trying again just in case" << endl;
+	cout << "Reference too fast, trying again just in case" << endl;
 	run_time = run_test(prefix + "speed.exe"),
 	ref_run_time = run_test(prefix + "speed_reference.exe");
 	if (
-		fabs(run_time - ref_run_time)
+		run_time - ref_run_time
 		> allowed_relative_difference * max(run_time, ref_run_time)
 	) {
-		cout << "Speed difference too large: "
-			<< run_time << " s vs. " << ref_run_time
-			<< " s\nFAILED" << endl;
+		cout << "Reference game of life too fast (struct: "
+			<< ref_run_time << " s vs. gensimcell: " << run_time
+			<< " s)\nFAILED" << endl;
 		abort();
 	}
 
