@@ -35,14 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
-#include "boost/function_types/property_tags.hpp"
-#include "boost/mpl/vector.hpp"
-#include "boost/tti/has_member_function.hpp"
 #include "complex"
 #include "cstddef"
 #include "cstdint"
-#include "mpi.h"
 #include "tuple"
+#include "type_traits"
+
+#include "boost/function_types/property_tags.hpp"
+#include "boost/mpl/vector.hpp"
+#include "boost/tti/has_member_function.hpp"
+#include "mpi.h"
+
+#include "type_support.hpp"
 
 
 namespace gensimcell {
@@ -54,7 +58,7 @@ BOOST_TTI_HAS_MEMBER_FUNCTION(get_mpi_datatype)
 
 /*!
 Returns the mpi transfer info of given
-variable with a get_mpi_datatype function.
+variable with its get_mpi_datatype function.
 */
 template <
 	class Variable_T,
@@ -193,6 +197,101 @@ GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE(std::complex<long double>, MPI_CXX_LONG_DO
 #endif
 
 #undef GENSIMCELL_GET_ARRAY_VAR_MPI_DATATYPE
+
+
+
+/*!
+Returns transfer info for an array of generic simulation cells.
+
+Returns count == 0 if Number_Of_Cells == 0.
+Returns transfer info given by cell if Number_Of_Cells == 1.
+Returns a structured datatype if Number_Of_Cells > 1 omitting
+cells which return a count == 0.
+*/
+template <
+	class Cell,
+	std::size_t Number_Of_Cells
+> typename std::enable_if<
+	is_gensimcell<Cell>::value,
+	std::tuple<
+		void*,
+		int,
+		MPI_Datatype
+	>
+>::type get_var_mpi_datatype(
+	const std::array<
+		Cell,
+		Number_Of_Cells
+	>& variables
+) {
+	if (Number_Of_Cells == 0) {
+		return std::make_tuple(nullptr, 0, MPI_BYTE);
+	}
+
+	if (Number_Of_Cells == 1) {
+		return variables[0].get_mpi_datatype();
+	}
+
+
+	std::array<void*, Number_Of_Cells> addresses{{nullptr}};
+	std::array<int, Number_Of_Cells> counts{{0}};
+	std::array<MPI_Datatype, Number_Of_Cells> datatypes{{MPI_BYTE}};
+
+	// skip cells with nothing to transfer
+	size_t cells_to_transfer = 0;
+	for (size_t i = 0; i < Number_Of_Cells; i++) {
+		std::tie(
+			addresses[cells_to_transfer],
+			counts[cells_to_transfer],
+			datatypes[cells_to_transfer]
+		) = variables[i].get_mpi_datatype();
+
+		// assume 0 count means don't transfer
+		if (counts[cells_to_transfer] > 0) {
+			cells_to_transfer++;
+		}
+	}
+
+	if (cells_to_transfer == 0) {
+		return std::make_tuple(nullptr, 0, MPI_BYTE);
+	}
+
+
+	std::array<MPI_Aint, Number_Of_Cells> displacements{{0}};
+	for (size_t i = 0; i < cells_to_transfer; i++) {
+		displacements[i]
+			= static_cast<char*>(addresses[i])
+			- static_cast<char*>(addresses[0]);
+	}
+
+	MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
+	if (
+		MPI_Type_create_struct(
+			int(cells_to_transfer),
+			counts.data(),
+			displacements.data(),
+			datatypes.data(),
+			&final_datatype
+		) != MPI_SUCCESS
+	) {
+		return std::make_tuple(nullptr, -1, MPI_DATATYPE_NULL);
+	}
+
+	// free component datatypes
+	for (size_t i = 0; i < cells_to_transfer; i++) {
+		if (datatypes[i] == MPI_DATATYPE_NULL) {
+			continue;
+		}
+		int combiner = -1, tmp1 = -1, tmp2 = -1, tmp3 = -1;
+		MPI_Type_get_envelope(datatypes[i], &tmp1, &tmp2, &tmp3, &combiner);
+		if (combiner != MPI_COMBINER_NAMED) {
+			MPI_Type_free(&datatypes[i]);
+		}
+	}
+
+	return std::make_tuple(addresses[0], 1, final_datatype);
+}
+
 
 
 #ifdef EIGEN_WORLD_VERSION
