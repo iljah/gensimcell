@@ -7,7 +7,7 @@ CPPFLAGS += \
   -I examples/advection/parallel \
   -I examples/particle_propagation/parallel
 
-CXXFLAGS += -std=c++0x -W -Wall -Wextra -pedantic -O3
+CXXFLAGS += -std=c++0x -W -Wall -Wextra -pedantic -O3 -march=native -mtune=native
 
 HEADERS = \
   examples/advection/parallel/advection_initialize.hpp \
