@@ -53,6 +53,15 @@ struct test_variable3 {
 	using data_type = char;
 };
 
+using cell_t = gensimcell::Cell<
+	gensimcell::Always_Transfer,
+	test_variable1
+>;
+
+struct test_variable4 {
+	using data_type = std::array<cell_t, 2>;
+};
+
 
 int main(int, char**)
 {
@@ -90,6 +99,11 @@ int main(int, char**)
 	CHECK_TRUE(cell_vector[0][test_variable1()] == 100)
 	CHECK_TRUE(cell_vector[1][test_variable1()] == 200)
 	CHECK_TRUE(cell_vector[2][test_variable1()] == 300)
+
+
+	gensimcell::Cell<gensimcell::Optional_Transfer, test_variable4> array_cell;
+	array_cell[test_variable4()][1][test_variable1()] = 4;
+	CHECK_TRUE(array_cell[test_variable4()][1][test_variable1()] == 4)
 
 
 	return EXIT_SUCCESS;
