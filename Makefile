@@ -99,6 +99,7 @@ EXECUTABLES = \
   examples/particle_propagation/serial.exe
 
 MPI_EXECS = \
+  examples/game_of_life/parallel/no_dccrg.mexe \
   tests/compile/enable_if.mexe \
   tests/compile/get_var_mpi_datatype_included.mexe \
   tests/compile/cell_included.mexe \
