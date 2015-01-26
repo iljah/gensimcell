@@ -1,7 +1,7 @@
 /*
 Saves results of parallel reference particle propagator.
 
-Copyright 2014 Ilja Honkonen
+Copyright 2014, 2015 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
