@@ -116,6 +116,7 @@ MPI_EXECS = \
   tests/serial/transfer_many_cells_many_variables.mexe \
   tests/serial/transfer_recursive.mexe \
   tests/parallel/one_variable.mexe \
+  tests/parallel/one_variable_multicontainer.mexe \
   tests/parallel/many_variables.mexe \
   tests/parallel/memory_ordering.mexe \
   tests/parallel/memory_layout.mexe \
@@ -164,6 +165,7 @@ TESTS = \
   tests/serial/operators/div.tst \
   tests/serial/game_of_life/main.tst \
   tests/parallel/one_variable.mtst \
+  tests/parallel/one_variable_multicontainer.mtst \
   tests/parallel/many_variables.mtst \
   tests/parallel/memory_ordering.mtst \
   tests/parallel/memory_layout.mtst \
