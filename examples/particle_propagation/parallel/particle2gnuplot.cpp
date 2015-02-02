@@ -267,11 +267,11 @@ int main(int argc, char* argv[])
 				continue;
 			}
 
-			for (const auto& coordinate: cell_data[Internal_Particles()].coordinates) {
+			for (const auto& particle: cell_data[Internal_Particles()]) {
 				total_particles++;
 				gnuplot_file
-					<< coordinate[0] << " "
-					<< coordinate[1] << " "
+					<< particle[0] << " "
+					<< particle[1] << " "
 					<< cell_id << "\n";
 			}
 		}
