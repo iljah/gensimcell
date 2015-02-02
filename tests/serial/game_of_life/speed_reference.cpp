@@ -40,7 +40,7 @@ using namespace std::chrono;
 
 struct cell_t
 {
-	// same layout as in generic cell version
+	// same layout as in generic cell version (with GCC)
 	int live_neighbors = 0;
 	bool is_alive = false;
 };
