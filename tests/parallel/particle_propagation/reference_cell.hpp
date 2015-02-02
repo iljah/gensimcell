@@ -41,9 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace particle {
 
-class Reference_Cell
+struct Reference_Cell
 {
-public:
 	enum transfer_types {
 		nr_of_int_particles = (1 << 0),
 		nr_of_ext_particles = (1 << 1),
@@ -54,10 +53,18 @@ public:
 
 	static int transfers;
 
-	std::vector<uint64_t> destinations;
-	std::vector<std::array<double, 3>> external_coordinates, internal_coordinates;
+	unsigned long long int
+		number_of_internal_particles,
+		number_of_external_particles;
+
 	std::array<double, 2> velocity;
-	unsigned long int number_of_external_particles, number_of_internal_particles;
+	std::vector<std::array<double, 3>> internal_particles;
+	std::vector<
+		std::pair<
+			std::array<double, 3>,
+			unsigned long long int
+		>
+	> external_particles;
 
 	// returns transfer info for each variable with bit set in transfers
 	std::tuple<
@@ -68,10 +75,9 @@ public:
 	{
 		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
 
-		std::array<int, 6> counts{{0, 0, 0, 0, 0, 0}};
-		std::array<MPI_Aint, 6> displacements{{0, 0, 0, 0, 0, 0}};
-		std::array<MPI_Datatype, 6> datatypes{{
-			MPI_DATATYPE_NULL,
+		std::array<int, 5> counts{{0, 0, 0, 0, 0}};
+		std::array<MPI_Aint, 5> displacements{{0, 0, 0, 0, 0}};
+		std::array<MPI_Datatype, 5> datatypes{{
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
 			MPI_DATATYPE_NULL,
@@ -86,11 +92,12 @@ public:
 			if (nr_vars_to_transfer == 0) {
 				starting_address = (void*) &(this->number_of_internal_particles);
 			}
+
 			counts[nr_vars_to_transfer] = 1;
 			displacements[nr_vars_to_transfer]
 				= reinterpret_cast<const char* const>(&(this->number_of_internal_particles))
 				- reinterpret_cast<const char* const>(starting_address);
-			datatypes[nr_vars_to_transfer] = MPI_UNSIGNED_LONG;
+			datatypes[nr_vars_to_transfer] = MPI_UNSIGNED_LONG_LONG;
 			nr_vars_to_transfer++;
 		}
 
@@ -98,11 +105,12 @@ public:
 			if (nr_vars_to_transfer == 0) {
 				starting_address = (void*) &(this->number_of_external_particles);
 			}
+
 			counts[nr_vars_to_transfer] = 1;
 			displacements[nr_vars_to_transfer]
 				= reinterpret_cast<const char* const>(&(this->number_of_external_particles))
 				- reinterpret_cast<const char* const>(starting_address);
-			datatypes[nr_vars_to_transfer] = MPI_UNSIGNED_LONG;
+			datatypes[nr_vars_to_transfer] = MPI_UNSIGNED_LONG_LONG;
 			nr_vars_to_transfer++;
 		}
 
@@ -110,6 +118,7 @@ public:
 			if (nr_vars_to_transfer == 0) {
 				starting_address = (void*) this->velocity.data();
 			}
+
 			counts[nr_vars_to_transfer] = 2;
 			displacements[nr_vars_to_transfer]
 				= reinterpret_cast<const char* const>(this->velocity.data())
@@ -120,32 +129,79 @@ public:
 
 		if ((transfers & transfer_types::int_particles) > 0) {
 			if (nr_vars_to_transfer == 0) {
-				starting_address = (void*) this->internal_coordinates.data();
+				starting_address = (void*) this->internal_particles.data();
 			}
-			counts[nr_vars_to_transfer] = 3 * this->internal_coordinates.size();
+
+			if (this->internal_particles.size() == 0) {
+
+				counts[nr_vars_to_transfer] = 0;
+				datatypes[nr_vars_to_transfer] = MPI_BYTE;
+
+			} else {
+
+				counts[nr_vars_to_transfer] = 3 * this->internal_particles.size();
+				datatypes[nr_vars_to_transfer] = MPI_DOUBLE;
+			}
+
 			displacements[nr_vars_to_transfer]
-				= reinterpret_cast<const char* const>(this->internal_coordinates.data())
+				= reinterpret_cast<const char* const>(this->internal_particles.data())
 				- reinterpret_cast<const char* const>(starting_address);
-			datatypes[nr_vars_to_transfer] = MPI_DOUBLE;
 			nr_vars_to_transfer++;
 		}
 
 		if ((transfers & transfer_types::ext_particles) > 0) {
 			if (nr_vars_to_transfer == 0) {
-				starting_address = (void*) this->external_coordinates.data();
+				starting_address = (void*) this->external_particles.data();
 			}
-			counts[nr_vars_to_transfer] = 3 * this->external_coordinates.size();
-			displacements[nr_vars_to_transfer]
-				= reinterpret_cast<const char* const>(this->external_coordinates.data())
-				- reinterpret_cast<const char* const>(starting_address);
-			datatypes[nr_vars_to_transfer] = MPI_DOUBLE;
-			nr_vars_to_transfer++;
 
-			counts[nr_vars_to_transfer] = this->destinations.size();
+			if (this->external_particles.size() == 0) {
+
+				counts[nr_vars_to_transfer] = 0;
+				datatypes[nr_vars_to_transfer] = MPI_BYTE;
+
+			} else {
+
+				std::vector<int> temp_counts;
+				std::vector<MPI_Aint> temp_displacements;
+				std::vector<MPI_Datatype> temp_datatypes;
+
+				for (const auto& ext_particle: this->external_particles) {
+					temp_counts.push_back(3);
+					temp_displacements.push_back(
+						reinterpret_cast<const char* const>(&ext_particle.first[0])
+						- reinterpret_cast<const char* const>(this->external_particles.data())
+					);
+					temp_datatypes.push_back(MPI_DOUBLE);
+
+					temp_counts.push_back(1);
+					temp_displacements.push_back(
+						reinterpret_cast<const char* const>(&ext_particle.second)
+						- reinterpret_cast<const char* const>(this->external_particles.data())
+					);
+					temp_datatypes.push_back(MPI_UNSIGNED_LONG_LONG);
+				}
+
+				MPI_Datatype ext_particles_type;
+				if (
+					MPI_Type_create_struct(
+						int(temp_counts.size()),
+						temp_counts.data(),
+						temp_displacements.data(),
+						temp_datatypes.data(),
+						&ext_particles_type
+					) != MPI_SUCCESS
+				) {
+					std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+					abort();
+				}
+
+				counts[nr_vars_to_transfer] = 1;
+				datatypes[nr_vars_to_transfer] = ext_particles_type;
+			}
+
 			displacements[nr_vars_to_transfer]
-				= reinterpret_cast<const char* const>(this->destinations.data())
+				= reinterpret_cast<const char* const>(this->external_particles.data())
 				- reinterpret_cast<const char* const>(starting_address);
-			datatypes[nr_vars_to_transfer] = MPI_UINT64_T;
 			nr_vars_to_transfer++;
 		}
 
@@ -161,18 +217,23 @@ public:
 			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 		}
 
+		// maybe free component types
+		for (auto& datatype: datatypes) {
+			if (datatype == MPI_DATATYPE_NULL) {
+				continue;
+			}
+			int combiner = -1, tmp1 = -1, tmp2 = -1, tmp3 = -1;
+			MPI_Type_get_envelope(datatype, &tmp1, &tmp2, &tmp3, &combiner);
+			if (combiner != MPI_COMBINER_NAMED) {
+				MPI_Type_free(&datatype);
+			}
+		}
+
 		return std::make_tuple(
 			(void*) starting_address,
 			1,
 			final_datatype
 		);
-	}
-
-	// resizes internal storage to fit new_size particles
-	void resize(const size_t new_size)
-	{
-		this->external_coordinates.resize(new_size);
-		this->destinations.resize(new_size);
 	}
 };
 

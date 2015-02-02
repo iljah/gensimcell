@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "array"
 #include "cstdlib"
 #include "iostream"
+#include "tuple"
+
 #include "mpi.h"
 
 #include "check_true.hpp"

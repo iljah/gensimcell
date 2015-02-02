@@ -74,14 +74,14 @@ template<
 	}
 
 
-	const std::vector<uint64_t> cell_ids = grid.get_cells();
+	const auto cell_ids = grid.get_cells();
 	for (auto cell_id: cell_ids) {
 
 		const auto
 			center = grid.geometry.get_center(cell_id),
 			length = grid.geometry.get_length(cell_id);
 
-		Cell_T* cell_data = grid[cell_id];
+		auto* const cell_data = grid[cell_id];
 		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
@@ -103,22 +103,24 @@ template<
 			continue;
 		}
 
-		(*cell_data)[Number_Of_Internal_Particles_T()] = 3;
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
+		(*cell_data)[Internal_Particles_T()].push_back({{
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
 		}});
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
+		(*cell_data)[Internal_Particles_T()].push_back({{
 				center[0],
 				center[1] + length[1] / 4,
 				center[2]
 		}});
-		(*cell_data)[Internal_Particles_T()].coordinates.push_back({{
+		(*cell_data)[Internal_Particles_T()].push_back({{
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
 		}});
+
+		(*cell_data)[Number_Of_Internal_Particles_T()]
+			= (*cell_data)[Internal_Particles_T()].size();
 	}
 }
 

@@ -64,7 +64,7 @@ template<
 ) {
 	const auto remote_cells = grid.get_remote_cells_on_process_boundary();
 	for (auto cell_id: remote_cells) {
-		Cell_T* data = grid[cell_id];
+		auto* const data = grid[cell_id];
 		if (data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
@@ -106,29 +106,26 @@ template<
 			cell_min = grid.geometry.get_min(cell_id),
 			cell_max = grid.geometry.get_max(cell_id);
 
-		Cell_T* cell_data = grid[cell_id];
+		auto* const cell_data = grid[cell_id];
 		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
 
 		// shorthand notation
-		const auto& v = (*cell_data)[Velocity_T()];
-		auto
-			&int_coords = (*cell_data)[Internal_Particles_T()].coordinates,
-			&ext_coords = (*cell_data)[External_Particles_T()].coordinates;
-		auto& ext_destinations = (*cell_data)[External_Particles_T()].destinations;
+		const auto& vel = (*cell_data)[Velocity_T()];
+		auto& int_particles = (*cell_data)[Internal_Particles_T()];
 
-		for (size_t i = 0; i < int_coords.size(); i++) {
-			auto& coordinate = int_coords[i];
+		for (size_t i = 0; i < int_particles.size(); i++) {
+			auto& coordinate = int_particles[i];
 
-			coordinate[0] += v[0] * dt;
-			coordinate[1] += v[1] * dt;
+			coordinate[0] += vel[0] * dt;
+			coordinate[1] += vel[1] * dt;
 
 			// handle periodic grid
 			coordinate = grid.geometry.get_real_coordinate(coordinate);
 
-			// check if particle outside of current cell
+			// move to ext list if particle outside of current cell
 			if (
 				coordinate[0] < cell_min[0]
 				or coordinate[0] > cell_max[0]
@@ -168,25 +165,26 @@ template<
 				}
 
 				if (destination != dccrg::error_cell) {
-					ext_coords.push_back(coordinate);
-					ext_destinations.push_back(destination);
+					(*cell_data)[External_Particles_T()]
+						.emplace_back(coordinate, destination);
 
-					int_coords.erase(int_coords.begin() + i);
+					int_particles.erase(int_particles.begin() + i);
 					i--;
 				}
 			}
 		}
 
-		(*cell_data)[Number_Of_Internal_Particles_T()] = int_coords.size();
-		(*cell_data)[Number_Of_External_Particles_T()] = ext_coords.size();
+		(*cell_data)[Number_Of_Internal_Particles_T()] = int_particles.size();
+		(*cell_data)[Number_Of_External_Particles_T()]
+			= (*cell_data)[External_Particles_T()].size();
 
 		// check time step
 		const auto length = grid.geometry.get_length(cell_id);
 		max_time_step =
 			std::min(max_time_step,
 			std::min(
-				fabs(length[0] / v[0]),
-				fabs(length[1] / v[1])
+				fabs(length[0] / vel[0]),
+				fabs(length[1] / vel[1])
 			));
 	}
 
@@ -209,13 +207,13 @@ template<
 ) {
 	for (auto cell_id: cell_ids) {
 
-		Cell_T* cell_data = grid[cell_id];
+		auto* const cell_data = grid[cell_id];
 		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
 
-		auto& int_coords = (*cell_data)[Internal_Particles_T()].coordinates;
+		auto& int_particles = (*cell_data)[Internal_Particles_T()];
 
 		// assign some particles from neighbors' external list to this cell
 		const auto* const neighbors = grid.get_neighbors_of(cell_id);
@@ -229,25 +227,28 @@ template<
 				continue;
 			}
 
-			Cell_T* neighbor_data = grid[neighbor_id];
+			const auto* const neighbor_data = grid[neighbor_id];
 			if (neighbor_data == NULL) {
 				std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 				abort();
 			}
 
-			const auto& neigh_ext_coords
-				= (*neighbor_data)[External_Particles_T()].coordinates;
-			const auto& neigh_destinations
-				= (*neighbor_data)[External_Particles_T()].destinations;
+			const auto& neigh_ext_particles
+				= (*neighbor_data)[External_Particles_T()];
 
-			for (size_t i = 0; i < neigh_destinations.size(); i++) {
-				if (neigh_destinations[i] == cell_id) {
-					int_coords.push_back(neigh_ext_coords[i]);
+			for (const auto& neigh_ext_particle: neigh_ext_particles) {
+				if (neigh_ext_particle.second == dccrg::error_cell) {
+					std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+					abort();
+				}
+
+				if (neigh_ext_particle.second == cell_id) {
+					int_particles.emplace_back(neigh_ext_particle.first);
 				}
 			}
 		}
 
-		(*cell_data)[Number_Of_Internal_Particles_T()] = int_coords.size();
+		(*cell_data)[Number_Of_Internal_Particles_T()] = int_particles.size();
 	}
 }
 
@@ -255,7 +256,7 @@ template<
 /*!
 Removes particles from the external particle list of given cells.
 
-Also clears particle destinations of given cells and updates number_of_particles.
+Updates number of external particles.
 */
 template<
 	class Cell_T,
@@ -267,15 +268,14 @@ template<
 ) {
 	for (auto cell_id: cell_ids) {
 
-		Cell_T* cell_data = grid[cell_id];
+		auto* const cell_data = grid[cell_id];
 		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
 		}
 
 		(*cell_data)[Number_Of_External_Particles_T()] = 0;
-		(*cell_data)[External_Particles_T()].coordinates.clear();
-		(*cell_data)[External_Particles_T()].destinations.clear();
+		(*cell_data)[External_Particles_T()].clear();
 	}
 }
 

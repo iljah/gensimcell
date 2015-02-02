@@ -53,123 +53,14 @@ namespace particle {
 
 
 /*!
-Stores an arbitrary number of 3d particle coordinates and
-provides the corresponding MPI transfer information.
-*/
-struct Internal_Particle_Storage
-{
-	std::vector<std::array<double, 3>> coordinates;
-
-	std::tuple<
-		void*,
-		int,
-		MPI_Datatype
-	> get_mpi_datatype() const
-	{
-		if (3 * this->coordinates.size() > std::numeric_limits<int>::max()) {
-			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
-		}
-
-		return std::make_tuple(
-			(void*) this->coordinates.data(),
-			3 * this->coordinates.size(),
-			MPI_DOUBLE
-		);
-	}
-
-	// resizes internal storage to fit new_size particles
-	void resize(const size_t new_size)
-	{
-		this->coordinates.resize(new_size);
-	}
-};
-
-
-/*!
 Particles whose coordinates are inside of
 the cell in which they are stored.
 */
 struct Internal_Particles
 {
-	using data_type = Internal_Particle_Storage;
+	using data_type = std::vector<std::array<double, 3>>;
 };
 
-
-
-/*!
-Stores an arbitrary number of 3d particle coordinates,
-the particles' destination cells and provides the
-corresponding MPI transfer information.
-*/
-struct External_Particle_Storage
-{
-	std::vector<std::array<double, 3>> coordinates;
-	std::vector<uint64_t> destinations;
-
-	/*!
-	Returns the MPI transfer information corresponding to
-	particle coordinates and their destination cells.
-
-	1st value is starting address, 2nd number of items, 3rd the datatype.
-	In case of error returns NULL, N and MPI_DATATYPE_NULL, where N is:
-		- -1 if the number of doubles in coordinates > maximum int
-		- -2 if MPI_Type_create_struct failed to create the final type
-	*/
-	std::tuple<
-		void*,
-		int,
-		MPI_Datatype
-	> get_mpi_datatype() const
-	{
-		if (3 * this->coordinates.size() > std::numeric_limits<int>::max()) {
-			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
-		}
-
-		std::array<int, 2> counts{{
-			int(3 * this->coordinates.size()),
-			int(1 * this->destinations.size())
-		}};
-
-		std::array<MPI_Aint, 2> displacements{{
-			0,
-			  reinterpret_cast<const char* const>(this->destinations.data())
-			- reinterpret_cast<const char* const>(this->coordinates.data())
-		}};
-
-		std::array<MPI_Datatype, 2> datatypes{{
-			MPI_DOUBLE,
-			MPI_UINT64_T
-		}};
-
-
-		MPI_Datatype final_datatype = MPI_DATATYPE_NULL;
-		if (
-			MPI_Type_create_struct(
-				2,
-				counts.data(),
-				displacements.data(),
-				datatypes.data(),
-				&final_datatype
-			) != MPI_SUCCESS
-		) {
-			return std::make_tuple((void*) NULL, -2, MPI_DATATYPE_NULL);
-		}
-
-
-		return std::make_tuple(
-			(void*) this->coordinates.data(),
-			1,
-			final_datatype
-		);
-	}
-
-	// resizes internal storage to fit new_size particles
-	void resize(const size_t new_size)
-	{
-		this->coordinates.resize(new_size);
-		this->destinations.resize(new_size);
-	}
-};
 
 
 /*!
@@ -179,7 +70,13 @@ assigned to the storage of a different cell.
 */
 struct External_Particles
 {
-	using data_type = External_Particle_Storage;
+	using data_type
+		= std::vector<
+			std::pair<
+				std::array<double, 3>, // coordinate
+				unsigned long long int // destination cell
+			>
+		>;
 };
 
 
@@ -191,7 +88,7 @@ data be known prior to the transfer.
 */
 struct Number_Of_Internal_Particles
 {
-	using data_type = unsigned long int;
+	using data_type = unsigned long long int;
 };
 
 
@@ -203,7 +100,7 @@ data be known prior to the transfer.
 */
 struct Number_Of_External_Particles
 {
-	using data_type = unsigned long int;
+	using data_type = unsigned long long int;
 };
 
 

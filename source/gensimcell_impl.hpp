@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(MPI_VERSION) && (MPI_VERSION >= 2)
 
+#include "tuple"
+
 #include "boost/logic/tribool.hpp"
 
 #endif // ifdef MPI_VERSION

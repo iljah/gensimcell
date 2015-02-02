@@ -55,7 +55,7 @@ struct test_variable2 {
 struct test_variable3 {
 	using data_type
 		= std::array<
-			std::tuple<long double, char>,
+			std::pair<long double, char>,
 			2
 		>;
 };
@@ -368,10 +368,13 @@ int main(int argc, char* argv[])
 		}
 		MPI_Type_free(&datatype);
 		CHECK_TRUE(
-			get<0>(c3[v3][0]) == 4.0
-			and get<1>(c3[v3][0]) == 'n'
-			and get<0>(c3[v3][1]) == -4.0
-			and get<1>(c3[v3][1]) == 'a'
+			get<0>(c3[v3][0]) == 4.0)
+		CHECK_TRUE(
+			 get<1>(c3[v3][0]) == 'n')
+		CHECK_TRUE(
+			 get<0>(c3[v3][1]) == -4.0)
+		CHECK_TRUE(
+			 get<1>(c3[v3][1]) == 'a'
 		)
 
 		c4[v4].resize(2);

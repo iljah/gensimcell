@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cmath"
 #include "cstdlib"
 #include "iostream"
-#include "mpi.h"
 #include "vector"
 
 #include "dccrg.hpp"
 #include "dccrg_cartesian_geometry.hpp"
+#include "mpi.h" // must be included before gensimcell
 #include "gensimcell.hpp"
 
 #include "particle_initialize.hpp"
@@ -186,8 +186,8 @@ int main(int argc, char* argv[])
 
 		/*
 		Wait for particle counts in external lists of
-		outer cells to arrive and allocate memory required
-		for particle coordinates.
+		remote neighbors to arrive and allocate memory
+		required for particle coordinates.
 		*/
 		grid.wait_remote_neighbor_copy_update_receives();
 		particle::resize_receiving_containers<

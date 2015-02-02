@@ -69,7 +69,7 @@ void reference_initialize(
 			center = grid.geometry.get_center(cell_id),
 			length = grid.geometry.get_length(cell_id);
 
-		Reference_Cell* cell_data = grid[cell_id];
+		auto* const cell_data = grid[cell_id];
 		if (cell_data == NULL) {
 			std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 			abort();
@@ -91,22 +91,24 @@ void reference_initialize(
 			continue;
 		}
 
-		cell_data->number_of_internal_particles = 3;
-		cell_data->internal_coordinates.push_back({{
+		cell_data->internal_particles.push_back({{
 				center[0] - length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
 		}});
-		cell_data->internal_coordinates.push_back({{
+		cell_data->internal_particles.push_back({{
 				center[0],
 				center[1] + length[1] / 4,
 				center[2]
 		}});
-		cell_data->internal_coordinates.push_back({{
+		cell_data->internal_particles.push_back({{
 				center[0] + length[0] / 4,
 				center[1] - length[1] / 4,
 				center[2]
 		}});
+
+		cell_data->number_of_internal_particles
+			= cell_data->internal_particles.size();
 	}
 }
 

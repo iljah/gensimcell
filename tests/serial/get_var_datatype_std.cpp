@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "complex"
 #include "cstdlib"
 #include "iostream"
+#include "tuple"
+#include "vector"
+
 #include "mpi.h"
 
 #include "check_true.hpp"
@@ -41,7 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace std;
 
-int main(int, char**) {
+int main(int argc, char* argv[]) {
+	if (MPI_Init(&argc, &argv) != MPI_SUCCESS) {
+		std::cerr << "Couldn't initialize MPI." << std::endl;
+		abort();
+	}
 
 	void* address = NULL;
 	int count = -1;
@@ -70,11 +77,11 @@ int main(int, char**) {
 	)
 
 
-	signed long long int i;
+	signed long long int a;
 	std::tie(address, count, datatype)
-		= gensimcell::detail::get_var_mpi_datatype(i);
+		= gensimcell::detail::get_var_mpi_datatype(a);
 	CHECK_TRUE(
-		address == &i
+		address == &a
 		and count == 1
 		and datatype == MPI_LONG_LONG_INT
 	)
@@ -113,6 +120,105 @@ int main(int, char**) {
 	)
 	#endif
 
+
+	std::vector<int> g;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(g);
+	CHECK_TRUE(
+		address == g.data()
+		and count == 0
+		and datatype == MPI_INT
+	)
+
+	g.insert(g.end(), {-1, 1, -2, 2});
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(g);
+	CHECK_TRUE(
+		address == g.data()
+		and count == 4
+		and datatype == MPI_INT
+		and *(static_cast<int*>(address) + 2) == -2
+	)
+
+
+	std::tuple<> h0;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(h0);
+	CHECK_TRUE(
+		address == nullptr
+		and count == 0
+	)
+
+	std::tuple<long double> h1;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(h1);
+	CHECK_TRUE(
+		address == &(std::get<0>(h1))
+		and count == 1
+		and datatype == MPI_LONG_DOUBLE
+	)
+
+	std::tuple<char, int, double> h;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(h);
+	CHECK_TRUE(
+		address == &(std::get<0>(h))
+		and count == 1
+	)
+
+
+	std::vector<std::tuple<double, char>> i;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(i);
+	CHECK_TRUE(
+		address == nullptr
+		and count == 0
+	)
+
+	i.emplace_back(3, 'a');
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(i);
+	CHECK_TRUE(
+		address == &(get<0>(i[0]))
+		and count == 1
+	)
+
+
+	std::vector<std::vector<std::array<std::tuple<int, char>, 3>>> j;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(j);
+	CHECK_TRUE(
+		address == nullptr
+		and count == 0
+	)
+
+	j.resize(1);
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(j);
+	CHECK_TRUE(
+		address == nullptr
+		and count == 0
+	)
+
+	j[0].resize(1);
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(j);
+	CHECK_TRUE(
+		address == &(std::get<0>(j[0][0][0]))
+		and count == 1
+	)
+
+
+	std::pair<std::tuple<int>, std::tuple<double, char>> k;
+	std::tie(address, count, datatype)
+		= gensimcell::detail::get_var_mpi_datatype(k);
+	CHECK_TRUE(
+		address == &(std::get<0>(k.first))
+		and count == 1
+	)
+
+
+	MPI_Finalize();
 
 	return EXIT_SUCCESS;
 }
