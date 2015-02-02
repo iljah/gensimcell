@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cmath"
 #include "cstdlib"
 #include "iostream"
-#include "mpi.h"
+#include "vector"
 
 #include "dccrg.hpp"
 #include "dccrg_cartesian_geometry.hpp"
+#include "mpi.h" // must be included before gensimcell
 #include "gensimcell.hpp"
 
 #include "particle_initialize.hpp"
@@ -139,7 +140,7 @@ int main(int argc, char* argv[])
 	double
 		simulation_time = 0,
 		time_step = 0;
-	while (simulation_time <= M_PI) {
+	while (simulation_time < M_PI) {
 
 		double next_time_step = std::numeric_limits<double>::max();
 
@@ -173,8 +174,8 @@ int main(int argc, char* argv[])
 
 
 		/*
-		Propagate particles in outer cells first so the number
-		of external particles can be sent to other processes.
+		Propagate particles in outer cells first so the number of
+		resulting external particles can be sent to other processes.
 		*/
 		next_time_step
 			= std::min(
@@ -190,15 +191,15 @@ int main(int argc, char* argv[])
 			);
 
 		/*
-		Update number of particles in external lists of outer cells
+		Update number of particles in external lists of remote neighbors
 		so that receiving processes can allocate memory for coordinates.
 		*/
 		Cell::set_transfer_all(true, particle::Number_Of_External_Particles());
 		grid.start_remote_neighbor_copy_updates();
 
 		/*
-		Propagate particles in inner cells while number of
-		particles in external lists of outer cells is transferred.
+		Propagate particles in inner cells while number of particles
+		in external lists of remote neighbors is transferred.
 		*/
 		next_time_step
 			= std::min(
@@ -215,8 +216,8 @@ int main(int argc, char* argv[])
 
 		/*
 		Wait for particle counts in external lists of
-		outer cells to arrive and allocate memory required
-		for particle coordinates.
+		remote neighbors to arrive and allocate memory
+		required for particle coordinates.
 		*/
 		grid.wait_remote_neighbor_copy_update_receives();
 		particle::resize_receiving_containers<
