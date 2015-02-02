@@ -96,6 +96,7 @@ void print_game(const Cell_T& cell, const int rank, const int comm_size)
 
 int main(int argc, char* argv[])
 {
+	// shorthand notation for referring to variables
 	const Is_Alive is_alive{};
 	const Live_Neighbors live_neighbors{};
 
