@@ -127,8 +127,9 @@ int main(int argc, char* argv[])
 
 
 	if (
-		fabs(run_time - ref_run_time)
-		<= allowed_relative_difference * max(run_time, ref_run_time)
+		run_time < ref_run_time
+		or fabs(run_time - ref_run_time)
+			<= allowed_relative_difference * max(run_time, ref_run_time)
 	) {
 		return EXIT_SUCCESS;
 	}
