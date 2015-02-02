@@ -42,7 +42,7 @@ using namespace std;
 Variable that records whether
 the cell is alive or not
 */
-struct is_alive
+struct Is_Alive
 {
 	using data_type = bool;
 };
@@ -51,7 +51,7 @@ struct is_alive
 Variable that records the
 number of cell's live neighbors
 */
-struct live_neighbors
+struct Live_Neighbors
 {
 	using data_type = int;
 };
@@ -62,8 +62,8 @@ defined by the variables it holds
 */
 using Cell_T = gensimcell::Cell<
 	gensimcell::Never_Transfer,
-	is_alive,
-	live_neighbors
+	Is_Alive,
+	Live_Neighbors
 >;
 
 
@@ -75,7 +75,7 @@ template<class Game_Grid> void print_game(const Game_Grid& grid)
 {
 	for (const auto& row: grid) {
 		for (const auto& cell: row) {
-			if (cell[is_alive()]) {
+			if (cell[Is_Alive()]) {
 				cout << "0";
 			} else {
 				cout << ".";
@@ -97,18 +97,23 @@ int main(int, char**)
 	array<array<Cell_T, width>, height> grid;
 
 
+	// shorthand notation for referring to variables
+	const Is_Alive is_alive{};
+	const Live_Neighbors live_neighbors{};
+
+
 	// initialize the game with a glider at upper left
 	for (auto& row: grid) {
 		for (auto& cell: row) {
-			cell[is_alive()] = false;
-			cell[live_neighbors()] = 0;
+			cell[is_alive] = false;
+			cell[live_neighbors] = 0;
 		}
 	}
-	grid[1][2][is_alive()] = true;
-	grid[2][3][is_alive()] = true;
-	grid[3][3][is_alive()] = true;
-	grid[3][2][is_alive()] = true;
-	grid[3][1][is_alive()] = true;
+	grid[1][2][is_alive] = true;
+	grid[2][3][is_alive] = true;
+	grid[3][3][is_alive] = true;
+	grid[3][2][is_alive] = true;
+	grid[3][1][is_alive] = true;
 
 
 	constexpr size_t max_turns = 4;
@@ -136,8 +141,8 @@ int main(int, char**)
 						(cell_i + cell_offset) % width
 					];
 
-				if (neighbor[is_alive()]) {
-					current_cell[live_neighbors()]++;
+				if (neighbor[is_alive]) {
+					current_cell[live_neighbors]++;
 				}
 			}
 		}
@@ -147,12 +152,12 @@ int main(int, char**)
 		for (size_t cell_i = 0; cell_i < grid[row_i].size(); cell_i++) {
 
 			auto& cell = grid[row_i][cell_i];
-			if (cell[live_neighbors()] == 3) {
-				cell[is_alive()] = true;
-			} else if (cell[live_neighbors()] != 2) {
-				cell[is_alive()] = false;
+			if (cell[live_neighbors] == 3) {
+				cell[is_alive] = true;
+			} else if (cell[live_neighbors] != 2) {
+				cell[is_alive] = false;
 			}
-			cell[live_neighbors()] = 0;
+			cell[live_neighbors] = 0;
 		}
 	}
 
