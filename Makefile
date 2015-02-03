@@ -100,6 +100,7 @@ EXECUTABLES = \
 
 MPI_EXECS = \
   examples/game_of_life/parallel/no_dccrg.mexe \
+  examples/custom_variable.mexe \
   tests/compile/enable_if.mexe \
   tests/compile/get_var_mpi_datatype_included.mexe \
   tests/compile/cell_included.mexe \
@@ -110,6 +111,7 @@ MPI_EXECS = \
   tests/compile/many_variables_recursive.mexe \
   tests/compile/identical_names.mexe \
   tests/serial/get_var_datatype_std.mexe \
+  tests/serial/get_var_datatype_custom.mexe \
   tests/serial/transfer_one_cell_one_variable.mexe \
   tests/serial/transfer_one_cell_many_variables.mexe \
   tests/serial/transfer_many_cells_one_variable.mexe \
@@ -148,6 +150,7 @@ DCCRG_EXECS = \
 
 TESTS = \
   tests/serial/get_var_datatype_std.mtst \
+  tests/serial/get_var_datatype_custom.mtst \
   tests/serial/get_var_datatype_eigen.etst \
   tests/serial/one_variable.tst \
   tests/serial/many_variables.tst \
