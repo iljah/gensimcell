@@ -284,6 +284,11 @@ int main(int argc, char* argv[])
 		lists of outer cells to arrive to other processes.
 		*/
 		grid.wait_remote_neighbor_copy_update_sends();
+		Cell::set_transfer_all(
+			false,
+			particle::Velocity(),
+			particle::External_Particles()
+		);
 
 		/*
 		Once local external lists have arrived to other

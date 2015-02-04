@@ -210,6 +210,11 @@ int main(int argc, char* argv[])
 		>(inner_cells, grid);
 
 		grid.wait_remote_neighbor_copy_update_sends();
+		Cell::set_transfer_all(
+			false,
+			advection::Density(),
+			advection::Velocity()
+		);
 
 		advection::apply_solution<
 			Cell,

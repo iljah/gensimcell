@@ -190,6 +190,7 @@ int main(int argc, char* argv[])
 		those local cells
 		*/
 		grid.wait_remote_neighbor_copy_update_sends();
+		Cell::set_transfer_all(false, gol::Is_Alive());
 
 		gol::apply_solution<
 			Cell,
