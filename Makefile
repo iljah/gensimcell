@@ -51,8 +51,7 @@ HEADERS = \
 %.eexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) -DHAVE_MPI -DHAVE_EIGEN $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $(EIGEN_CPPFLAGS) $< -o $@
 
-# these require dccrg (the c++11 version from c++11 branch,
-# https://gitorious.org/dccrg) which also requires Zoltan
+# these require dccrg which also requires Zoltan
 %.dexe: %.cpp $(HEADERS) Makefile
 	@echo "MPICXX "$< && $(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(BOOST_CPPFLAGS) $(DCCRG_CPPFLAGS) $(ZOLTAN_CPPFLAGS) $(ZOLTAN_LDFLAGS) $(ZOLTAN_LIBS) $< -o $@
 
@@ -146,7 +145,8 @@ DCCRG_EXECS = \
   examples/advection/parallel/advection2gnuplot.dexe \
   examples/particle_propagation/parallel/main.dexe \
   examples/particle_propagation/parallel/particle2gnuplot.dexe \
-  examples/combined/parallel.dexe
+  examples/combined/parallel.dexe \
+  examples/combined/parallel_async.dexe
 
 TESTS = \
   tests/serial/get_var_datatype_std.mtst \
