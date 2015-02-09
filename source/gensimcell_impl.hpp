@@ -454,7 +454,7 @@ public:
 	If given a determined tribool (true or false) the given
 	variables will or will not be included in the MPI_Datatype
 	returned by get_mpi_datatype() of all instances of this
-	cell type. Setting an underemined value here will make
+	cell type. Setting a boost::indeterminate value here will make
 	the decision of whether to include a variable or not in
 	the MPI transfer info to be decided on a cell by cell
 	basis controlled by set_transfer().
