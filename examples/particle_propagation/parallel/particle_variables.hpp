@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "array"
-#include "mpi.h"
 #include "tuple"
 #include "vector"
 
+#include "mpi.h" // must be included before gensimcell
 #include "gensimcell.hpp"
 
 
