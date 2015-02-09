@@ -155,12 +155,12 @@ int main(int argc, char* argv[])
 		inner_cells = grid.get_local_cells_not_on_process_boundary(),
 		outer_cells = grid.get_local_cells_on_process_boundary();
 
-	const double advection_save_interval = 0.1;
-	const double particle_save_interval = 0.1;
+	/*const double advection_save_interval = 0.1;
+	const double particle_save_interval = 0.1;*/
 
 	double
-		advection_next_save = 0,
-		particle_next_save = 0,
+		/*advection_next_save = 0,
+		particle_next_save = 0,*/
 		simulation_time = 0,
 		time_step = 0;
 
