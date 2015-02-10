@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "array"
-#include "mpi.h"
 #include "tuple"
 #include "vector"
+
+#include "mpi.h"
 
 namespace particle {
 
@@ -127,81 +128,92 @@ struct Reference_Cell
 			nr_vars_to_transfer++;
 		}
 
-		if ((transfers & transfer_types::int_particles) > 0) {
+		if (
+			(transfers & transfer_types::int_particles) > 0
+			and this->internal_particles.size() > 0
+		) {
 			if (nr_vars_to_transfer == 0) {
 				starting_address = (void*) this->internal_particles.data();
 			}
 
-			if (this->internal_particles.size() == 0) {
-
-				counts[nr_vars_to_transfer] = 0;
-				datatypes[nr_vars_to_transfer] = MPI_BYTE;
-
-			} else {
-
-				counts[nr_vars_to_transfer] = 3 * this->internal_particles.size();
-				datatypes[nr_vars_to_transfer] = MPI_DOUBLE;
-			}
-
+			counts[nr_vars_to_transfer] = 3 * this->internal_particles.size();
+			datatypes[nr_vars_to_transfer] = MPI_DOUBLE;
 			displacements[nr_vars_to_transfer]
 				= reinterpret_cast<const char* const>(this->internal_particles.data())
 				- reinterpret_cast<const char* const>(starting_address);
 			nr_vars_to_transfer++;
 		}
 
-		if ((transfers & transfer_types::ext_particles) > 0) {
+		if (
+			(transfers & transfer_types::ext_particles) > 0
+			and this->external_particles.size() > 0
+		) {
 			if (nr_vars_to_transfer == 0) {
 				starting_address = (void*) this->external_particles.data();
 			}
 
-			if (this->external_particles.size() == 0) {
-
-				counts[nr_vars_to_transfer] = 0;
-				datatypes[nr_vars_to_transfer] = MPI_BYTE;
-
-			} else {
-
-				std::vector<int> temp_counts;
-				std::vector<MPI_Aint> temp_displacements;
-				std::vector<MPI_Datatype> temp_datatypes;
-
-				for (const auto& ext_particle: this->external_particles) {
-					temp_counts.push_back(3);
-					temp_displacements.push_back(
-						reinterpret_cast<const char* const>(&ext_particle.first[0])
-						- reinterpret_cast<const char* const>(this->external_particles.data())
-					);
-					temp_datatypes.push_back(MPI_DOUBLE);
-
-					temp_counts.push_back(1);
-					temp_displacements.push_back(
-						reinterpret_cast<const char* const>(&ext_particle.second)
-						- reinterpret_cast<const char* const>(this->external_particles.data())
-					);
-					temp_datatypes.push_back(MPI_UNSIGNED_LONG_LONG);
-				}
-
-				MPI_Datatype ext_particles_type;
-				if (
-					MPI_Type_create_struct(
-						int(temp_counts.size()),
-						temp_counts.data(),
-						temp_displacements.data(),
-						temp_datatypes.data(),
-						&ext_particles_type
-					) != MPI_SUCCESS
-				) {
-					std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
-					abort();
-				}
-
-				counts[nr_vars_to_transfer] = 1;
-				datatypes[nr_vars_to_transfer] = ext_particles_type;
+			// datatype for one particle
+			std::array<int, 2> temp_counts{{3, 1}};
+			std::array<MPI_Aint, 2> temp_displacements{{
+				0,
+				reinterpret_cast<const char* const>(
+					&(this->external_particles[0].second)
+				)
+				- reinterpret_cast<const char* const>(
+					&(this->external_particles[0].first[0])
+				)
+			}};
+			std::array<MPI_Datatype, 2> temp_datatypes{{
+				MPI_DOUBLE,
+				MPI_UNSIGNED_LONG_LONG
+			}};
+			MPI_Datatype temp_datatype;
+			if (
+				MPI_Type_create_struct(
+					int(temp_counts.size()),
+					temp_counts.data(),
+					temp_displacements.data(),
+					temp_datatypes.data(),
+					&temp_datatype
+				) != MPI_SUCCESS
+			) {
+				return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
 			}
 
+			// datatype for all particles
+			const auto size = this->external_particles.size();
+			std::vector<int> temp2_counts(size, 1);
+			std::vector<MPI_Datatype> temp2_datatypes(size, temp_datatype);
+
+			std::vector<MPI_Aint> temp2_displacements;
+			temp2_displacements.reserve(size);
+			for (const auto& ext_particle: this->external_particles) {
+				temp2_displacements.emplace_back(
+					reinterpret_cast<const char* const>(&(ext_particle.first[0]))
+					- reinterpret_cast<const char* const>(this->external_particles.data())
+				);
+			}
+
+			MPI_Datatype ext_particles_type;
+			if (
+				MPI_Type_create_struct(
+					int(temp2_counts.size()),
+					temp2_counts.data(),
+					temp2_displacements.data(),
+					temp2_datatypes.data(),
+					&ext_particles_type
+				) != MPI_SUCCESS
+			) {
+				return std::make_tuple((void*) NULL, -2, MPI_DATATYPE_NULL);
+			}
+
+			datatypes[nr_vars_to_transfer] = ext_particles_type;
 			displacements[nr_vars_to_transfer]
 				= reinterpret_cast<const char* const>(this->external_particles.data())
 				- reinterpret_cast<const char* const>(starting_address);
+			MPI_Type_free(&temp_datatype);
+
+			counts[nr_vars_to_transfer] = 1;
 			nr_vars_to_transfer++;
 		}
 
@@ -214,7 +226,7 @@ struct Reference_Cell
 				&final_datatype
 			) != MPI_SUCCESS
 		) {
-			return std::make_tuple((void*) NULL, -1, MPI_DATATYPE_NULL);
+			return std::make_tuple((void*) NULL, -3, MPI_DATATYPE_NULL);
 		}
 
 		// maybe free component types

@@ -31,16 +31,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "array"
-#include "boost/lexical_cast.hpp"
 #include "chrono"
 #include "cmath"
 #include "cstdlib"
 #include "iostream"
-#include "mpi.h"
 #include "vector"
 
+#include "boost/lexical_cast.hpp"
 #include "dccrg.hpp"
 #include "dccrg_cartesian_geometry.hpp"
+#include "mpi.h"
 
 #include "reference_cell.hpp"
 #include "reference_initialize.hpp"
@@ -165,6 +165,7 @@ int main(int argc, char* argv[])
 		required for particle coordinates.
 		*/
 		grid.wait_remote_neighbor_copy_update_receives();
+
 		particle::reference_resize(grid);
 
 		grid.wait_remote_neighbor_copy_update_sends();
