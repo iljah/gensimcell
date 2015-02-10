@@ -506,7 +506,7 @@ template <
 	std::vector<int> counts(size, 0);
 	std::vector<MPI_Datatype> datatypes(size, MPI_BYTE);
 
-	// skip cells with nothing to transfer
+	// skip items with nothing to transfer
 	size_t items_to_transfer = 0;
 	for (size_t i = 0; i < size; i++) {
 		std::tie(
