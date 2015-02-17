@@ -84,6 +84,7 @@ EXECUTABLES = \
   tests/serial/one_variable_recursive.exe \
   tests/serial/get_variable.exe \
   tests/serial/many_variables_recursive.exe \
+  tests/serial/operators/equal.exe \
   tests/serial/operators/plus.exe \
   tests/serial/operators/minus.exe \
   tests/serial/operators/mul.exe \
@@ -162,6 +163,7 @@ TESTS = \
   tests/serial/transfer_many_cells_one_variable.mtst \
   tests/serial/transfer_many_cells_many_variables.mtst \
   tests/serial/transfer_recursive.mtst \
+  tests/serial/operators/equal.tst \
   tests/serial/operators/plus.tst \
   tests/serial/operators/minus.tst \
   tests/serial/operators/mul.tst \

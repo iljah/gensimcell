@@ -179,6 +179,7 @@ protected:
 		this->data OPERATOR rhs; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(equal_impl, =)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(plus_equal_impl, +=)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(minus_equal_impl, -=)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION(mul_equal_impl, *=)
@@ -282,6 +283,7 @@ public:
 		return *this; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR(equal, equal_impl, =)
 	GENSIMCELL_MAKE_OPERATOR(plus_equal, plus_equal_impl, +=)
 	GENSIMCELL_MAKE_OPERATOR(minus_equal, minus_equal_impl, -=)
 	GENSIMCELL_MAKE_OPERATOR(mul_equal, mul_equal_impl, *=)
@@ -335,6 +337,24 @@ public:
 		return *this; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, bool)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, signed char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, float)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, double)
+	GENSIMCELL_MAKE_OPERATOR_OTHER(equal, equal_impl, =, long double)
 	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, bool)
 	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, char)
 	GENSIMCELL_MAKE_OPERATOR_OTHER(plus_equal, plus_equal_impl, +=, char16_t)
@@ -641,6 +661,7 @@ protected:
 		this->data OPERATOR rhs; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(equal_impl, =)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(plus_equal_impl, +=)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(minus_equal_impl, -=)
 	GENSIMCELL_MAKE_OPERATOR_IMPLEMENTATION_LAST(mul_equal_impl, *=)
@@ -709,6 +730,7 @@ public:
 		return *this; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR_LAST(equal_impl, =)
 	GENSIMCELL_MAKE_OPERATOR_LAST(plus_equal_impl, +=)
 	GENSIMCELL_MAKE_OPERATOR_LAST(minus_equal_impl, -=)
 	GENSIMCELL_MAKE_OPERATOR_LAST(mul_equal_impl, *=)
@@ -729,6 +751,24 @@ public:
 		return *this; \
 	}
 
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, bool)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, char16_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, char32_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, wchar_t)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, signed char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, unsigned char)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, unsigned short)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, unsigned int)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, unsigned long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, unsigned long long)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, float)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, double)
+	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(equal_impl, =, long double)
 	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, bool)
 	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, char)
 	GENSIMCELL_MAKE_OPERATOR_LAST_OTHER(plus_equal_impl, +=, char16_t)
