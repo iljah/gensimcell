@@ -23,6 +23,7 @@ HEADERS = \
   examples/particle_propagation/parallel/particle_save.hpp \
   examples/particle_propagation/parallel/particle_solve.hpp \
   examples/particle_propagation/parallel/particle_variables.hpp \
+  source/assign.hpp \
   source/gensimcell.hpp \
   source/gensimcell_impl.hpp \
   source/get_var_mpi_datatype.hpp \
@@ -79,6 +80,7 @@ EXECUTABLES = \
   tests/compile/one_variable_recursive.exe \
   tests/compile/many_variables_recursive.exe \
   tests/compile/identical_names.exe \
+  tests/compile/assign_different_cells.exe \
   tests/serial/one_variable.exe \
   tests/serial/many_variables.exe \
   tests/serial/one_variable_recursive.exe \

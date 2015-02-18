@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tuple"
 
+#include "assign.hpp"
 #include "operators.hpp"
 #include "type_support.hpp"
 #include "gensimcell_impl.hpp"
@@ -163,6 +164,14 @@ public:
 		sizeof...(Variables),
 		Variables...
 	>;
+
+
+	/*!
+	*/
+	template<class Other> void assign(const Other& other)
+	{
+		gensimcell::assign(*this, other);
+	}
 
 
 	#if defined(MPI_VERSION) && (MPI_VERSION >= 2)
