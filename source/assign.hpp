@@ -75,6 +75,8 @@ Assigns all common variables from source to target cell.
 
 For each common variable of given cells does:
 target[Variable()] = source[Variable()]
+
+Does not change whether variables are transferred with MPI.
 */
 template<
 	template<class> class Transfer_Policy1,

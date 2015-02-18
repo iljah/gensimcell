@@ -94,6 +94,7 @@ EXECUTABLES = \
   tests/serial/game_of_life/speed.exe \
   tests/serial/game_of_life/speed_reference.exe \
   tests/serial/game_of_life/main.exe \
+  tests/serial/assign_different_cells.exe \
   tests/parallel/particle_propagation/main.exe \
   examples/game_of_life/serial.exe \
   examples/game_of_life/non_cellular.exe \
@@ -171,6 +172,7 @@ TESTS = \
   tests/serial/operators/mul.tst \
   tests/serial/operators/div.tst \
   tests/serial/game_of_life/main.tst \
+  tests/serial/assign_different_cells.tst \
   tests/parallel/one_variable.mtst \
   tests/parallel/one_variable_multicontainer.mtst \
   tests/parallel/many_variables.mtst \
