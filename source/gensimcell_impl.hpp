@@ -37,12 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "array"
 #include "cstdlib"
 #include "limits"
+#include "tuple"
 #include "vector"
 
 
 #if defined(MPI_VERSION) && (MPI_VERSION >= 2)
-
-#include "tuple"
 
 #include "boost/logic/tribool.hpp"
 
@@ -211,6 +210,26 @@ public:
 	const typename Current_Variable::data_type& operator[](const Current_Variable&) const
 	{
 		return this->data;
+	};
+
+	//! Returns references to the data of given variables.
+	template<
+		class... Variables
+	> std::tuple<
+		typename Variables::data_type&...
+	> operator()(const Variables&...)
+	{
+		return std::forward_as_tuple(this->operator[](Variables())...);
+	};
+
+	//! Returns const references to the data of given variables.
+	template<
+		class... Variables
+	> std::tuple<
+		const typename Variables::data_type&...
+	> operator()(const Variables&...) const
+	{
+		return std::forward_as_tuple(this->operator[](Variables())...);
 	};
 
 
@@ -711,6 +730,18 @@ public:
 	const typename Variable::data_type& operator[](const Variable&) const
 	{
 		return this->data;
+	}
+
+	//! See the variadic version of Cell_impl for documentation
+	std::tuple<typename Variable::data_type&> operator()(const Variable&)
+	{
+		return std::forward_as_tuple(this->data);
+	}
+
+	//! See the variadic version of Cell_impl for documentation
+	std::tuple<const typename Variable::data_type&> operator()(const Variable&) const
+	{
+		return std::forward_as_tuple(this->data);
 	}
 
 

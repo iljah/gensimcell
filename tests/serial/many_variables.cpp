@@ -71,7 +71,19 @@ int main(int, char**)
 	CHECK_TRUE(cell[test_variable1()] == 3)
 	CHECK_TRUE(cell[test_variable2()] == 1.5)
 	CHECK_TRUE(cell[test_variable3()] == '3')
-
+	cell(
+		test_variable1(),
+		test_variable2(),
+		test_variable3()
+	) = std::make_tuple(1, 1.25, '4');
+	CHECK_TRUE(cell[test_variable1()] == 1);
+	CHECK_TRUE(cell[test_variable2()] == 1.25);
+	CHECK_TRUE(cell[test_variable3()] == '4');
+	test_variable1::data_type a = 0;
+	test_variable2::data_type b = 0;
+	std::tie(a, b) = cell(test_variable1(), test_variable2());
+	CHECK_TRUE(a == 1);
+	CHECK_TRUE(b == 1.25);
 
 	tuple<
 		gensimcell::Cell<
