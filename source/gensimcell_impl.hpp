@@ -204,13 +204,13 @@ public:
 	typename Current_Variable::data_type& operator[](const Current_Variable&)
 	{
 		return this->data;
-	};
+	}
 
 	//! Returns a const reference to the data of given variable.
 	const typename Current_Variable::data_type& operator[](const Current_Variable&) const
 	{
 		return this->data;
-	};
+	}
 
 	//! Returns references to the data of given variables.
 	template<
@@ -220,7 +220,7 @@ public:
 	> operator()(const Variables&...)
 	{
 		return std::forward_as_tuple(this->operator[](Variables())...);
-	};
+	}
 
 	//! Returns const references to the data of given variables.
 	template<
@@ -230,7 +230,7 @@ public:
 	> operator()(const Variables&...) const
 	{
 		return std::forward_as_tuple(this->operator[](Variables())...);
-	};
+	}
 
 
 	/*
