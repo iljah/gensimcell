@@ -82,12 +82,12 @@ struct Live_Neighbors { using data_type = int;};
 @endcode
 An instance of a GoL cell is created by:
 @code
-gensimcell::Cell<Is_Alive, Live_Neighbors> cell;
+gensimcell::Cell<gensimcell::Always_Transfer, Is_Alive, Live_Neighbors> cell;
 @endcode
 And a grid of such cells can be created by:
 @code
-using Cell_T = gensimcell::Cell<Is_Alive, Live_Neighbors>;
-std::array<std::array<Cell_T, 10>, 10> grid;
+using Cell = gensimcell::Cell<gensimcell::Always_Transfer, Is_Alive, Live_Neighbors>;
+std::array<std::array<Cell, 10>, 10> grid;
 @endcode
 Access to the data of each variable is provided by the []
 operator overloaded for the class type:
