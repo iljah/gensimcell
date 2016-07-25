@@ -1,7 +1,7 @@
 /*
 Tests that transfer logic works when the cell is used as a variable in a cell.
 
-Copyright 2013, 2014, 2015 Ilja Honkonen
+Copyright 2013, 2014, 2015, 2016 Ilja Honkonen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
