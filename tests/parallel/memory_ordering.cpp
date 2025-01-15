@@ -28,6 +28,9 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Author(s): Ilja Honkonen
 */
 
 /*!
@@ -36,6 +39,7 @@ end up as first in memory when transferred.
 */
 
 #include "cstdlib"
+#include "iostream"
 #include "mpi.h"
 #include "tuple"
 
@@ -72,6 +76,9 @@ using cell321_t = gensimcell::Cell<
 
 int main(int argc, char* argv[])
 {
+	using std::cerr;
+	using std::endl;
+
 	if (MPI_Init(&argc, &argv) != MPI_SUCCESS) {
 		cerr << "Couldn't initialize MPI." << endl;
 		abort();

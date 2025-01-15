@@ -28,6 +28,9 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Author(s): Ilja Honkonen
 */
 
 /*!
@@ -36,6 +39,7 @@ end up as first in memory when transferred.
 */
 
 #include "cstdlib"
+#include "iostream"
 #include "mpi.h"
 
 #include "gensimcell.hpp"
@@ -80,6 +84,9 @@ using cell_optional_t = gensimcell::Cell<
 
 int main(int, char**)
 {
+	using std::cerr;
+	using std::endl;
+
 	const test_variable1 v1{};
 	const test_variable2 v2{};
 	const test_variable3 v3{};
@@ -91,14 +98,14 @@ int main(int, char**)
 		*never_addr_v3 = &never[v3];
 
 	if (abs(never_addr_v1 - never_addr_v2) != 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Memory offset between variables should be 1 byte."
-			<< std::endl;
+			<< endl;
 	}
 	if (abs(never_addr_v2 - never_addr_v3) != 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Memory offset between variables should be 1 byte."
-			<< std::endl;
+			<< endl;
 	}
 
 	cell_always_t always;
@@ -108,14 +115,14 @@ int main(int, char**)
 		*always_addr_v3 = &always[v3];
 
 	if (abs(always_addr_v1 - always_addr_v2) != 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Memory offset between variables should be 1 byte."
-			<< std::endl;
+			<< endl;
 	}
 	if (abs(always_addr_v2 - always_addr_v3) != 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Memory offset between variables should be 1 byte."
-			<< std::endl;
+			<< endl;
 	}
 
 	cell_optional_t optional;
@@ -125,14 +132,14 @@ int main(int, char**)
 		*optional_addr_v3 = &optional[v3];
 
 	if (abs(optional_addr_v1 - optional_addr_v2) == 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Unexpected memory offset of 1 byte between variables."
-			<< std::endl;
+			<< endl;
 	}
 	if (abs(optional_addr_v2 - optional_addr_v3) == 1) {
-		std::cerr << __FILE__ << ":" << __LINE__
+		cerr << __FILE__ << ":" << __LINE__
 			<< " Unexpected memory offset of 1 byte between variables."
-			<< std::endl;
+			<< endl;
 	}
 
 	return EXIT_SUCCESS;
