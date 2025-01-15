@@ -28,6 +28,9 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Author(s): Ilja Honkonen
 */
 
 #ifndef GENSIMCELL_IMPL_HPP
@@ -64,7 +67,11 @@ template <
 	template<class> class Transfer_Policy,
 	size_t number_of_variables,
 	class... Variables
-> class Cell_impl {};
+> class Cell_impl {
+public:
+	Cell_impl() = default;
+	Cell_impl(const Cell_impl&) = default;
+};
 
 
 /*!
@@ -187,6 +194,8 @@ protected:
 
 
 public:
+	Cell_impl() = default;
+	Cell_impl(const Cell_impl&) = default;
 
 
 	/*!
@@ -719,6 +728,8 @@ protected:
 
 
 public:
+	Cell_impl() = default;
+	Cell_impl(const Cell_impl&) = default;
 
 	//! See the variadic version of Cell_impl for documentation
 	typename Variable::data_type& operator[](const Variable&)
